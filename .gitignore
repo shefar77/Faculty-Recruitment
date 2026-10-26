@@ -1,0 +1,32 @@
+# Candidate data and ground truth contain real PII (names, emails, phones) —
+# never commit these. See data flow in the project's CLAUDE.md.
+data/
+
+# Pipeline outputs derived from candidate data (text, JSON, audit files) —
+# also carry real PII.
+output/
+
+# SQLite database (stage 7+) — stores candidate profiles/scores with PII.
+*.db
+*.sqlite
+*.sqlite3
+
+# Standard Python / Node noise
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+frontend/dist/
+.env
+.env.local
+
+# SQLite WAL sidecar files
+*.db-wal
+*.db-shm
+
+# Server logs
+logs/
+
+DESIGN_DECISIONS.md
+KNOWN_DEFECTS.md

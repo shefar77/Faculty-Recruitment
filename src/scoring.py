@@ -1,0 +1,858 @@
+"""
+STAGE 6 - deterministic scoring.
+
+NO LLM. NO NETWORK. Pure Python over the Stage 4 validated profile and the
+Stage 5 verification results. Same input -> same output, every time.
+
+    DEMO/RESEARCH RUBRIC. The criteria, weights and thresholds below are
+    illustrative choices for a student project. They are NOT LNMIIT's
+    hiring criteria and carry no institutional authority.
+
+THREE OUTPUTS, KEPT SEPARATE ON PURPOSE
+  1. eligibility  - a gate: met / not_met / indeterminate. Never a number,
+                    never affected by the score, never affecting it.
+  2. score        - per-criterion points, each traceable to a source field.
+  3. flags        - observations for a human. They move nothing.
+
+Collapsing any of these into the others would destroy information the
+reviewer needs. See DESIGN_DECISIONS.md sections 3 and 4.
+
+EVERY NUMBER CARRIES ITS PROVENANCE
+  Each criterion reports the source field(s) it read and the evidence
+  behind them. A criterion with no evidence scores 0 and says
+  "insufficient evidence" - which must stay distinguishable from scoring 0
+  on present-but-weak evidence, because those call for different decisions.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+from dataclasses import dataclass, field
+from datetime import date, datetime, timezone
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import schema  # noqa: E402
+
+RUBRIC_VERSION = "demo-rubric-v1"
+
+# --- Weights. They sum to 100 (asserted at import). ------------------------
+WEIGHTS = {
+    "publications": 40,     # corroborated peer-reviewed output
+    "teaching_experience": 25,
+    "doctorate": 20,
+    "industry_experience": 10,
+    "research_visibility": 5,   # citations of corroborated work
+}
+assert sum(WEIGHTS.values()) == 100, "weights must sum to 100"
+
+# --- Saturation points: the level at which a criterion earns full marks. ---
+# Set deliberately low for a DEMO rubric; they are not sector norms.
+# Raised from 10 to 20 (user decision, 2026-10-15). At 10, Candidate_04's
+# 19 corroborated papers scored identically to a hypothetical 10-paper
+# candidate: the criterion stopped discriminating exactly among the
+# strongest applicants, where it matters most. Like every number in this
+# rubric, it is a DEMO/RESEARCH choice, not a validated sector norm.
+FULL_MARKS_PUBLICATION_CREDIT = 20.0   # credited publications (see schema)
+FULL_MARKS_TEACHING_YEARS = 5.0
+FULL_MARKS_INDUSTRY_YEARS = 3.0
+FULL_MARKS_CITATIONS = 100
+
+MONTHS = {m: i for i, m in enumerate(
+    ["jan", "feb", "mar", "apr", "may", "jun",
+     "jul", "aug", "sep", "oct", "nov", "dec"], start=1)}
+
+
+# ---------------------------------------------------------------------------
+# Dates and durations
+# ---------------------------------------------------------------------------
+
+def parse_date(value) -> tuple[int, int] | None:
+    """
+    Parse a CV date to (year, month). None when genuinely unreadable.
+
+    Day precision is accepted and discarded - durations here are measured
+    in whole months, so the day adds nothing but a parsing failure.
+
+    FORMATS, and why each is here. Candidate_06's CV printed
+    "Oct 4, 2024" for an Assistant Professor post. Only month-precision
+    forms were handled, so the date failed to parse, the position was
+    discarded as unusable, and the criterion scored 0 with "no teaching
+    position with a readable date range" - a real, documented, currently
+    held academic appointment reported as absent evidence. A parser that
+    rejects an ordinary way of writing a date is not a safeguard, it is a
+    bug, and it fails in the direction this project most wants to avoid.
+    """
+    if value in (None, ""):
+        return None
+    text = str(value).strip().lower()
+    text = text.replace(",", " ")
+    text = re.sub(r"\s+", " ", text).strip()
+
+    def month_of(token: str):
+        return MONTHS.get(token[:3])
+
+    # 2025-08  /  2025-08-14  /  2025/08
+    iso = re.match(r"^(\d{4})[-/](\d{1,2})(?:[-/]\d{1,2})?$", text)
+    if iso:
+        month = int(iso.group(2))
+        if 1 <= month <= 12:
+            return int(iso.group(1)), month
+
+    # 2025
+    if re.match(r"^\d{4}$", text):
+        return int(text), 1
+
+    # aug 2025  /  august 2025  /  aug. 2025  /  sept 2024
+    named = re.match(r"^([a-z]{3,9})\.? (\d{4})$", text)
+    if named and month_of(named.group(1)):
+        return int(named.group(2)), month_of(named.group(1))
+
+    # oct 4 2024  /  october 4 2024   (day dropped)
+    named_day = re.match(r"^([a-z]{3,9})\.? (\d{1,2})(?:st|nd|rd|th)? (\d{4})$", text)
+    if named_day and month_of(named_day.group(1)):
+        return int(named_day.group(3)), month_of(named_day.group(1))
+
+    # 4 oct 2024  /  4th october 2024
+    day_named = re.match(r"^(\d{1,2})(?:st|nd|rd|th)? ([a-z]{3,9})\.? (\d{4})$", text)
+    if day_named and month_of(day_named.group(2)):
+        return int(day_named.group(3)), month_of(day_named.group(2))
+
+    # 2024 oct
+    rev = re.match(r"^(\d{4}) ([a-z]{3,9})\.?$", text)
+    if rev and month_of(rev.group(2)):
+        return int(rev.group(1)), month_of(rev.group(2))
+
+    # 04/10/2024 is ambiguous (day-first vs month-first) and is NOT
+    # guessed at: an unreadable date is reported, never invented.
+    return None
+
+
+def _months(point: tuple[int, int]) -> int:
+    return point[0] * 12 + (point[1] - 1)
+
+
+# --- Teaching role kind, and its weighting --------------------------------
+# A teaching assistantship or lab demonstration is real teaching, but it is
+# less load and less autonomy than running a course as faculty. Counting
+# them per-month identically overstates the assistantship; counting them at
+# zero would erase the only teaching most early-career candidates have.
+#
+# 0.5 is a judgement about a KNOWN role - the CV says "Teaching Assistant" -
+# not an estimate of an unknown, which is what makes it different from the
+# in-progress doctorate case (DESIGN_DECISIONS.md sections 9 and 10).
+ASSISTANTSHIP_CREDIT = 0.5
+
+ASSISTANTSHIP_ROLE = re.compile(
+    r"(teaching assistant|lab instructor|laboratory instructor|"
+    r"teaching assistantship|assistantship|demonstrator|tutor\b|"
+    r"lab assistant)", re.I)
+
+FACULTY_ROLE = re.compile(
+    r"(professor|lecturer|reader|faculty|instructor of record|"
+    r"course coordinator|head of department)", re.I)
+
+
+def classify_teaching_role(position: dict) -> str:
+    """
+    'assistantship' | 'appointment' | 'uncertain'.
+
+    Reads the role title AND the CV section it came from - Candidate_04's
+    assistantship entries are named after the courses taught
+    ("PH-204: Physics Lab IV") and are identifiable only by their
+    "Teaching Assistantship" heading.
+
+    'uncertain' is a real answer. Where the CV's wording and structure do
+    not settle it, the pipeline says so rather than quietly picking a side
+    (user decision, 2026-10-15).
+    """
+    context = f"{position.get('title') or ''} {position.get('source_section') or ''}"
+    is_assistantship = bool(ASSISTANTSHIP_ROLE.search(context))
+    is_faculty = bool(FACULTY_ROLE.search(context))
+
+    if is_assistantship and not is_faculty:
+        return "assistantship"
+    if is_faculty and not is_assistantship:
+        return "appointment"
+    # Neither matched, or both did ("Assistant Professor" vs "Teaching
+    # Assistant" are a single word apart and both can appear in one line).
+    return "uncertain"
+
+
+def subtract_intervals(base: list[tuple[int, int]],
+                       remove: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """Months in `base` not covered by `remove`."""
+    result = []
+    for start, end in base:
+        pieces = [(start, end)]
+        for cut_start, cut_end in remove:
+            nxt = []
+            for piece_start, piece_end in pieces:
+                if cut_end <= piece_start or cut_start >= piece_end:
+                    nxt.append((piece_start, piece_end))
+                    continue
+                if cut_start > piece_start:
+                    nxt.append((piece_start, cut_start))
+                if cut_end < piece_end:
+                    nxt.append((cut_end, piece_end))
+            pieces = nxt
+        result.extend(pieces)
+    return result
+
+
+def merge_intervals(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """Merge overlapping [start, end) month ranges."""
+    if not intervals:
+        return []
+    ordered = sorted(intervals)
+    merged = [ordered[0]]
+    for start, end in ordered[1:]:
+        last_start, last_end = merged[-1]
+        if start <= last_end:                 # overlapping or touching
+            merged[-1] = (last_start, max(last_end, end))
+        else:
+            merged.append((start, end))
+    return merged
+
+
+def duration_years(positions: list[dict], categories: set[str],
+                   as_of: date) -> tuple[float, list[dict], list[str]]:
+    """
+    Total years across `categories`, with OVERLAPPING ROLES MERGED.
+
+    Merging rather than summing is deliberate: a candidate holding a
+    lectureship and a teaching assistantship in the same months has not
+    lived through twice the time. Summing would let concurrent roles
+    inflate a total past wall-clock duration.
+
+    Returns (years, evidence rows, problems).
+    """
+    intervals, evidence, problems = [], [], []
+
+    for position in positions:
+        if (position.get("category") or "").lower() not in categories:
+            continue
+
+        start = parse_date(position.get("start_date"))
+        if start is None:
+            problems.append(
+                f"{position.get('title') or 'untitled role'}: unreadable or "
+                f"missing start date {position.get('start_date')!r}")
+            continue
+
+        if position.get("is_current") or not position.get("end_date"):
+            # "Present" resolves against a RECORDED run date, so the same CV
+            # does not silently score differently next year.
+            end = (as_of.year, as_of.month)
+        else:
+            end = parse_date(position.get("end_date"))
+            if end is None:
+                problems.append(
+                    f"{position.get('title') or 'untitled role'}: unreadable "
+                    f"end date {position.get('end_date')!r}")
+                continue
+
+        start_m, end_m = _months(start), _months(end)
+        if end_m < start_m:
+            problems.append(
+                f"{position.get('title') or 'untitled role'}: end precedes start")
+            continue
+
+        intervals.append((start_m, end_m))
+        evidence.append({
+            "title": position.get("title"),
+            "organisation": position.get("organisation"),
+            "category": position.get("category"),
+            "from": position.get("start_date"),
+            "to": position.get("end_date") or f"present ({as_of.isoformat()})",
+            "months": end_m - start_m,
+            "evidence": position.get("evidence", ""),
+        })
+
+    total_months = sum(end - start for start, end in merge_intervals(intervals))
+    return round(total_months / 12.0, 2), evidence, problems
+
+
+# ---------------------------------------------------------------------------
+# Criteria
+# ---------------------------------------------------------------------------
+
+@dataclass
+class Criterion:
+    name: str
+    weight: int
+    raw: float                 # the measured quantity, in its own units
+    unit: str
+    fraction: float            # 0.0 - 1.0 of the weight earned
+    points: float
+    sources: list[str] = field(default_factory=list)
+    evidence: list = field(default_factory=list)
+    insufficient_evidence: bool = False
+    note: str = ""
+    unclassified_roles: list = field(default_factory=list)
+    # True when the pipeline could not reach a verdict - distinct from
+    # scoring zero on evidence. See DESIGN_DECISIONS.md section 12.
+    indeterminate: bool = False
+    indeterminate_entries: int = 0
+
+    def as_dict(self) -> dict:
+        return {
+            "criterion": self.name,
+            "weight": self.weight,
+            "measured": self.raw,
+            "unit": self.unit,
+            "fraction_of_weight": round(self.fraction, 4),
+            "points": round(self.points, 2),
+            "source_fields": self.sources,
+            "evidence": self.evidence,
+            "insufficient_evidence": self.insufficient_evidence,
+            "note": self.note,
+            "unclassified_roles": self.unclassified_roles,
+            "indeterminate": self.indeterminate,
+            "indeterminate_entries": self.indeterminate_entries,
+        }
+
+
+def _capped(value: float, full_marks_at: float) -> float:
+    if full_marks_at <= 0:
+        return 0.0
+    return max(0.0, min(1.0, value / full_marks_at))
+
+
+def score_publications(verified: list[dict]) -> Criterion:
+    """
+    Sum of per-entry credit from schema.CREDIT_MATRIX, with
+    schema.CREDIT_EXCLUSIONS applied FIRST and overriding the matrix.
+    """
+    weight = WEIGHTS["publications"]
+    total, rows, indeterminate = 0.0, [], 0
+
+    for entry in verified:
+        status = entry.get("status") or "unknown"
+        status_class = schema.STATUS_CLASS.get(status, "unknown")
+        outcome = entry["verification"]["outcome"]
+        exclusions = entry.get("credit_exclusions") or []
+
+        if exclusions:
+            credit, reason = 0.0, f"excluded: {', '.join(exclusions)}"
+        else:
+            matrix = schema.CREDIT_MATRIX[(status_class, outcome)]
+            if matrix is schema.INDETERMINATE:
+                credit, reason = 0.0, "lookup failed - INDETERMINATE, needs review"
+                indeterminate += 1
+            else:
+                credit, reason = matrix, f"{status_class} + {outcome}"
+
+        # Visibility rule (DESIGN_DECISIONS.md section 2): an unlabelled,
+        # uncorroborated claim earns nothing but must stay in front of the
+        # reviewer, with wording about OUR knowledge, not their honesty.
+        note = ""
+        if not exclusions and status_class == "unknown" and outcome in (
+                "not_found", "weak_match", "unconfirmed_author"):
+            note = "Unlabeled claim, not independently verifiable."
+
+        total += credit
+        rows.append({
+            "title": entry.get("title"),
+            "status": status,
+            "verification": outcome,
+            "credit": credit,
+            "reason": reason,
+            "note": note,
+            "openalex": entry["verification"].get("openalex_id"),
+            "query_url": entry["verification"].get("query_url"),
+        })
+
+    fraction = _capped(total, FULL_MARKS_PUBLICATION_CREDIT)
+    criterion = Criterion(
+        name="publications",
+        weight=weight,
+        raw=round(total, 2),
+        unit="credited publications",
+        fraction=fraction,
+        points=weight * fraction,
+        sources=["publications[].status", "verification.outcome"],
+        evidence=rows,
+        insufficient_evidence=(not verified),
+        note=(f"full marks at {FULL_MARKS_PUBLICATION_CREDIT} credited "
+              f"publications"),
+    )
+    if not verified:
+        criterion.note = "no publications listed - insufficient evidence"
+    elif indeterminate:
+        # The matrix says INDETERMINATE for these; the arithmetic has to
+        # put SOME number in, and 0.0 is the only safe one. But a 0 that
+        # means "we could not check" must never be presented as a 0 that
+        # means "nothing to credit" - that is a system failure dressed up
+        # as a finding about a person. Flag it loudly instead.
+        criterion.indeterminate = True
+        criterion.indeterminate_entries = indeterminate
+        criterion.note += (
+            f"; {indeterminate} of {len(verified)} entr(ies) could NOT BE "
+            f"LOOKED UP (service unreachable). This score is not reliable "
+            f"and must not be read as a judgement on the candidate's "
+            f"publication record - re-run when the index is reachable")
+    return criterion
+
+
+def teaching_years_weighted(positions: list[dict],
+                            as_of: date) -> tuple[float, list[dict], list[str], list[str]]:
+    """
+    Teaching years with assistantship months counted at ASSISTANTSHIP_CREDIT.
+
+    Appointment and assistantship intervals are merged SEPARATELY, then any
+    months covered by both are removed from the assistantship side. A month
+    in which someone was simultaneously a professor and a TA is counted once,
+    as the professorship - the higher-responsibility role wins rather than
+    the two stacking past wall-clock time.
+
+    Returns (effective years, evidence rows, date problems, uncertainty notes).
+    """
+    buckets: dict[str, list[tuple[int, int]]] = {
+        "appointment": [], "assistantship": []}
+    evidence, problems, uncertain = [], [], []
+
+    for position in positions:
+        if (position.get("category") or "").lower() != "teaching":
+            continue
+
+        start = parse_date(position.get("start_date"))
+        if start is None:
+            problems.append(f"{position.get('title') or 'untitled role'}: "
+                            f"unreadable start date "
+                            f"{position.get('start_date')!r}")
+            continue
+        if position.get("is_current") or not position.get("end_date"):
+            end = (as_of.year, as_of.month)
+        else:
+            end = parse_date(position.get("end_date"))
+            if end is None:
+                problems.append(f"{position.get('title') or 'untitled role'}: "
+                                f"unreadable end date "
+                                f"{position.get('end_date')!r}")
+                continue
+
+        start_m, end_m = _months(start), _months(end)
+        if end_m < start_m:
+            problems.append(f"{position.get('title') or 'untitled role'}: "
+                            f"end precedes start")
+            continue
+
+        kind = classify_teaching_role(position)
+        if kind == "uncertain":
+            # Counted at the FULL rate, and said out loud. Defaulting
+            # downward would penalise the candidate for our inability to
+            # read their CV; defaulting silently either way is what the
+            # reviewer asked us not to do.
+            uncertain.append(
+                f"'{position.get('title')}' could not be classified as a "
+                f"teaching assistantship or a faculty appointment from the "
+                f"CV - counted at the full rate; please check.")
+            kind = "appointment"
+
+        buckets[kind].append((start_m, end_m))
+        evidence.append({
+            "title": position.get("title"),
+            "organisation": position.get("organisation"),
+            "kind": kind,
+            "credit_per_month": (1.0 if kind == "appointment"
+                                 else ASSISTANTSHIP_CREDIT),
+            "from": position.get("start_date"),
+            "to": position.get("end_date") or f"present ({as_of.isoformat()})",
+            "months": end_m - start_m,
+            "evidence": position.get("evidence", ""),
+        })
+
+    appointment = merge_intervals(buckets["appointment"])
+    assistantship = subtract_intervals(
+        merge_intervals(buckets["assistantship"]), appointment)
+
+    appointment_months = sum(e - s for s, e in appointment)
+    assistantship_months = sum(e - s for s, e in assistantship)
+    effective = appointment_months + ASSISTANTSHIP_CREDIT * assistantship_months
+
+    return round(effective / 12.0, 2), evidence, problems, uncertain
+
+
+def score_experience(positions: list[dict], categories: set[str],
+                     key: str, full_marks_at: float, as_of: date) -> Criterion:
+    weight = WEIGHTS[key]
+    uncertain: list[str] = []
+
+    if categories == {"teaching"}:
+        years, evidence, problems, uncertain = teaching_years_weighted(
+            positions, as_of)
+    else:
+        years, evidence, problems = duration_years(positions, categories, as_of)
+
+    fraction = _capped(years, full_marks_at)
+
+    criterion = Criterion(
+        name=key,
+        weight=weight,
+        raw=years,
+        unit=("years (overlapping merged; assistantships at "
+              f"{ASSISTANTSHIP_CREDIT})" if categories == {"teaching"}
+              else "years (overlapping roles merged)"),
+        fraction=fraction,
+        points=weight * fraction,
+        sources=["positions[].category", "positions[].start_date",
+                 "positions[].end_date"],
+        evidence=evidence,
+        insufficient_evidence=(not evidence),
+        note=f"full marks at {full_marks_at} years",
+    )
+    if not evidence:
+        criterion.note = (f"no {'/'.join(sorted(categories))} position with a "
+                          f"readable date range - insufficient evidence")
+    if problems:
+        criterion.note += "; unusable entries: " + "; ".join(problems)
+    if uncertain:
+        criterion.note += "; UNCLASSIFIED: " + " ".join(uncertain)
+        criterion.unclassified_roles = uncertain
+    return criterion
+
+
+def score_doctorate(profile: dict, gate: dict) -> Criterion:
+    """
+    Scored SEPARATELY from the eligibility gate, and never reads it.
+
+    The gate decides whether the person may be appointed at all; this
+    criterion reflects the qualification as one input among several. They
+    are computed independently so neither can quietly contaminate the
+    other (DESIGN_DECISIONS.md section 3).
+    """
+    weight = WEIGHTS["doctorate"]
+    status = _value(profile, "phd_status")
+    year = _value(profile, "phd_year")
+
+    # A withheld claim is NOT the same as absent evidence, and the output
+    # must keep them apart: one means "we could not confirm this", the
+    # other means "there is nothing here". Only the second is
+    # insufficient_evidence.
+    withheld = _rejected(profile, "phd_status")
+
+    if status == "awarded" and year:
+        fraction, note, thin = 1.0, f"doctorate awarded {year}", False
+    elif status == "pursuing" or _value(profile, "highest_degree") == "phd_pursuing":
+        # ZERO, not a part-mark (user decision, 2026-10-15). Awarding 0.5
+        # for an unfinished doctorate would be guessing how far along it
+        # is - a first-year and a thesis-submitted candidate are not the
+        # same, and nothing in a CV reliably tells them apart. Whether an
+        # in-progress PhD makes someone considerable at all is already
+        # answered, separately, by the eligibility gate.
+        fraction, note, thin = 0.0, ("doctorate in progress, not yet awarded - "
+                                     "no credit until the award is evidenced"), False
+    elif withheld:
+        fraction, thin = 0.0, False
+        note = ("a doctorate was reported but Stage 4 withheld the claim - "
+                "scored 0 pending human review, NOT a finding that none exists")
+    else:
+        fraction, note, thin = 0.0, "no doctorate evidenced - insufficient evidence", True
+
+    return Criterion(
+        name="doctorate",
+        weight=weight,
+        raw=fraction,
+        unit="fraction (1.0 awarded, 0.0 until awarded)",
+        fraction=fraction,
+        points=weight * fraction,
+        sources=["phd_status", "phd_year", "highest_degree"],
+        evidence=[{"field": "phd_status",
+                   "evidence": _evidence(profile, "phd_status")}],
+        insufficient_evidence=thin,
+        note=note,
+    )
+
+
+def score_visibility(verified: list[dict]) -> Criterion:
+    """Citations, counted ONLY on corroborated entries."""
+    weight = WEIGHTS["research_visibility"]
+    citations, rows = 0, []
+
+    for entry in verified:
+        if entry.get("credit_exclusions"):
+            continue
+        verification = entry["verification"]
+        if verification["outcome"] not in ("matched", "matched_by_biblio"):
+            continue
+        count = verification.get("cited_by_count") or 0
+        citations += count
+        if count:
+            rows.append({"title": entry.get("title"), "cited_by": count,
+                         "openalex": verification.get("openalex_id")})
+
+    fraction = _capped(citations, FULL_MARKS_CITATIONS)
+    return Criterion(
+        name="research_visibility",
+        weight=weight,
+        raw=citations,
+        unit="citations of corroborated publications",
+        fraction=fraction,
+        points=weight * fraction,
+        sources=["verification.cited_by_count"],
+        evidence=rows,
+        insufficient_evidence=(citations == 0),
+        note=("no citations on corroborated work - insufficient evidence"
+              if citations == 0 else
+              f"full marks at {FULL_MARKS_CITATIONS} citations"),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Eligibility gate and reviewer flags
+# ---------------------------------------------------------------------------
+
+def _value(profile: dict, key: str):
+    entry = profile.get(key) or {}
+    return entry.get("value") if isinstance(entry, dict) else None
+
+
+def _evidence(profile: dict, key: str) -> str:
+    entry = profile.get(key) or {}
+    return entry.get("evidence", "") if isinstance(entry, dict) else ""
+
+
+def _rejected(profile: dict, key: str):
+    entry = profile.get(key) or {}
+    return entry.get("rejected_value") if isinstance(entry, dict) else None
+
+
+def evaluate_gate(profile: dict, summary: dict) -> dict:
+    """
+    schema.ELIGIBILITY_GATES[0]: doctorate awarded OR NET/SET qualified.
+
+    Produces no number and reads no score.
+    """
+    phd_status = _value(profile, "phd_status")
+    phd_year = _value(profile, "phd_year")
+    net = _value(profile, "net_qualified")
+    cross_check_failed = bool(summary.get("doctorate_cross_check_failed"))
+
+    doctorate_evidenced = bool(
+        _value(profile, "highest_degree") in ("phd", "phd_pursuing")
+        or _value(profile, "phd_institution")
+        or cross_check_failed
+        or _rejected(profile, "phd_status")
+    )
+
+    if phd_status == "awarded" and phd_year:
+        outcome = "met"
+        reason = f"doctorate awarded {phd_year}"
+        evidence = _evidence(profile, "phd_year")
+    elif net is True:
+        outcome = "met"
+        reason = "NET/SET qualified (recognised teaching-eligibility route)"
+        evidence = _evidence(profile, "net_qualified")
+    elif doctorate_evidenced:
+        outcome = "indeterminate"
+        reason = ("doctorate evidenced but its award is not confirmed"
+                  + (" - Stage 4 withheld the claim" if cross_check_failed
+                     else " (no award year stated)"))
+        evidence = _evidence(profile, "phd_status")
+    else:
+        outcome = "not_met"
+        reason = "no doctorate evidenced and no NET/SET qualification"
+        evidence = ""
+
+    return {
+        "gate": schema.ELIGIBILITY_GATES[0]["id"],
+        "requirement": schema.ELIGIBILITY_GATES[0]["requirement"],
+        "outcome": outcome,
+        "reason": reason,
+        "evidence": evidence,
+        "rubric": "DEMO/RESEARCH - not LNMIIT hiring policy",
+        "affects_score": False,
+        "human_override_allowed": True,
+    }
+
+
+# Roles whose overlap with a degree is normal and must NOT be flagged.
+NORMAL_CONCURRENT_ROLE = re.compile(
+    r"(teaching assistant|research assistant|assistantship|research scholar|"
+    r"jrf|srf|project associate|project assistant|research fellow|"
+    r"doctoral fellow|lab assistant|teaching experience|"
+    r"research intern|summer intern|project fellow)", re.I)
+
+
+def reviewer_flags(profile: dict, as_of: date) -> list[dict]:
+    """
+    Advisory observations. They change NO score and NO gate outcome.
+    """
+    flags = []
+    phd_start = parse_date(_value(profile, "phd_start_year"))
+
+    # ONLY the doctorate, and only when its start year is explicitly stated.
+    # An earlier version also flagged overlaps with an INFERRED master's
+    # window (completion year minus two). That was a guess, and guessing is
+    # what this project refuses to do - it produced a false flag on
+    # Candidate_01 off the back of a separately-wrong masters_year. If the
+    # CV does not state when a degree began, we do not pretend to know.
+    enrolments = []
+    if phd_start:
+        phd_end = parse_date(_value(profile, "phd_year")) or (as_of.year, as_of.month)
+        enrolments.append(("doctorate", _months(phd_start), _months(phd_end)))
+
+    for position in profile.get("positions") or []:
+        title = position.get("title") or ""
+        # The section a role came from is as telling as its title. A course
+        # listed under "Teaching Assistantship" has a title like
+        # "PH-204: Physics Lab IV", which matches no role keyword at all -
+        # so checking the title alone flagged a PhD student for the
+        # teaching every PhD student does.
+        context = f"{title} {position.get('source_section') or ''}"
+        if NORMAL_CONCURRENT_ROLE.search(context):
+            continue
+
+        start = parse_date(position.get("start_date"))
+        if start is None:
+            continue
+        end = ((as_of.year, as_of.month) if position.get("is_current")
+               or not position.get("end_date")
+               else parse_date(position.get("end_date")))
+        if end is None:
+            continue
+
+        employer = position.get("organisation") or "an unnamed employer"
+        until = position.get("end_date") or "present"
+
+        for label, enrol_start, enrol_end in enrolments:
+            if _months(start) < enrol_end and _months(end) > enrol_start:
+                flags.append({
+                    "id": "concurrent_employment_and_study",
+                    "message": (
+                        f"'{title}' at {employer} "
+                        f"({position.get('start_date')} to {until}) overlaps "
+                        f"the {label} enrolment - please check. This is often "
+                        f"entirely legitimate (distance or part-time study, "
+                        f"study leave, or rounded CV dates)."),
+                    "affects_score": False,
+                    "affects_gate": False,
+                    "evidence": position.get("evidence", ""),
+                })
+                break
+    return flags
+
+
+# ---------------------------------------------------------------------------
+# Top level
+# ---------------------------------------------------------------------------
+
+def score_candidate(validated: dict, verified: dict,
+                    as_of: date | None = None) -> dict:
+    """
+    Score one candidate. Deterministic given (validated, verified, as_of).
+
+    `as_of` is recorded in the output: ongoing roles are measured against
+    it, so a result can be reproduced exactly at any later date.
+    """
+    as_of = as_of or date.today()
+    profile = validated.get("profile", {})
+    summary = validated.get("validation_summary", {})
+    pubs = verified.get("publications", [])
+    positions = profile.get("positions") or []
+
+    criteria = [
+        score_publications(pubs),
+        score_experience(positions, {"teaching"}, "teaching_experience",
+                         FULL_MARKS_TEACHING_YEARS, as_of),
+        score_doctorate(profile, {}),
+        score_experience(positions, {"industry"}, "industry_experience",
+                         FULL_MARKS_INDUSTRY_YEARS, as_of),
+        score_visibility(pubs),
+    ]
+
+    total = round(sum(c.points for c in criteria), 2)
+
+    # A score built on lookups that never happened is not a score. It is
+    # surfaced at the top level, not buried in a criterion note, because
+    # the ranking is what people read.
+    unreliable = [
+        (f"{c.name}: {c.indeterminate_entries} entr(ies) could not be "
+         f"verified because the lookup service was unreachable")
+        for c in criteria if c.indeterminate
+    ]
+
+    return {
+        "candidate_id": validated.get("candidate_id"),
+        "candidate_name": _value(profile, "full_name"),
+        "scored_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "as_of_date": as_of.isoformat(),
+        "rubric": {
+            "version": RUBRIC_VERSION,
+            "weights": dict(WEIGHTS),
+            "disclaimer": ("DEMO/RESEARCH rubric for a student project. NOT "
+                           "LNMIIT hiring criteria."),
+        },
+        "eligibility": evaluate_gate(profile, summary),
+        "total_score": total,
+        "max_score": sum(WEIGHTS.values()),
+        "scoring_reliable": not unreliable,
+        "unreliable_reasons": unreliable,
+        "criteria": [c.as_dict() for c in criteria],
+        "reviewer_flags": reviewer_flags(profile, as_of),
+        "human_decision_required": True,
+    }
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def main(argv: list[str]) -> int:
+    out_dir = Path(__file__).resolve().parent.parent / "output"
+    as_of = date.today()
+    for arg in argv:
+        if arg.startswith("--as-of="):
+            as_of = date.fromisoformat(arg.split("=", 1)[1])
+
+    files = sorted(out_dir.glob("Candidate_*.validated.json"))
+    if not files:
+        print(f"No *.validated.json in {out_dir}. Run validate.py first.")
+        return 1
+
+    print(f"Stage 6: deterministic scoring  (rubric {RUBRIC_VERSION}, "
+          f"as-of {as_of})")
+    print("DEMO/RESEARCH rubric - NOT LNMIIT hiring criteria\n")
+
+    results = []
+    for path in files:
+        stem = path.name.replace(".validated.json", "")
+        verified_path = out_dir / f"{stem}.verified.json"
+        if not verified_path.is_file():
+            print(f"{stem}: missing {verified_path.name}")
+            continue
+
+        result = score_candidate(
+            json.loads(path.read_text(encoding="utf-8")),
+            json.loads(verified_path.read_text(encoding="utf-8")),
+            as_of=as_of,
+        )
+        (out_dir / f"{stem}.scored.json").write_text(
+            json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+        results.append(result)
+
+    eligible = [r for r in results if r["eligibility"]["outcome"] == "met"]
+    gated = [r for r in results if r["eligibility"]["outcome"] != "met"]
+
+    for label, group in (("ELIGIBLE", eligible), ("NEEDS REVIEW / NOT ELIGIBLE", gated)):
+        print(f"--- {label} " + "-" * (58 - len(label)))
+        for r in sorted(group, key=lambda x: -x["total_score"]):
+            print(f"  {r['candidate_id']:<14} {r['total_score']:>6.2f}/100   "
+                  f"{r['eligibility']['outcome']:<14} {r['eligibility']['reason'][:38]}")
+            for c in r["criteria"]:
+                marker = "  (insufficient evidence)" if c["insufficient_evidence"] else ""
+                print(f"      {c['criterion']:<22} {c['points']:>6.2f} / {c['weight']:<3}"
+                      f"  [{c['measured']} {c['unit']}]{marker}")
+            for f in r["reviewer_flags"]:
+                print(f"      FLAG  {f['message'][:72]}")
+        print()
+
+    print(f"Wrote *.scored.json to {out_dir}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
