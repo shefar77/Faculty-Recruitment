@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isUnreliable, reliabilityReasons } from "./reliability.js";
+import { generateExplanations } from "./api.js";
 import OverrideForm from "./OverrideForm.jsx";
 
 /** Per-criterion evidence, override history, publication verdicts, flags. */
@@ -21,6 +22,80 @@ function Warnings({ candidate }) {
         judgement on their record. Re-run the pipeline once the service is
         reachable.
       </p>
+    </div>
+  );
+}
+
+/** Does this criterion need a human decision before it can be trusted? */
+function needsReview(criterion) {
+  return Boolean(
+    criterion.indeterminate ||
+      criterion.unscored_positions?.length ||
+      criterion.unclassified_roles?.length,
+  );
+}
+
+/**
+ * The evidence behind a score, in the reviewer's language.
+ *
+ * Deliberately NOT the raw note: that string carries internal wording
+ * ("UNCLASSIFIED:", field names, saturation thresholds) written for the
+ * audit record. A professor needs the roles, the dates and the durations
+ * that produced the number, and those are shown directly.
+ */
+function Evidence({ criterion }) {
+  const rows = criterion.evidence || [];
+  if (!rows.length) return null;
+
+  const roles = rows.filter((row) => row.months !== undefined);
+  const papers = rows.filter((row) => row.credit !== undefined && row.kind !== "patent");
+  const patents = rows.filter((row) => row.kind === "patent");
+
+  return (
+    <div className="evidence">
+      {roles.length > 0 && (
+        <ul>
+          {roles.map((row, i) => (
+            <li key={i}>
+              <strong>{row.title}</strong>
+              {row.organisation ? ` — ${row.organisation}` : ""}
+              {row.from ? ` · ${row.from} to ${row.to}` : ""}
+              {row.months ? ` · ${row.months} months` : ""}
+              {row.kind === "assistantship" && (
+                <span className="muted"> · counted at half rate (assistantship)</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {papers.length > 0 && (
+        <ul>
+          {papers.map((row, i) => (
+            <li key={i}>
+              {row.credit > 0 ? "✓" : "—"} {row.title}
+              <span className="muted"> · {row.reason}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {patents.length > 0 && (
+        <>
+          <div className="muted">
+            Patents (not checked against any patent register):
+          </div>
+          <ul>
+            {patents.map((row, i) => (
+              <li key={i}>
+                {row.credit > 0 ? "✓" : "—"} {row.title}
+                {row.number ? ` · ${row.number}` : ""}
+                <span className="muted"> · {row.reason}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
@@ -61,9 +136,40 @@ function Criteria({ criteria }) {
                 <span className="badge badge-unreliable">! NOT VERIFIED</span>
               )}
               {criterion.insufficient_evidence && (
-                <span className="badge">insufficient evidence</span>
+                <span className="badge">no evidence in CV</span>
               )}
-              <div className="muted">{criterion.note}</div>
+              {needsReview(criterion) && (
+                <span className="badge badge-review">needs your review</span>
+              )}
+
+              <Evidence criterion={criterion} />
+
+              {criterion.unscored_positions?.length > 0 && (
+                <div className="alert alert-note small">
+                  <strong>Documented roles this score could not count.</strong>{" "}
+                  This is a gap in what could be read from the CV, not an
+                  absence of experience.
+                  <ul>
+                    {criterion.unscored_positions.map((role, i) => (
+                      <li key={i}>
+                        <strong>{role.title}</strong>
+                        {role.organisation ? ` at ${role.organisation}` : ""}
+                        {role.from ? ` (${role.from}${role.to ? ` to ${role.to}` : ""})` : ""}
+                        <div className="muted">{role.reason}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {criterion.unclassified_roles?.length > 0 && (
+                <div className="alert alert-note small">
+                  {criterion.unclassified_roles.map((note, i) => (
+                    <div key={i}>{note}</div>
+                  ))}
+                </div>
+              )}
+
               {criterion.override && (
                 <div className="small">
                   {criterion.override.original_value} →{" "}
@@ -72,11 +178,67 @@ function Criteria({ criteria }) {
                   {criterion.override.reason}”
                 </div>
               )}
+              {criterion.explanation && (
+                <div className="explanation">
+                  {criterion.explanation}
+                  <span className="muted"> (
+                    {criterion.explanation_source === "llm"
+                      ? "written by the local model from the computed figures"
+                      : "deterministic template"}
+                    )</span>
+                </div>
+              )}
             </td>
           </tr>
         ))}
       </tbody>
     </table>
+  );
+}
+
+/**
+ * Prose is generated on request, not during upload.
+ *
+ * It is the only pipeline output that cannot change a result - the model
+ * is handed the finished criterion, never the CV - so it does not belong
+ * on the path a reviewer waits on. The scores below are complete and
+ * final whether or not this is ever pressed.
+ */
+function ExplanationControl({ candidate, onDone }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const state = candidate.explanation_state;
+  if (!state || state.all_llm) return null;
+
+  return (
+    <div className="alert alert-note">
+      <p className="small">
+        {state.llm_written === 0
+          ? "Each criterion currently carries a deterministic template sentence."
+          : `${state.llm_written} of ${state.criteria_total} criteria have written explanations.`}{" "}
+        Generating prose takes a minute or two on this machine and changes
+        no score.
+      </p>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          setError(null);
+          try {
+            await generateExplanations(candidate.candidate_id);
+            onDone?.();
+          } catch (exception) {
+            setError(exception.message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? "Generating…" : "Generate written explanations"}
+      </button>
+      {error && <div className="alert alert-danger small">{error}</div>}
+    </div>
   );
 }
 
@@ -171,6 +333,7 @@ export default function CandidateDetail({ candidate, onOverridden }) {
       </div>
 
       <h3>Criteria</h3>
+      <ExplanationControl candidate={candidate} onDone={onOverridden} />
       <Criteria criteria={candidate.criteria || []} />
 
       {candidate.reviewer_flags?.length > 0 && (

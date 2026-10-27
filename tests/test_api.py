@@ -11,6 +11,7 @@ Run:  python -m pytest tests/ -v
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -113,6 +114,92 @@ def test_listing_always_returns_both_computed_and_effective(client):
         assert "effective_eligibility" in candidate
 
 
+# ---------------------------------------------------------------------------
+# On-demand explanations
+#
+# Prose moved off the upload path because it was 27% of the runtime and the
+# one output that cannot change a result. These tests pin down that it is
+# genuinely separable: the endpoint writes sentences and nothing else.
+# ---------------------------------------------------------------------------
+
+def test_detail_reports_whether_prose_has_been_generated(client):
+    body = client.get("/candidates/Cand_A").json()
+    state = body["explanation_state"]
+    assert state["criteria_total"] == 1
+    assert state["llm_written"] == 0        # fixture stores templates
+    assert state["all_llm"] is False
+
+
+def test_explain_endpoint_writes_prose_without_touching_any_score(
+        client, monkeypatch):
+    import explain
+
+    def fake(scored, *, use_llm=True):
+        return {"candidate_id": scored.get("candidate_id"),
+                "criterion_explanations": [
+                    {"criterion": "teaching_experience",
+                     "explanation": "Scored 10.85 of 25 from 2.17 years.",
+                     "source": "llm"}],
+                "eligibility_explanation": "gate text",
+                "llm_used": True, "explanations_rejected": 0}
+
+    monkeypatch.setattr(explain, "explain_candidate", fake)
+
+    before = client.get("/candidates/Cand_A").json()
+    response = client.post("/candidates/Cand_A/explain")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["criteria_updated"] == 1
+    assert body["llm_used"] is True
+    assert body["state"]["all_llm"] is True
+
+    after = client.get("/candidates/Cand_A").json()
+    # The entire numeric surface must be untouched.
+    assert after["computed_total"] == before["computed_total"]
+    assert after["effective_total"] == before["effective_total"]
+    assert after["computed_eligibility"] == before["computed_eligibility"]
+    for old, new in zip(before["criteria"], after["criteria"]):
+        assert new["computed_points"] == old["computed_points"]
+        assert new["effective_points"] == old["effective_points"]
+        assert new["measured"] == old["measured"]
+        assert new["note"] == old["note"]
+    # ...and only the prose changed.
+    assert after["criteria"][0]["explanation"] != before["criteria"][0]["explanation"]
+    assert after["criteria"][0]["explanation_source"] == "llm"
+
+
+def test_explain_endpoint_404s_for_an_unknown_candidate(client):
+    assert client.post("/candidates/Nobody/explain").status_code == 404
+
+
+def test_explain_endpoint_reports_a_model_failure_as_503(client, monkeypatch):
+    """
+    An unreachable model must not look like a problem with the candidate.
+    """
+    import explain
+
+    def boom(scored, *, use_llm=True):
+        raise ConnectionError("ollama unreachable")
+
+    monkeypatch.setattr(explain, "explain_candidate", boom)
+    response = client.post("/candidates/Cand_A/explain")
+    assert response.status_code == 503
+    assert "ollama unreachable" in response.json()["detail"]
+
+
+def test_a_failed_explanation_leaves_the_stored_prose_intact(
+        client, monkeypatch):
+    import explain
+
+    before = client.get("/candidates/Cand_A").json()
+    monkeypatch.setattr(explain, "explain_candidate",
+                        lambda *a, **k: (_ for _ in ()).throw(RuntimeError("x")))
+    client.post("/candidates/Cand_A/explain")
+    after = client.get("/candidates/Cand_A").json()
+    assert after["criteria"][0]["explanation"] == \
+        before["criteria"][0]["explanation"]
+
+
 def test_detail_returns_evidence(client):
     body = client.get("/candidates/Cand_A").json()
     assert body["candidate_name"] == "Alice"
@@ -121,6 +208,95 @@ def test_detail_returns_evidence(client):
     assert publication["openalex_id"].startswith("https://openalex.org/")
     assert publication["query_url"]
     assert "reviewer_flags" in body and "eligibility" in body
+
+
+# ---------------------------------------------------------------------------
+# The evidence has to survive the trip to the browser.
+#
+# Regression guard for a measured defect: the scorer recorded the roles,
+# papers and uncategorised positions behind every number, and the UI knew
+# how to render all three - but effective_state() rebuilds each criterion
+# from the criteria TABLE, which has no column for any of them, so the API
+# served a score with no evidence attached and the reviewer saw a bare
+# figure. Both halves worked in isolation and the seam between them did
+# not, which is exactly the kind of gap a component test cannot see.
+# ---------------------------------------------------------------------------
+
+EVIDENCE_AUDIT_CRITERION = {
+    **CRITERION,
+    "evidence": [{
+        "title": "Assistant Professor", "organisation": "A University",
+        "kind": "appointment", "from": "2024-10", "to": "present",
+        "months": 24,
+    }],
+    "unscored_positions": [{
+        "title": "Summer Intern", "organisation": "Veltrix",
+        "from": "2022-07", "to": "2022-08",
+        "reason": "employer name carries no academic or commercial marker",
+    }],
+    "indeterminate": True,
+    "indeterminate_entries": 3,
+}
+
+
+@pytest.fixture
+def evidenced(tmp_path, monkeypatch):
+    monkeypatch.setattr(store, "DB_PATH", tmp_path / "evidence.db")
+    audit = _audit("Cand_E", 50.0, "met", "Eve")
+    audit["scoring"]["criteria"] = [dict(EVIDENCE_AUDIT_CRITERION)]
+    connection = store.connect()
+    store.save_audit(connection, audit)
+    connection.close()
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+def test_detail_carries_the_roles_behind_a_score(evidenced):
+    criterion = evidenced.get("/candidates/Cand_E").json()["criteria"][0]
+    assert criterion["evidence"], "the roles were dropped between store and API"
+    role = criterion["evidence"][0]
+    assert role["title"] == "Assistant Professor"
+    assert role["organisation"] == "A University"
+    assert role["months"] == 24
+
+
+def test_detail_carries_roles_that_could_not_be_counted(evidenced):
+    """A gap in our reading must reach the reviewer, not vanish into a zero."""
+    criterion = evidenced.get("/candidates/Cand_E").json()["criteria"][0]
+    unscored = criterion["unscored_positions"]
+    assert [role["title"] for role in unscored] == ["Summer Intern"]
+    assert unscored[0]["reason"]
+
+
+def test_detail_carries_the_not_verified_state(evidenced):
+    criterion = evidenced.get("/candidates/Cand_E").json()["criteria"][0]
+    assert criterion["indeterminate"] is True
+    assert criterion["indeterminate_entries"] == 3
+
+
+def test_the_evidence_merge_cannot_change_a_score(evidenced):
+    """
+    The audit record is a display source here, never an authority on a
+    number. If the two ever disagree, the stored score must win: a merge
+    that could rewrite points would make the audit trail unfalsifiable.
+    """
+    connection = store.connect()
+    stored = connection.execute(
+        "SELECT audit_json FROM candidates WHERE candidate_id=?",
+        ("Cand_E",)).fetchone()
+    audit = json.loads(stored["audit_json"])
+    audit["scoring"]["criteria"][0].update(
+        {"points": 999.0, "weight": 999, "measured": 999.0})
+    connection.execute(
+        "UPDATE candidates SET audit_json=? WHERE candidate_id=?",
+        (json.dumps(audit), "Cand_E"))
+    connection.commit()
+    connection.close()
+
+    criterion = evidenced.get("/candidates/Cand_E").json()["criteria"][0]
+    assert criterion["computed_points"] == 10.85
+    assert criterion["effective_points"] == 10.85
+    assert criterion["weight"] == 25
 
 
 def test_detail_404(client):

@@ -35,6 +35,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import schema  # noqa: E402
+import roles   # noqa: E402  the shared role taxonomy
 
 RUBRIC_VERSION = "demo-rubric-v1"
 
@@ -145,40 +146,25 @@ def _months(point: tuple[int, int]) -> int:
 # in-progress doctorate case (DESIGN_DECISIONS.md sections 9 and 10).
 ASSISTANTSHIP_CREDIT = 0.5
 
-ASSISTANTSHIP_ROLE = re.compile(
-    r"(teaching assistant|lab instructor|laboratory instructor|"
-    r"teaching assistantship|assistantship|demonstrator|tutor\b|"
-    r"lab assistant)", re.I)
-
-FACULTY_ROLE = re.compile(
-    r"(professor|lecturer|reader|faculty|instructor of record|"
-    r"course coordinator|head of department)", re.I)
-
 
 def classify_teaching_role(position: dict) -> str:
     """
     'assistantship' | 'appointment' | 'uncertain'.
 
-    Reads the role title AND the CV section it came from - Candidate_04's
-    assistantship entries are named after the courses taught
-    ("PH-204: Physics Lab IV") and are identifiable only by their
-    "Teaching Assistantship" heading.
+    The vocabulary and the head-noun rule live in roles.py, which both this
+    module and Stage 4 consult, so a title cannot be read one way when it
+    is validated and another way when it is scored.
 
     'uncertain' is a real answer. Where the CV's wording and structure do
     not settle it, the pipeline says so rather than quietly picking a side
     (user decision, 2026-10-15).
     """
-    context = f"{position.get('title') or ''} {position.get('source_section') or ''}"
-    is_assistantship = bool(ASSISTANTSHIP_ROLE.search(context))
-    is_faculty = bool(FACULTY_ROLE.search(context))
+    return roles.teaching_kind(position)[0]
 
-    if is_assistantship and not is_faculty:
-        return "assistantship"
-    if is_faculty and not is_assistantship:
-        return "appointment"
-    # Neither matched, or both did ("Assistant Professor" vs "Teaching
-    # Assistant" are a single word apart and both can appear in one line).
-    return "uncertain"
+
+def classify_teaching_role_reason(position: dict) -> str:
+    """The justification behind classify_teaching_role, for the audit log."""
+    return roles.teaching_kind(position)[1]
 
 
 def subtract_intervals(base: list[tuple[int, int]],
@@ -292,6 +278,16 @@ class Criterion:
     insufficient_evidence: bool = False
     note: str = ""
     unclassified_roles: list = field(default_factory=list)
+    # Roles the CV documents that this criterion could NOT count, with the
+    # reason. A position whose category cannot be determined contributes
+    # nothing - but it must never do so invisibly, or a gap in our reading
+    # of the CV is presented to the reviewer as an absence of experience.
+    unscored_positions: list = field(default_factory=list)
+    # Research-output breakdown, so the two kinds of contribution stay
+    # legible instead of collapsing into one number.
+    publication_credit: float = 0.0
+    patent_credit: float = 0.0
+    patent_credit_counted: float = 0.0
     # True when the pipeline could not reach a verdict - distinct from
     # scoring zero on evidence. See DESIGN_DECISIONS.md section 12.
     indeterminate: bool = False
@@ -310,6 +306,10 @@ class Criterion:
             "insufficient_evidence": self.insufficient_evidence,
             "note": self.note,
             "unclassified_roles": self.unclassified_roles,
+            "unscored_positions": self.unscored_positions,
+            "publication_credit": self.publication_credit,
+            "patent_credit": self.patent_credit,
+            "patent_credit_counted": self.patent_credit_counted,
             "indeterminate": self.indeterminate,
             "indeterminate_entries": self.indeterminate_entries,
         }
@@ -321,10 +321,59 @@ def _capped(value: float, full_marks_at: float) -> float:
     return max(0.0, min(1.0, value / full_marks_at))
 
 
-def score_publications(verified: list[dict]) -> Criterion:
+def patent_credit(patents: list[dict]) -> tuple[float, list[dict]]:
     """
-    Sum of per-entry credit from schema.CREDIT_MATRIX, with
-    schema.CREDIT_EXCLUSIONS applied FIRST and overriding the matrix.
+    Patent credit in PUBLICATION-EQUIVALENTS, with exclusions applied.
+
+    Shares the publication scale deliberately, so one saturation point
+    governs the whole research criterion and a reviewer can read "this
+    candidate's output is worth N papers" across both kinds of work.
+    """
+    total, rows = 0.0, []
+    for patent in patents:
+        exclusions = patent.get("credit_exclusions") or []
+        status = patent.get("status_final", "unknown")
+
+        if exclusions:
+            credit = 0.0
+            reason = f"excluded: {', '.join(exclusions)}"
+        else:
+            credit = schema.PATENT_CREDIT.get(status, 0.0)
+            reason = (f"{status} patent, credited at {credit} of a "
+                      f"corroborated publication")
+            if credit == 0.0:
+                reason = (f"{status}: no examination has taken place, so "
+                          f"this earns no credit yet")
+
+        total += credit
+        rows.append({
+            "title": patent.get("title"),
+            "number": patent.get("number"),
+            "status": status,
+            "credit": credit,
+            "reason": reason,
+            "inventors": patent.get("inventors") or [],
+            "verification": patent.get("verification", "unavailable"),
+            "verification_note": patent.get("verification_note", ""),
+            "duplicate_of": patent.get("duplicate_of"),
+        })
+    return total, rows
+
+
+def score_publications(verified: list[dict],
+                       patents: list[dict] | None = None) -> Criterion:
+    """
+    Research output: peer-reviewed publications PLUS patents.
+
+    Publication credit comes from schema.CREDIT_MATRIX with
+    schema.CREDIT_EXCLUSIONS applied first. Patent credit comes from
+    schema.PATENT_CREDIT, on the same publication-equivalent scale, and is
+    CAPPED at schema.PATENT_SHARE_OF_RESEARCH of the criterion so it can
+    supplement peer-reviewed work without substituting for it.
+
+    The two are summed into one criterion rather than scored separately,
+    so that disciplines which do not patent are not handed an automatic
+    zero on a scored line (see schema.py section 4b).
     """
     weight = WEIGHTS["publications"]
     total, rows, indeterminate = 0.0, [], 0
@@ -365,22 +414,48 @@ def score_publications(verified: list[dict]) -> Criterion:
             "query_url": entry["verification"].get("query_url"),
         })
 
-    fraction = _capped(total, FULL_MARKS_PUBLICATION_CREDIT)
+    # --- patents, on the same scale, then capped -------------------------
+    patent_total, patent_rows = patent_credit(patents or [])
+    patent_ceiling = FULL_MARKS_PUBLICATION_CREDIT * schema.PATENT_SHARE_OF_RESEARCH
+    patent_counted = min(patent_total, patent_ceiling)
+    patent_capped = patent_total > patent_ceiling
+
+    combined = total + patent_counted
+    fraction = _capped(combined, FULL_MARKS_PUBLICATION_CREDIT)
+
     criterion = Criterion(
         name="publications",
         weight=weight,
-        raw=round(total, 2),
-        unit="credited publications",
+        raw=round(combined, 2),
+        unit="publication-equivalents (papers + capped patent credit)",
         fraction=fraction,
         points=weight * fraction,
-        sources=["publications[].status", "verification.outcome"],
-        evidence=rows,
-        insufficient_evidence=(not verified),
-        note=(f"full marks at {FULL_MARKS_PUBLICATION_CREDIT} credited "
-              f"publications"),
+        sources=["publications[].status", "verification.outcome",
+                 "patents[].status"],
+        evidence=rows + [dict(row, kind="patent") for row in patent_rows],
+        insufficient_evidence=(not verified and not patent_rows),
+        note=(f"full marks at {FULL_MARKS_PUBLICATION_CREDIT} "
+              f"publication-equivalents"),
     )
-    if not verified:
-        criterion.note = "no publications listed - insufficient evidence"
+    criterion.patent_credit = round(patent_total, 2)
+    criterion.patent_credit_counted = round(patent_counted, 2)
+    criterion.publication_credit = round(total, 2)
+
+    if patent_rows:
+        criterion.note += (
+            f"; of which {round(patent_counted, 2)} from "
+            f"{len(patent_rows)} patent(s)")
+        if patent_capped:
+            criterion.note += (
+                f" (capped: patents may contribute at most "
+                f"{patent_ceiling} publication-equivalents, "
+                f"{round(patent_total, 2)} claimed)")
+        criterion.note += (
+            "; patent records were NOT checked against any patent register")
+
+    if not verified and not patent_rows:
+        criterion.note = ("no publications or patents listed - "
+                          "insufficient evidence")
     elif indeterminate:
         # The matrix says INDETERMINATE for these; the arithmetic has to
         # put SOME number in, and 0.0 is the only safe one. But a 0 that
@@ -440,7 +515,7 @@ def teaching_years_weighted(positions: list[dict],
                             f"end precedes start")
             continue
 
-        kind = classify_teaching_role(position)
+        kind, why = roles.teaching_kind(position)
         if kind == "uncertain":
             # Counted at the FULL rate, and said out loud. Defaulting
             # downward would penalise the candidate for our inability to
@@ -457,6 +532,7 @@ def teaching_years_weighted(positions: list[dict],
             "title": position.get("title"),
             "organisation": position.get("organisation"),
             "kind": kind,
+            "kind_reason": why,
             "credit_per_month": (1.0 if kind == "appointment"
                                  else ASSISTANTSHIP_CREDIT),
             "from": position.get("start_date"),
@@ -474,6 +550,37 @@ def teaching_years_weighted(positions: list[dict],
     effective = appointment_months + ASSISTANTSHIP_CREDIT * assistantship_months
 
     return round(effective / 12.0, 2), evidence, problems, uncertain
+
+
+def uncategorised_positions(positions: list[dict]) -> list[dict]:
+    """
+    Documented roles that no experience criterion can count.
+
+    These are positions the CV plainly states but whose nature could not be
+    determined - typically an employer known only by a proper noun, with a
+    title that names no academic role. The honest answer is that we cannot
+    tell, and the reviewer has to be TOLD that, because the alternative is
+    a zero that reads as "no such experience" when it means "we could not
+    read this".
+    """
+    unscored = []
+    for position in positions:
+        category = (position.get("category") or "other").lower()
+        review = position.get("category_review") or {}
+        if category in ("teaching", "research", "industry"):
+            continue
+        if not review.get("needs_review"):
+            continue          # legitimately 'other', e.g. training
+        unscored.append({
+            "title": position.get("title"),
+            "organisation": position.get("organisation"),
+            "from": position.get("start_date"),
+            "to": position.get("end_date") or (
+                "present" if position.get("is_current") else None),
+            "reason": review.get("reason", "category could not be determined"),
+            "evidence": position.get("evidence", ""),
+        })
+    return unscored
 
 
 def score_experience(positions: list[dict], categories: set[str],
@@ -512,6 +619,22 @@ def score_experience(positions: list[dict], categories: set[str],
     if uncertain:
         criterion.note += "; UNCLASSIFIED: " + " ".join(uncertain)
         criterion.unclassified_roles = uncertain
+
+    # Roles we could not categorise are reported on EVERY experience
+    # criterion, because any one of them might have been the criterion
+    # that should have counted it.
+    unscored = uncategorised_positions(positions)
+    if unscored:
+        criterion.unscored_positions = unscored
+        criterion.note += (
+            f"; {len(unscored)} documented role(s) could not be categorised "
+            f"from the CV and are counted toward NO criterion - this is a "
+            f"gap in our reading, not an absence of experience; please "
+            f"classify: "
+            + "; ".join(f"{u['title']!r}"
+                        + (f" at {u['organisation']!r}" if u["organisation"]
+                           else "")
+                        for u in unscored))
     return criterion
 
 
@@ -670,11 +793,8 @@ def evaluate_gate(profile: dict, summary: dict) -> dict:
 
 
 # Roles whose overlap with a degree is normal and must NOT be flagged.
-NORMAL_CONCURRENT_ROLE = re.compile(
-    r"(teaching assistant|research assistant|assistantship|research scholar|"
-    r"jrf|srf|project associate|project assistant|research fellow|"
-    r"doctoral fellow|lab assistant|teaching experience|"
-    r"research intern|summer intern|project fellow)", re.I)
+# Shared with Stage 4 via roles.py.
+NORMAL_CONCURRENT_ROLE = roles.NORMAL_CONCURRENT_ROLE
 
 
 def reviewer_flags(profile: dict, as_of: date) -> list[dict]:
@@ -752,10 +872,11 @@ def score_candidate(validated: dict, verified: dict,
     profile = validated.get("profile", {})
     summary = validated.get("validation_summary", {})
     pubs = verified.get("publications", [])
+    patents = validated.get("patents", []) or []
     positions = profile.get("positions") or []
 
     criteria = [
-        score_publications(pubs),
+        score_publications(pubs, patents),
         score_experience(positions, {"teaching"}, "teaching_experience",
                          FULL_MARKS_TEACHING_YEARS, as_of),
         score_doctorate(profile, {}),

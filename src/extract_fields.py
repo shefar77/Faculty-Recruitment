@@ -77,6 +77,19 @@ REQUEST_TIMEOUT = (10, 2400)
 # If a prompt gets within this fraction of the window, assume truncation.
 TRUNCATION_WARN_RATIO = 0.95
 
+# How long Ollama keeps the model resident after a call. Its default is 5
+# minutes, which is shorter than the gap between a reviewer uploading one
+# CV and the next, so the 4.7GB model is evicted and reloaded between runs.
+#
+# Measured on this machine: load_duration was 10.7s on the first call of a
+# run and 0.01s on every call after it. That 10.7s is pure overhead - the
+# same model, read off disk again - and a reviewer working through a stack
+# of CVs pays it once per CV.
+#
+# Not a correctness setting. It changes nothing about what the model
+# returns; it only stops Ollama throwing away work it is about to need.
+KEEP_ALIVE = "30m"
+
 
 # ---------------------------------------------------------------------------
 # Prompts
@@ -206,6 +219,17 @@ class CallResult:
     seconds: float = 0.0
     truncated: bool = False
     called_at: str = ""
+    # Ollama's own breakdown of where `seconds` went. Wall-clock alone
+    # cannot tell a slow model from a reloaded one from a long prompt, and
+    # that distinction is the whole of any performance question asked
+    # later. Recording it here means the audit file answers it without
+    # anyone having to re-run a profiler.
+    #   load_seconds    - reading the model into memory (0 when resident)
+    #   prefill_seconds - processing the input tokens
+    #   decode_seconds  - generating the output tokens
+    load_seconds: float = 0.0
+    prefill_seconds: float = 0.0
+    decode_seconds: float = 0.0
     # Fingerprint of the exact prompt text. Defect 4 in KNOWN_DEFECTS.md:
     # a one-line prompt edit silently moved accuracy from 92% to 82%, and
     # nothing in the output revealed that a different prompt had been used.
@@ -230,6 +254,7 @@ def call_ollama(prompt: str, *, num_ctx: int = NUM_CTX) -> CallResult:
         "prompt": prompt,
         "stream": False,
         "format": "json",      # constrains SYNTAX only - see module docstring
+        "keep_alive": KEEP_ALIVE,
         "options": {
             "temperature": TEMPERATURE,
             "seed": SEED,
@@ -266,6 +291,9 @@ def call_ollama(prompt: str, *, num_ctx: int = NUM_CTX) -> CallResult:
         truncated=truncated,
         called_at=called_at,
         prompt_sha=prompt_sha,
+        load_seconds=round((body.get("load_duration") or 0) / 1e9, 2),
+        prefill_seconds=round((body.get("prompt_eval_duration") or 0) / 1e9, 2),
+        decode_seconds=round((body.get("eval_duration") or 0) / 1e9, 2),
     )
 
     # format:"json" makes this parse almost always succeed. "Almost": the
@@ -507,6 +535,81 @@ def extract_positions(cv_text: str) -> CallResult:
     return combined
 
 
+# Cheap pre-check, same reasoning as NET_TOKEN: if the word never appears,
+# there is nothing to extract and the call is pure cost. Most CVs in most
+# disciplines list no patents at all.
+PATENT_TOKEN = re.compile("patent", re.I)
+
+
+PATENTS_PROMPT = """You extract PATENTS from an academic CV into JSON.
+
+ABSOLUTE RULES
+1. Copy ONLY what the CV states. Never invent a patent, a number or a date.
+2. List EVERY patent entry you find, in the order printed.
+3. "evidence" must be the patent line copied VERBATIM from the CV.
+4. If a field is not printed for an entry, use null. A null is correct.
+5. Do not compute anything and do not count anything.
+
+Return EXACTLY this shape:
+
+{{
+  "patents": [
+    {{"title": <string>,
+      "inventors": [<string>, ...],
+      "number": <string|null>,
+      "status": <"granted"|"published"|"filed"|"unknown">,
+      "year": <integer|null>,
+      "jurisdiction": <string|null>,
+      "evidence": <string>}}
+  ]
+}}
+
+STATUS - READ CAREFULLY
+Report only the stage the CV ACTUALLY STATES:
+  "granted" / "patent granted" / "issued"        -> granted
+  "published" / "application published"          -> published
+  "filed" / "application filed" / "pending"
+    / "under examination" / "application no."    -> filed
+  nothing stated about the stage                 -> unknown
+
+These are DIFFERENT stages and must not be merged. A filed application has
+passed no examination; a granted patent has. If the CV says only
+"Patent (2023)" with no stage word, that is "unknown", not "granted".
+
+NUMBER
+Copy the application or grant number exactly as printed, including any
+country prefix. If no number is printed, use null - do not construct one.
+
+WHAT IS NOT A PATENT
+Exclude copyrights, trademarks, design registrations, software licences
+and published papers ABOUT a patented method. Only patents and patent
+applications belong here.
+
+CV TEXT
+---
+{cv_text}
+---
+Return only the JSON object."""
+
+
+def extract_patents(cv_text: str) -> CallResult:
+    """
+    Patents, as their own call, and only when the CV mentions one.
+
+    Gated on PATENT_TOKEN because most CVs list no patents: running this
+    unconditionally would add a round trip - tens of seconds on CPU - to
+    every candidate in order to extract an empty list. If the word is
+    absent, an empty list is the only correct answer, which is exactly
+    what is recorded.
+    """
+    if not PATENT_TOKEN.search(cv_text):
+        return CallResult(
+            ok=True, data={"patents": []}, seconds=0.0,
+            called_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            error="skipped: CV contains no occurrence of 'patent'")
+    return call_ollama(PATENTS_PROMPT.format(cv_text=cv_text))
+
+
 def extract_publications(cv_text: str) -> CallResult:
     """
     Publication list only, as its own call.
@@ -555,6 +658,7 @@ def extract_candidate(cv_text: str, stem: str) -> dict:
     # experience-like heading and silently dropped later ones.
     positions_call = extract_positions(cv_text)
     publications_call = extract_publications(cv_text)
+    patents_call = extract_patents(cv_text)
 
     profile = dict(profile_call.data) if profile_call.ok else {}
     profile["positions"] = (positions_call.data.get("positions", [])
@@ -570,16 +674,24 @@ def extract_candidate(cv_text: str, stem: str) -> dict:
         if isinstance(raw, list):
             publications = raw
 
+    patents = []
+    if patents_call.ok:
+        raw = patents_call.data.get("patents", [])
+        if isinstance(raw, list):
+            patents = raw
+
     return {
         "candidate_id": stem,
         "extracted_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "profile": profile,
         "publications": publications,
+        "patents": patents,
         "provenance": {
             "profile_call": _provenance(profile_call),
             "eligibility_call": _provenance(eligibility_call),
             "positions_call": _provenance(positions_call),
             "publications_call": _provenance(publications_call),
+            "patents_call": _provenance(patents_call),
         },
     }
 
@@ -616,6 +728,9 @@ def _provenance(call: CallResult) -> dict:
         "prompt_tokens": call.prompt_tokens,
         "output_tokens": call.output_tokens,
         "seconds": call.seconds,
+        "load_seconds": call.load_seconds,
+        "prefill_seconds": call.prefill_seconds,
+        "decode_seconds": call.decode_seconds,
         "truncated": call.truncated,
         "called_at": call.called_at,
         "prompt_sha": call.prompt_sha,

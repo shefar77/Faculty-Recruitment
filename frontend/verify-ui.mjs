@@ -163,6 +163,154 @@ check("the override reason and author appear",
   overrideHtml.includes("Prof. Reviewer") &&
   overrideHtml.includes("Two more papers confirmed."));
 
+// ---------------------------------------------------------------------------
+// EXPLANATIONS
+//
+// Regression guard for a measured defect: the pipeline spent 47 seconds per
+// CV - 27% of its total runtime - generating prose that this component then
+// dropped on the floor. Nothing failed; the work was simply invisible. A
+// test that only checks scores would never have caught it, so the rendering
+// of the explanation is pinned here.
+// ---------------------------------------------------------------------------
+console.log("\nEXPLANATIONS");
+
+const explained = {
+  ...reliable,
+  explanation_state: { criteria_total: 1, llm_written: 1,
+                       template_written: 0, all_llm: true },
+  criteria: [criterion({
+    computed_points: 38, effective_points: 38,
+    explanation: "Publications scored 38 of 40 from 19 corroborated entries.",
+    explanation_source: "llm",
+  })],
+};
+const explainedHtml = globalThis.renderDetail(explained);
+check("a generated explanation is actually rendered",
+  explainedHtml.includes(
+    "Publications scored 38 of 40 from 19 corroborated entries."),
+  "the pipeline generated prose and the UI discarded it - the original defect");
+check("the explanation says the model wrote it",
+  explainedHtml.includes("written by the local model"));
+check("no generate button once every criterion has prose",
+  !explainedHtml.includes("Generate written explanations"));
+
+const templated = {
+  ...explained,
+  explanation_state: { criteria_total: 1, llm_written: 0,
+                       template_written: 1, all_llm: false },
+  criteria: [criterion({
+    computed_points: 38, effective_points: 38,
+    explanation: "The publications criterion scored 38 out of 40.",
+    explanation_source: "template",
+  })],
+};
+const templatedHtml = globalThis.renderDetail(templated);
+check("a template explanation is rendered too",
+  templatedHtml.includes("The publications criterion scored 38 out of 40."));
+check("a template is labelled as deterministic, not as model prose",
+  templatedHtml.includes("deterministic template") &&
+  !templatedHtml.includes("written by the local model"));
+check("prose can be requested when it has not been generated",
+  templatedHtml.includes("Generate written explanations"));
+check("the offer states that generating prose changes no score",
+  templatedHtml.includes("changes") && templatedHtml.includes("no score"));
+
+// ---------------------------------------------------------------------------
+// PROFESSOR-FACING EVIDENCE
+//
+// The reviewer is a professor assessing a person, not a developer reading
+// a schema. Internal field names leaked into this view through the
+// criterion note; these checks pin down that the roles, dates and
+// durations are shown instead, and that a gap in our reading of the CV is
+// presented as a gap rather than as an absence of experience.
+// ---------------------------------------------------------------------------
+console.log("\nPROFESSOR-FACING EVIDENCE");
+
+const withEvidence = {
+  ...reliable,
+  criteria: [criterion({
+    criterion: "teaching_experience", weight: 25,
+    computed_points: 10, effective_points: 10, measured: 2.0,
+    note: "full marks at 5.0 years",
+    evidence: [{
+      title: "Assistant Professor", organisation: "A College",
+      from: "2024-10", to: "present", months: 24, kind: "appointment",
+    }, {
+      title: "Teaching Assistant", organisation: "A University",
+      from: "2022-01", to: "2023-01", months: 12, kind: "assistantship",
+    }],
+  })],
+};
+const evidenceHtml = globalThis.renderDetail(withEvidence);
+check("the roles behind a score are listed",
+  evidenceHtml.includes("Assistant Professor") &&
+  evidenceHtml.includes("A College"));
+check("dates and durations are shown",
+  evidenceHtml.includes("2024-10") && evidenceHtml.includes("24 months"));
+check("an assistantship is labelled as half rate",
+  evidenceHtml.includes("half rate"));
+check("no internal field names reach the reviewer",
+  !evidenceHtml.includes("positions[]") &&
+  !evidenceHtml.includes("start_date") &&
+  !evidenceHtml.includes("source_fields"));
+
+const withGap = {
+  ...reliable,
+  criteria: [criterion({
+    criterion: "industry_experience", weight: 10,
+    computed_points: 0, effective_points: 0, measured: 0,
+    unscored_positions: [{
+      title: "Summer Intern", organisation: "Veltrix",
+      from: "2022-07", to: "2022-08",
+      reason: "employer name carries no academic or commercial marker",
+    }],
+  })],
+};
+const gapHtml = globalThis.renderDetail(withGap);
+check("a role that could not be categorised is shown, not hidden",
+  gapHtml.includes("Summer Intern") && gapHtml.includes("Veltrix"));
+check("the gap is framed as unread evidence, not absent experience",
+  gapHtml.includes("not an") && gapHtml.includes("absence of experience"));
+check("a criterion needing a decision is badged for the reviewer",
+  gapHtml.includes("needs your review"));
+
+const withPatents = {
+  ...reliable,
+  criteria: [criterion({
+    criterion: "publications", weight: 40,
+    computed_points: 4, effective_points: 4, measured: 2.0,
+    evidence: [
+      { title: "A Paper", credit: 1.0, reason: "completed + matched" },
+      { kind: "patent", title: "A Method for X", number: "IN2024001",
+        credit: 0.75, reason: "granted patent, credited at 0.75" },
+    ],
+  })],
+};
+const patentHtml = globalThis.renderDetail(withPatents);
+check("patents are listed separately from papers",
+  patentHtml.includes("A Method for X") && patentHtml.includes("IN2024001"));
+check("the UI states patents were not checked against a register",
+  patentHtml.includes("not checked against any patent register"));
+
+// The audit record's evidence list is not uniform: some criteria record a
+// schema field rather than a role or a paper (doctorate stores
+// {field: "phd_status"}). Now that the API serves the audit evidence
+// verbatim, those rows reach the browser, and a professor must not be
+// shown an internal field name. The component filters on shape, and that
+// filter is what this pins.
+const withInternalRow = {
+  ...reliable,
+  criteria: [criterion({
+    criterion: "doctorate", weight: 20,
+    computed_points: 0, effective_points: 0, measured: 0,
+    evidence: [{ field: "phd_status", evidence: "" }],
+  })],
+};
+const internalHtml = globalThis.renderDetail(withInternalRow);
+check("an internal field name in the evidence is not rendered",
+  !internalHtml.includes("phd_status"),
+  "the audit record legitimately stores field names; the reviewer's view must not show them");
+
 rmSync(entry, { force: true });
 rmSync(bundle, { force: true });
 

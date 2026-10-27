@@ -48,6 +48,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import schema  # noqa: E402  (local spec module)
+import roles   # noqa: E402  the shared role taxonomy
 
 # How close a string must be to count as "present in the source".
 # 1.0 would fail on a single stray space; this tolerates whitespace and
@@ -513,28 +514,25 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
 # non-academic employer" - so this is a rule the code can apply itself
 # rather than hope for.
 
-ACADEMIC_EMPLOYER = re.compile(
-    r"(universit|college|institute of technology|\binstitute\b|\biit\b|\bnit\b|"
-    r"\biiit\b|\biisc\b|polytechnic|academy|\bschool\b|vidyalaya|vishwavidyalaya)",
-    re.I)
-
-TEACHING_TITLE = re.compile(
-    r"(professor|lecturer|reader|faculty|teaching assistant|instructor|"
-    r"tutor|demonstrator|assistantship)", re.I)
-
-RESEARCH_TITLE = re.compile(
-    r"(research|postdoc|post-doc|scientist|scholar|fellow|jrf|srf)", re.I)
-
-
 def review_position_categories(positions: list) -> tuple[list, list]:
     """
-    Re-derive each position's category from the schema's definitions.
+    Re-derive each position's category from the shared taxonomy.
 
-    Only CHANGES a category when the evidence settles it: an employer is
-    named, and the employer's nature plus the role title point one way.
-    Where the CV names no employer and the model was unsure, the entry is
-    left alone and flagged, because guessing is what this system is built
-    not to do.
+    The vocabulary lives in roles.py, so Stage 4 and Stage 6 cannot read
+    the same title two different ways.
+
+    THE TITLE LEADS, NOT THE EMPLOYER. An earlier version asked the
+    employer first and fell back to "any non-academic employer is
+    industry", which filed a research post at an institute known only by
+    an acronym as industry, and would have done the same to a lectureship
+    at a corporate training academy. A role title that names a teaching or
+    research post settles the question on its own; the employer is
+    consulted only when the title says nothing.
+
+    A category is CHANGED only when the evidence settles it. Where neither
+    the title nor the employer is informative, the entry is left as the
+    model proposed and FLAGGED for a human, because guessing is what this
+    system is built not to do.
     """
     notes = []
     for index, position in enumerate(positions):
@@ -542,36 +540,36 @@ def review_position_categories(positions: list) -> tuple[list, list]:
         organisation = position.get("organisation") or ""
         proposed = (position.get("category") or "other").lower()
 
-        if not organisation.strip():
-            if proposed == "other":
-                notes.append(
-                    f"position[{index}] '{title}' has no employer named and "
-                    f"could not be categorised - counted toward no experience "
-                    f"criterion; please check")
-            continue
+        verdict = roles.classify_position(position)
+        derived = verdict["category"]
 
-        academic = bool(ACADEMIC_EMPLOYER.search(organisation))
-        if academic:
-            if TEACHING_TITLE.search(title):
-                derived = "teaching"
-            elif RESEARCH_TITLE.search(title):
-                derived = "research"
-            else:
-                derived = proposed if proposed != "other" else "other"
-        else:
-            # schema.py: industry is "any non-academic employer".
-            derived = "industry"
+        # Low-confidence verdicts never overwrite the model's answer. They
+        # only ever add a flag: the classifier saying "I cannot tell" is
+        # not a reason to discard what the model read off the page.
+        if verdict["confidence"] == "low":
+            if verdict["needs_review"]:
+                notes.append(
+                    f"position[{index}] '{title}'"
+                    + (f" at '{organisation}'" if organisation else "")
+                    + f": left as {proposed!r} - {verdict['reason']}; "
+                      f"please check")
+            position["category_review"] = verdict
+            continue
 
         if derived != proposed:
             position["category"] = derived
             position["category_proposed_by_model"] = proposed
-            position["category_rule"] = (
-                f"employer {organisation!r} is "
-                f"{'academic' if academic else 'non-academic'}; "
-                f"title {title!r} -> {derived}")
+            position["category_rule"] = verdict["reason"]
             notes.append(
-                f"position[{index}] '{title}' at '{organisation}': category "
-                f"{proposed} -> {derived} ({position['category_rule']})")
+                f"position[{index}] '{title}'"
+                + (f" at '{organisation}'" if organisation else "")
+                + f": category {proposed} -> {derived} ({verdict['reason']})")
+
+        position["category_review"] = verdict
+        if verdict["needs_review"]:
+            notes.append(
+                f"position[{index}] '{title}': {verdict['reason']}; "
+                f"please check")
 
     return positions, notes
 
@@ -616,6 +614,97 @@ def check_positions(positions: list, source_norm: str) -> tuple[list, list]:
         cleaned.append(entry)
 
     return cleaned, issues
+
+
+def _patent_key(patent: dict) -> str:
+    """
+    Identity of an invention, for duplicate detection.
+
+    The number is the real identifier when present. Falling back to the
+    normalised title catches the common CV pattern of listing the same
+    invention twice - once when filed and again when granted - without a
+    number on either line.
+    """
+    number = re.sub(r"[^a-z0-9]", "", str(patent.get("number") or "").lower())
+    return number or normalise(patent.get("title") or "")
+
+
+def check_patents(patents: list, source_norm: str) -> list[dict]:
+    """
+    Validate patent entries: traceable to the CV, identifiable, unique.
+
+    Applies schema.PATENT_EXCLUSIONS. Nothing is deleted - an excluded
+    entry stays visible with its reason, because a reviewer needs to see
+    the claim AND why it earned nothing.
+
+    Where a filing and its grant are both listed, the HIGHER status is
+    kept and the other marked duplicate: the invention progressed, it did
+    not happen twice.
+    """
+    seen: dict[str, int] = {}
+    results: list[dict] = []
+    rank = {"granted": 3, "published": 2, "filed": 1, "unknown": 0}
+
+    for index, patent in enumerate(patents):
+        if not isinstance(patent, dict):
+            continue
+        title = patent.get("title") or ""
+        evidence = patent.get("evidence") or ""
+        status = (patent.get("status") or "unknown").lower()
+        if status not in schema.PATENT_STATUSES:
+            status = "unknown"
+
+        exclusions: list[str] = []
+        issues: list[str] = []
+
+        title_ok, title_score = (appears_in(title, source_norm) if title
+                                 else (False, 0.0))
+        if not title_ok:
+            issues.append(f"title not found in CV (best {title_score})")
+            exclusions.append("failed_validation")
+
+        if evidence.strip() and not appears_in(evidence, source_norm)[0]:
+            issues.append("evidence span not found in CV")
+
+        if not str(patent.get("number") or "").strip():
+            exclusions.append("no_identifier")
+
+        key = _patent_key(patent)
+        duplicate_of = None
+        if key and key in seen:
+            previous = results[seen[key]]
+            if rank[status] > rank[previous["status_final"]]:
+                # This entry supersedes the earlier one.
+                previous["credit_exclusions"] = sorted(
+                    set(previous["credit_exclusions"]) | {"duplicate_patent"})
+                previous["duplicate_of"] = index
+                seen[key] = len(results)
+            else:
+                exclusions.append("duplicate_patent")
+                duplicate_of = seen[key]
+        elif key:
+            seen[key] = len(results)
+
+        results.append({
+            "index": index,
+            "title": title,
+            "number": patent.get("number"),
+            "status_final": status,
+            "inventors": patent.get("inventors") or [],
+            "year": patent.get("year"),
+            "jurisdiction": patent.get("jurisdiction"),
+            "evidence": evidence,
+            "title_in_source": title_ok,
+            "issues": issues,
+            "credit_exclusions": sorted(set(exclusions)),
+            "duplicate_of": duplicate_of,
+            # No register was consulted - see schema.PATENT_VERIFICATION.
+            "verification": "unavailable",
+            "verification_note": schema.PATENT_VERIFICATION["unavailable"],
+            "verdict": "verified" if not issues else "unverified",
+        })
+
+    return results
 
 
 def validate_record(record: dict, source_text: str) -> dict:
@@ -681,6 +770,8 @@ def validate_record(record: dict, source_text: str) -> dict:
         }
         clean_pubs.append(entry)
 
+    patent_results = check_patents(record.get("patents", []) or [], source_norm)
+
     verified = sum(1 for r in scalar_results if r["status"] == "verified")
     partial = sum(1 for r in scalar_results if r["status"] == "partial")
     present = sum(1 for r in scalar_results if r["status"] != "absent")
@@ -692,7 +783,11 @@ def validate_record(record: dict, source_text: str) -> dict:
         "candidate_id": record.get("candidate_id"),
         "profile": clean,
         "publications": clean_pubs,
+        "patents": patent_results,
         "validation_summary": {
+            "patents_total": len(patent_results),
+            "patents_excluded": sum(1 for p in patent_results
+                                    if p["credit_exclusions"]),
             "scalar_fields_present": present,
             "scalar_fields_verified": verified,
             "scalar_fields_partial": partial,

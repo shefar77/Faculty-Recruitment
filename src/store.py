@@ -193,6 +193,75 @@ def save_audit(connection: sqlite3.Connection, audit: dict) -> None:
     connection.commit()
 
 
+def update_explanations(connection: sqlite3.Connection, candidate_id: str,
+                        explained: dict) -> int:
+    """
+    Replace the stored prose for one candidate. Touches NO number.
+
+    Explanations are generated after the fact rather than during upload,
+    because they are the one part of the pipeline that cannot change a
+    result: the model is handed the finished criterion and writes sentences
+    about it. Keeping them off the critical path costs a reviewer nothing
+    and saves roughly a quarter of the run.
+
+    Only the `explanation` and `explanation_source` columns are written.
+    The scores, measurements and notes in the same row are left exactly as
+    the pipeline computed them, so this cannot quietly restate a number.
+    The audit record is updated in step, so the file and the table cannot
+    disagree about what was said.
+    """
+    row = connection.execute(
+        "SELECT audit_json FROM candidates WHERE candidate_id=?",
+        (candidate_id,)).fetchone()
+    if row is None:
+        raise KeyError(candidate_id)
+
+    by_criterion = {entry["criterion"]: entry
+                    for entry in explained.get("criterion_explanations", [])}
+
+    updated = 0
+    for criterion, entry in by_criterion.items():
+        cursor = connection.execute(
+            """UPDATE criteria SET explanation=?, explanation_source=?
+               WHERE candidate_id=? AND criterion=?""",
+            (entry.get("explanation"), entry.get("source"),
+             candidate_id, criterion))
+        updated += cursor.rowcount
+
+    audit = json.loads(row["audit_json"])
+    audit["explanations"] = explained
+    connection.execute(
+        "UPDATE candidates SET audit_json=? WHERE candidate_id=?",
+        (json.dumps(audit, ensure_ascii=False), candidate_id))
+
+    connection.commit()
+    return updated
+
+
+def explanation_state(connection: sqlite3.Connection,
+                      candidate_id: str) -> dict:
+    """
+    Whether this candidate's prose has been generated yet.
+
+    'template' means the deterministic sentence written by Python, which is
+    always present and always correct. 'llm' means a model wrote it and it
+    passed the numeric check. The UI uses this to decide whether offering
+    to generate prose would do anything.
+    """
+    rows = connection.execute(
+        "SELECT criterion, explanation_source FROM criteria "
+        "WHERE candidate_id=?", (candidate_id,)).fetchall()
+    if not rows:
+        raise KeyError(candidate_id)
+    sources = [r["explanation_source"] for r in rows]
+    return {
+        "criteria_total": len(sources),
+        "llm_written": sum(1 for s in sources if s == "llm"),
+        "template_written": sum(1 for s in sources if s != "llm"),
+        "all_llm": all(s == "llm" for s in sources),
+    }
+
+
 def record_override(connection: sqlite3.Connection, candidate_id: str,
                     field: str, original_value, new_value, reason: str,
                     overridden_by: str = "faculty") -> int:
@@ -368,6 +437,27 @@ def ranked_candidates(connection: sqlite3.Connection) -> list[dict]:
     return states
 
 
+# Per-criterion fields the reviewer needs in order to see WHY a number is
+# what it is. They live in the audit record rather than the criteria
+# table: that table stores what each score IS, and widening it for every
+# new kind of evidence would mean a migration each time.
+#
+# Deliberately excludes points, weight, measured and eligibility.
+# effective_state() owns every figure, and an audit record that disagreed
+# with the stored score must not be able to overwrite one here - a display
+# merge is not allowed to change an outcome.
+EVIDENCE_FIELDS = (
+    "evidence",
+    "unscored_positions",
+    "unclassified_roles",
+    "indeterminate",
+    "indeterminate_entries",
+    "publication_credit",
+    "patent_credit",
+    "patent_credit_counted",
+)
+
+
 def candidate_detail(connection: sqlite3.Connection, candidate_id: str) -> dict:
     """
     Everything a reviewer needs for one candidate, assembled here rather
@@ -375,8 +465,9 @@ def candidate_detail(connection: sqlite3.Connection, candidate_id: str) -> dict:
 
     effective_state() covers scores and overrides. This adds the evidence
     that lives in the stored audit record - publication verdicts with
-    their OpenAlex URLs, reviewer flags, the eligibility rationale and the
-    run's provenance - so the HTTP layer only has to serialise a dict.
+    their OpenAlex URLs, the roles and papers behind each criterion,
+    reviewer flags, the eligibility rationale and the run's provenance -
+    so the HTTP layer only has to serialise a dict.
     """
     state = effective_state(connection, candidate_id)
 
@@ -408,13 +499,22 @@ def candidate_detail(connection: sqlite3.Connection, candidate_id: str) -> dict:
         for item in audit.get("explanations", {})
                          .get("criterion_explanations", [])
     }
+    audited = {
+        item["criterion"]: item for item in scored.get("criteria", [])
+    }
     for criterion in state["criteria"]:
         explanation = explanations.get(criterion["criterion"], {})
         criterion["explanation_source"] = explanation.get(
             "source", criterion.get("explanation_source"))
 
+        record = audited.get(criterion["criterion"], {})
+        for field in EVIDENCE_FIELDS:
+            if field in record:
+                criterion[field] = record[field]
+
     state.update({
         "eligibility": scored.get("eligibility", {}),
+        "explanation_state": explanation_state(connection, candidate_id),
         "reviewer_flags": scored.get("reviewer_flags", []),
         "eligibility_explanation": audit.get("explanations", {})
                                         .get("eligibility_explanation"),

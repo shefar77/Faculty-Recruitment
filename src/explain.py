@@ -37,7 +37,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import extract_fields as ef  # noqa: E402  (reuses the Ollama client)
 
-MAX_SENTENCES = 5
+MAX_SENTENCES = 6
+
+# Mirrors scoring.ASSISTANTSHIP_CREDIT, imported lazily to keep this module
+# free of a scoring dependency it otherwise does not need.
+ASSISTANTSHIP_RATE = 0.5
 
 EXPLANATION_PROMPT = """You explain one scoring criterion to a faculty
 reviewer. A deterministic program has ALREADY computed the score. Your only
@@ -232,28 +236,184 @@ def check_explanation(text: str, criterion: dict) -> tuple[bool, str]:
     return True, ""
 
 
+# Plain-English names for the criteria, and for what each one measures.
+# The reviewer is a professor reading a candidate, not a developer reading
+# a schema: "positions[].start_date" tells them nothing they want to know.
+CRITERION_LABEL = {
+    "publications": "Research output",
+    "teaching_experience": "Teaching experience",
+    "doctorate": "Doctoral qualification",
+    "industry_experience": "Industry experience",
+    "research_visibility": "Research visibility",
+}
+
+
+def _years(value: float) -> str:
+    """'2.0' -> 'two years'. Durations read better as language."""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    months = round(number * 12)
+    if months <= 0:
+        return "no recorded time"
+    if months < 12:
+        return f"{months} month{'s' if months != 1 else ''}"
+    whole, rest = divmod(months, 12)
+    if rest == 0:
+        return f"{whole} year{'s' if whole != 1 else ''}"
+    return (f"{whole} year{'s' if whole != 1 else ''} "
+            f"and {rest} month{'s' if rest != 1 else ''}")
+
+
+def _experience_sentences(criterion: dict) -> list[str]:
+    """Describe experience in terms of the roles behind it."""
+    rows = [r for r in criterion.get("evidence", []) if r.get("months")]
+    if not rows:
+        return []
+
+    described = []
+    for row in rows[:4]:
+        title = row.get("title") or "an unnamed role"
+        where = f" at {row['organisation']}" if row.get("organisation") else ""
+
+        # Only state a span when both ends are actually known. Printing
+        # "None to None" tells the reviewer nothing and looks like a bug
+        # in the very place they are being asked to trust the figures.
+        start, end = row.get("from"), row.get("to")
+        # Stage 6 writes "present (2026-10-27)" so the as-of date is
+        # recorded. Nested inside a span that is itself parenthesised it
+        # reads badly, so the date is dropped here - it stays in the audit
+        # record, and the criterion's own as_of_date carries it for the UI.
+        if isinstance(end, str) and end.startswith("present"):
+            end = "present"
+        if start and end:
+            span = f" ({start} to {end})"
+        elif start:
+            span = f" (from {start})"
+        elif end:
+            span = f" (until {end})"
+        else:
+            span = ""
+        duration = (f"{', ' if span else ' '}{_years((row['months']) / 12)}"
+                    if row.get("months") else "")
+
+        rate = ""
+        if row.get("kind") == "assistantship":
+            rate = (f", counted at {int(ASSISTANTSHIP_RATE * 100)}% because it "
+                    f"is a teaching assistantship rather than a faculty post")
+        described.append(f"{title}{where}{span}{duration}{rate}")
+
+    sentences = ["The CV documents " + "; ".join(described) + "."]
+    if len(rows) > 1:
+        sentences.append(
+            "Where these periods overlap, the overlapping months are counted "
+            "once rather than added together.")
+    return sentences
+
+
+def _research_sentences(criterion: dict) -> list[str]:
+    """Describe research output, keeping papers and patents distinct."""
+    rows = criterion.get("evidence", [])
+    papers = [r for r in rows if r.get("kind") != "patent"]
+    patents = [r for r in rows if r.get("kind") == "patent"]
+    sentences = []
+
+    if papers:
+        credited = sum(1 for r in papers if (r.get("credit") or 0) > 0)
+        uncredited = len(papers) - credited
+        sentence = (f"The CV lists {len(papers)} publication"
+                    f"{'s' if len(papers) != 1 else ''}, of which {credited} "
+                    f"could be corroborated against the OpenAlex index")
+        if uncredited:
+            sentence += (f"; the remaining {uncredited} could not be "
+                         f"confirmed there and so earned no credit")
+        sentences.append(sentence + ".")
+
+    if patents:
+        counted = criterion.get("patent_credit_counted", 0)
+        granted = sum(1 for r in patents if r.get("status") == "granted")
+        sentence = (f"It also lists {len(patents)} patent"
+                    f"{'s' if len(patents) != 1 else ''}"
+                    f"{f', {granted} of them granted' if granted else ''}, "
+                    f"contributing {counted} of the research total")
+        sentences.append(sentence + ".")
+        sentences.append(
+            "Patent records could not be checked against a patent register, "
+            "so they rest on the CV alone and are capped so that they "
+            "supplement peer-reviewed work rather than replace it.")
+
+    return sentences
+
+
 def template_explanation(criterion: dict) -> str:
     """
-    Deterministic fallback, used when the model's prose fails the check or
-    the model is unavailable.
+    Deterministic, professor-facing prose. No field names, no JSON paths.
 
-    An audit file with a plain, correct sentence is strictly better than one
-    with fluent prose nobody verified.
+    This is what a reviewer reads when the model is unavailable or its
+    wording failed the numeric check, so it has to stand on its own as an
+    explanation - not as a debugging trace. The implementation detail it
+    used to print ("computed by fixed rules from the fields
+    positions[].category, positions[].start_date") told a professor
+    nothing they could act on, while implying the answer was somehow
+    mechanical rather than evidential.
+
+    The audit record still carries source_fields and every internal label;
+    they simply do not belong in front of a reviewer.
     """
-    name = criterion["criterion"].replace("_", " ")
+    name = CRITERION_LABEL.get(criterion["criterion"],
+                               criterion["criterion"].replace("_", " "))
     points, weight = criterion["points"], criterion["weight"]
-    measured, unit = criterion["measured"], criterion["unit"]
+    measured = criterion.get("measured")
+    key = criterion["criterion"]
+
+    opening = f"{name} scored {points} out of {weight}."
+
+    if criterion.get("indeterminate"):
+        return (f"{opening} This score is NOT reliable: a lookup service "
+                f"could not be reached while the candidate was assessed, so "
+                f"part of their record could not be checked. It must not be "
+                f"read as a judgement on the candidate. Re-run once the "
+                f"service is reachable.")
 
     if criterion.get("insufficient_evidence"):
-        return (f"The {name} criterion scored {points} out of {weight}. "
-                f"The CV did not provide evidence that could be scored for "
-                f"this criterion, so it contributes nothing to the total. "
-                f"Detail recorded: {criterion.get('note', 'none')}.")
+        return (f"{opening} The CV did not provide evidence that could be "
+                f"scored here, so this criterion contributes nothing to the "
+                f"total. That is a statement about what the CV records, not "
+                f"a judgement on the candidate.")
 
-    return (f"The {name} criterion scored {points} out of {weight}, from a "
-            f"measured {measured} {unit}. This was computed by fixed rules "
-            f"from the fields {', '.join(criterion.get('source_fields', []))}. "
-            f"Detail recorded: {criterion.get('note', 'none')}.")
+    body: list[str] = []
+    if key in ("teaching_experience", "industry_experience"):
+        body = _experience_sentences(criterion)
+        if measured is not None:
+            opening = (f"{name} scored {points} out of {weight}, from "
+                       f"{_years(measured)} of documented experience.")
+    elif key == "publications":
+        body = _research_sentences(criterion)
+    elif key == "doctorate":
+        body = [criterion.get("note", "").capitalize() + "."]
+    elif key == "research_visibility":
+        body = [f"Corroborated publications have attracted {measured} "
+                f"citation{'s' if measured != 1 else ''} in total."]
+
+    if criterion.get("unclassified_roles"):
+        body.append(
+            "One or more roles could not be identified as either a faculty "
+            "appointment or a teaching assistantship from the CV; they were "
+            "counted at the full rate and need a reviewer's eye.")
+
+    if criterion.get("unscored_positions"):
+        titles = ", ".join(
+            f"{u['title']}" for u in criterion["unscored_positions"][:3])
+        body.append(
+            f"The CV documents further roles that could not be categorised "
+            f"and therefore count toward no criterion ({titles}). This is a "
+            f"gap in what could be read from the CV, not an absence of "
+            f"experience, and needs a reviewer's decision.")
+
+    tail = ("The score reflects only what the CV evidences and can be "
+            "overridden by a reviewer.")
+    return " ".join([opening] + [s for s in body if s.strip()] + [tail])
 
 
 def explain_criterion(criterion: dict, *, use_llm: bool = True) -> dict:

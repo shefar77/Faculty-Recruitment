@@ -26,7 +26,12 @@ export const listCandidates = () => request("/candidates");
 export const getCandidate = (id) =>
   request(`/candidates/${encodeURIComponent(id)}`);
 
-export function uploadCV(file, { useLlm = true } = {}) {
+/**
+ * Prose is off by default, matching the API. It cannot change a score, and
+ * generating it during upload costs roughly a quarter of the run for text
+ * the reviewer may never open. Ask for it per candidate instead.
+ */
+export function uploadCV(file, { useLlm = false } = {}) {
   const form = new FormData();
   form.append("file", file);
   return request(`/candidates?use_llm=${useLlm}`, {
@@ -34,6 +39,9 @@ export function uploadCV(file, { useLlm = true } = {}) {
     body: form,
   });
 }
+
+export const generateExplanations = (id) =>
+  request(`/candidates/${encodeURIComponent(id)}/explain`, { method: "POST" });
 
 export function overrideScore(id, payload) {
   return request(`/candidates/${encodeURIComponent(id)}/score`, {

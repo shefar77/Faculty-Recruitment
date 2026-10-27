@@ -344,18 +344,59 @@ def test_open_ended_row_is_not_corrected():
 
 
 # ---------------------------------------------------------------------------
-# Candidate_06 regressions: classification and the authorship contradiction
+# Position classification
 # ---------------------------------------------------------------------------
 
-def test_non_academic_employer_is_classified_as_industry():
-    """schema.py defines industry as "any non-academic employer"."""
+def test_a_recognisably_commercial_employer_is_industry():
+    """An employer whose NAME marks it as a company settles the question."""
     positions, notes = validate.review_position_categories([
-        {"title": "Tech Mentor Intern", "organisation": "Kalvium",
+        {"title": "Software Engineer",
+         "organisation": "Acme Technologies Pvt. Ltd.",
          "category": "other"},
     ])
     assert positions[0]["category"] == "industry"
     assert positions[0]["category_proposed_by_model"] == "other"
     assert notes and "other -> industry" in notes[0]
+
+
+def test_an_unrecognisable_employer_is_flagged_not_called_industry():
+    """
+    CHANGED DELIBERATELY. The old rule was "any employer without an
+    academic word in its name is industry", which cannot distinguish a
+    startup from a government research institute - both are a single
+    proper noun. It filed a government institute as industry.
+
+    Absence of an academic marker is not evidence of a company, so the
+    entry is now flagged instead of guessed.
+    """
+    positions, notes = validate.review_position_categories([
+        {"title": "Summer Intern", "organisation": "Veltrix",
+         "category": "other"},
+    ])
+    assert positions[0]["category"] == "other"          # not guessed
+    assert positions[0]["category_review"]["needs_review"] is True
+    assert any("please check" in note for note in notes)
+
+
+def test_an_academic_title_outranks_an_unrecognised_employer():
+    """
+    A research post at a body known only by an acronym must not become
+    'industry' merely because the name carries no university word.
+    """
+    positions, _ = validate.review_position_categories([
+        {"title": "Research Associate", "organisation": "Veltrix",
+         "category": "other"},
+    ])
+    assert positions[0]["category"] == "research"
+
+
+def test_a_lectureship_at_a_company_is_still_teaching():
+    """The role decides the category, not the employer's legal form."""
+    positions, _ = validate.review_position_categories([
+        {"title": "Lecturer", "organisation": "Acme Technologies Pvt. Ltd.",
+         "category": "other"},
+    ])
+    assert positions[0]["category"] == "teaching"
 
 
 def test_academic_employer_keeps_teaching_classification():

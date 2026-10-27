@@ -238,6 +238,107 @@ CREDIT_EXCLUSIONS = (
 # publication scored nothing.
 
 
+# ===========================================================================
+# 4b. PATENTS - a subcategory of research output, not a criterion of its own
+# ===========================================================================
+# WHY A SUBCATEGORY AND NOT A SIXTH CRITERION
+#   A separate top-level criterion would give every candidate in a
+#   patent-light discipline a guaranteed zero on a scored line. Mathematics,
+#   history and most of theoretical physics do not file patents, and a
+#   rubric that reads that as a deficiency is measuring the field, not the
+#   person. Folding patents into research output means a candidate is
+#   credited for the contributions they actually made, in whatever form
+#   their discipline produces them.
+#
+# WHY PATENTS ARE DISCOUNTED AGAINST PEER-REVIEWED WORK
+#   A granted patent has passed substantive examination for novelty by a
+#   patent office - a real, independent check, and the reason granted
+#   patents earn most of a publication's credit. But it is an examination
+#   for patentability, not for scholarly contribution, and the two are not
+#   interchangeable. A PUBLISHED APPLICATION has passed no such check at
+#   all: publication at 18 months is automatic and says only that a filing
+#   exists. A PENDING or FILED application is a receipt.
+#
+#   DEMO/RESEARCH values. These ratios are a proposal, not sector policy,
+#   and need faculty approval before any real use.
+PATENT_STATUSES = (
+    "granted",       # examined and granted by a patent office
+    "published",     # application published (automatic at ~18 months)
+    "filed",         # application submitted, not yet published
+    "unknown",       # the CV states no stage
+)
+
+# Credit in PUBLICATION-EQUIVALENTS, so patents and papers share one scale
+# and one saturation point. A granted patent is worth 0.75 of a
+# corroborated paper; an unexamined filing is worth nothing.
+PATENT_CREDIT = {
+    "granted": 0.75,
+    "published": 0.25,
+    "filed": 0.00,
+    "unknown": 0.00,
+}
+
+# Hard ceiling on what patents may contribute to the research criterion,
+# as a fraction of its weight.
+#
+# WHY A CEILING AT ALL: patents are cheap to list and hard to verify from a
+# CV. Without a cap, a candidate listing twenty granted patents would
+# saturate a criterion whose stated purpose is peer-reviewed scholarship,
+# and would outscore a candidate with a strong publication record. The cap
+# lets patents matter without letting them substitute for peer review.
+PATENT_SHARE_OF_RESEARCH = 0.25
+
+# Patents a reviewer must look at rather than trust.
+PATENT_EXCLUSIONS = (
+    {
+        "id": "duplicate_patent",
+        "rule": ("The same application or grant number, or the same title, "
+                 "appears more than once in the CV - commonly because a "
+                 "filing and its later grant are both listed."),
+        "credit": 0.00,
+        "reviewer_note": (
+            "Counted once only. A filing and the grant that follows it are "
+            "one invention, not two."),
+    },
+    {
+        "id": "failed_validation",
+        "rule": "Stage 4 could not find the patent's title in the CV text.",
+        "credit": 0.00,
+        "reviewer_note": (
+            "Could not be corroborated against the CV text. A statement "
+            "about traceability, not an accusation."),
+    },
+    {
+        "id": "no_identifier",
+        "rule": ("Neither an application number nor a grant number is "
+                 "stated, so the record cannot be looked up by anyone."),
+        "credit": 0.00,
+        "reviewer_note": (
+            "No application or grant number is given, so this claim cannot "
+            "be checked against any patent register. It stays visible and "
+            "earns nothing until a number is supplied. Reviewer may "
+            "override."),
+    },
+)
+
+# NOT VERIFIED AGAINST ANY REGISTER, and the UI must say so.
+#   OpenAlex does not index patents. Espacenet, Google Patents and the
+#   Indian IPO all publish searchable data, but each needs either an API
+#   key, a licence, or scraping - and this project has a zero-budget, no-
+#   scraping constraint. So a patent's credit rests on the CV plus a
+#   checkable number, never on an external confirmation.
+#
+#   This is a MEANINGFUL weakness and is the reason granted patents are
+#   capped well below the research criterion's weight. It must never be
+#   presented to a reviewer as though it carried the same evidential
+#   standing as an OpenAlex-confirmed publication.
+PATENT_VERIFICATION = {
+    "verified": "confirmed against a patent register",
+    "unverified": "a number is stated but no register was consulted",
+    "unavailable": "no register could be consulted for this record",
+}
+
+
 # WHY (c) RESOLVED AS "NO SPECIAL DISCOUNT FOR accepted / in_press".
 # The question was whether accepted/in_press should score below published.
 # They should not - at the STATUS level. Acceptance is the moment peer

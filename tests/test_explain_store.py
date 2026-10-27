@@ -307,19 +307,82 @@ def test_true_claim_of_full_marks_is_accepted():
     assert ok, why
 
 
-def test_threshold_wording_is_not_mistaken_for_a_claim():
+def test_the_template_passes_its_own_numeric_check():
     """
-    "full marks at 5.0 years" states the SATURATION POINT; "the full marks
-    awarded" claims to have reached it. The criterion's own note uses the
-    first form, and the template quotes it, so confusing the two made the
-    fallback fail its own check.
+    The fallback has to satisfy the same guard the model's prose does -
+    otherwise a rejected explanation would be replaced by one that is
+    itself rejectable.
     """
     criterion = dict(CRITERION, points=10.85, weight=25,
                      note="full marks at 5.0 years")
     text = explain.template_explanation(criterion)
     ok, why = explain.check_explanation(text, criterion)
     assert ok, why
-    assert "full marks at" in text
+
+
+def test_the_template_never_shows_internal_field_names():
+    """
+    A professor reading a candidate must not be shown JSON paths. These
+    leaked into the reviewer-facing text through the old template, which
+    quoted source_fields and the raw internal note verbatim.
+    """
+    criterion = dict(
+        CRITERION, points=10.85, weight=25,
+        note="full marks at 5.0 years; UNCLASSIFIED: check this",
+        source_fields=["positions[].category", "positions[].start_date"],
+        evidence=[{"title": "Assistant Professor", "organisation": "A College",
+                   "from": "2024-10", "to": "present", "months": 24,
+                   "kind": "appointment"}],
+    )
+    text = explain.template_explanation(criterion)
+    for leak in ["positions[]", "start_date", "end_date", "[].", "_date",
+                 "source_fields", "insufficient_evidence", "fraction_of_weight"]:
+        assert leak not in text, f"template leaked {leak!r}: {text}"
+
+
+def test_the_template_describes_the_actual_roles():
+    criterion = dict(
+        CRITERION, points=10.0, weight=25, measured=2.0,
+        evidence=[{"title": "Assistant Professor", "organisation": "A College",
+                   "from": "2024-10", "to": "present", "months": 24,
+                   "kind": "appointment"}],
+    )
+    text = explain.template_explanation(criterion)
+    assert "Assistant Professor" in text
+    assert "A College" in text
+    assert "2 years" in text
+
+
+def test_the_template_omits_a_date_span_it_does_not_have():
+    """Printing "None to None" looks like a defect to the reviewer."""
+    criterion = dict(
+        CRITERION, points=10.0, weight=25, measured=2.0,
+        evidence=[{"title": "Assistant Professor", "organisation": None,
+                   "from": None, "to": None, "months": 24,
+                   "kind": "appointment"}],
+    )
+    text = explain.template_explanation(criterion)
+    assert "None" not in text
+
+
+def test_an_assistantship_is_explained_as_discounted():
+    criterion = dict(
+        CRITERION, points=5.0, weight=25, measured=1.0,
+        evidence=[{"title": "Teaching Assistant", "organisation": "A College",
+                   "from": "2023-09", "to": "2025-05", "months": 20,
+                   "kind": "assistantship"}],
+    )
+    text = explain.template_explanation(criterion)
+    assert "assistantship" in text.lower()
+    assert "50%" in text
+
+
+def test_a_lookup_failure_is_not_reported_as_a_candidate_finding():
+    criterion = dict(CRITERION, points=0.0, weight=40, indeterminate=True,
+                     indeterminate_entries=19)
+    text = explain.template_explanation(criterion)
+    assert "not reliable" in text.lower()
+    assert "must not be read as a judgement" in text.lower()
 
 
 # ---------------------------------------------------------------------------

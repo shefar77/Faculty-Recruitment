@@ -42,8 +42,9 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))          # for run.py
 sys.path.insert(0, str(ROOT / "src"))  # for the pipeline modules
 
-import run     # noqa: E402  the Stage 7 orchestrator, imported unchanged
-import store   # noqa: E402
+import run      # noqa: E402  the Stage 7 orchestrator, imported unchanged
+import store    # noqa: E402
+import explain  # noqa: E402
 
 CV_DIR = ROOT / "data" / "cvs"
 SAFE_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
@@ -107,9 +108,12 @@ def health() -> dict:
 @app.post("/candidates", status_code=201)
 async def upload_candidate(
     file: UploadFile = File(...),
-    use_llm: bool = Query(True, description=(
-        "Generate prose explanations. Off is much faster and yields "
-        "deterministic template text.")),
+    use_llm: bool = Query(False, description=(
+        "Generate prose explanations during the upload. Defaults to OFF: "
+        "prose is the one output that cannot change a score, and generating "
+        "it here costs about a quarter of the run for text the reviewer may "
+        "never open. Every criterion still gets a deterministic template "
+        "sentence. Call POST /candidates/{id}/explain for prose on demand.")),
     reuse_extraction: bool = Query(False, description=(
         "Replay a stored extraction for this filename instead of calling "
         "the model again. Refuses if the stored record is for a different "
@@ -123,9 +127,14 @@ async def upload_candidate(
     Upload a CV, run the whole pipeline, return the complete audit record.
 
     SLOW BY NATURE: a full run is minutes per CV on CPU, because a local
-    7B model reads the CV three times. That is the cost of the zero-API
-    constraint, not a defect. Pass use_llm=false for a fast path that
-    keeps every computed number and uses template explanations.
+    7B model reads the CV three times. Measured on the development machine,
+    99.9% of the runtime is Ollama generating tokens at ~8/sec; text
+    extraction, validation, OpenAlex lookups, scoring and the database
+    together account for 0.1 seconds. That is the cost of the zero-API
+    constraint, not a defect in this code.
+
+    Prose explanations are OFF by default here for the reason given on the
+    parameter. Pass use_llm=true to generate them inline instead.
     """
     name = Path(file.filename or "").name
     if not name or not SAFE_NAME.match(name):
@@ -219,6 +228,59 @@ def get_audit(candidate_id: str,
     if row is None:
         raise HTTPException(404, f"no candidate {candidate_id!r}")
     return json.loads(row["audit_json"])
+
+
+@app.post("/candidates/{candidate_id}/explain")
+async def generate_explanations(
+    candidate_id: str,
+    connection: sqlite3.Connection = Depends(get_db),
+) -> dict:
+    """
+    Write prose for one candidate's already-computed criteria.
+
+    Separated from the upload because it is the only stage that cannot
+    affect a result. The model is handed the finished criterion - never
+    the CV - and every number it writes is checked against the numbers it
+    was given, exactly as in Stage 7. Prose that fails that check is
+    replaced by the template, so this endpoint cannot introduce a claim
+    the pipeline did not make.
+
+    Idempotent in effect: calling it again regenerates the same text from
+    the same inputs at temperature 0, and no score is touched either way.
+    """
+    row = connection.execute(
+        "SELECT audit_json FROM candidates WHERE candidate_id=?",
+        (candidate_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404, f"no candidate {candidate_id!r}")
+
+    scored = json.loads(row["audit_json"]).get("scoring", {})
+    if not scored.get("criteria"):
+        raise HTTPException(
+            422, f"{candidate_id!r} has no stored criteria to explain")
+
+    # Minutes of blocking generation - off the event loop, as with upload.
+    try:
+        explained = await run_in_threadpool(
+            explain.explain_candidate, scored, use_llm=True)
+    except Exception as exc:
+        raise HTTPException(
+            503, f"explanation generation failed: {type(exc).__name__}: {exc}")
+
+    updated = store.update_explanations(connection, candidate_id, explained)
+
+    return {
+        "candidate_id": candidate_id,
+        "criteria_updated": updated,
+        "llm_used": explained.get("llm_used", False),
+        "explanations_rejected": explained.get("explanations_rejected", 0),
+        "state": store.explanation_state(connection, candidate_id),
+        "explanations": explained.get("criterion_explanations", []),
+        "note": ("Prose only. No score, measurement or eligibility outcome "
+                 "was read from the model or changed by this call. Any "
+                 "sentence that stated a number not present in the computed "
+                 "criterion was rejected and replaced by a template."),
+    }
 
 
 @app.patch("/candidates/{candidate_id}/score")
