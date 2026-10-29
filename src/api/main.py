@@ -187,13 +187,27 @@ def list_candidates(connection: sqlite3.Connection = Depends(get_db)) -> dict:
     """
     rows = store.ranked_candidates(connection)
     eligible = [r for r in rows if r["effective_eligibility"] == "met"]
-    gated = [r for r in rows if r["effective_eligibility"] != "met"]
+    # THREE buckets, not two. "gated" used to hold both of these at once,
+    # and the dashboard printed the pair under one heading reading "Needs
+    # review / not eligible" - so a candidate whose doctorate simply was
+    # not yet confirmed appeared alongside candidates who fail the
+    # requirement outright. They call for opposite decisions: one needs a
+    # person to look, the other needs no further work. Merging them put
+    # an unproven conclusion in front of the reviewer.
+    needs_review = [r for r in rows
+                    if r["effective_eligibility"] == "indeterminate"]
+    not_eligible = [r for r in rows
+                    if r["effective_eligibility"] == "not_met"]
 
     unreliable = [r for r in rows if not r.get("scoring_reliable", True)]
 
     return {
         "eligible": eligible,
-        "gated": gated,
+        "needs_review": needs_review,
+        "not_eligible": not_eligible,
+        # Retained as the union of the two above so existing clients and
+        # saved queries keep working. New code should read the split.
+        "gated": needs_review + not_eligible,
         # Loud, at the top of the payload: if a lookup service was down
         # during scoring, these rankings are not trustworthy and the UI
         # must say so rather than render a normal-looking table.
@@ -202,8 +216,12 @@ def list_candidates(connection: sqlite3.Connection = Depends(get_db)) -> dict:
              "reasons": r.get("unreliable_reasons", [])}
             for r in unreliable],
         "all_scores_reliable": not unreliable,
-        "counts": {"eligible": len(eligible), "gated": len(gated),
+        "counts": {"eligible": len(eligible),
+                   "needs_review": len(needs_review),
+                   "not_eligible": len(not_eligible),
+                   "gated": len(needs_review) + len(not_eligible),
                    "total": len(rows)},
+        "eligibility_explained": schema.ELIGIBILITY_EXPLAINED,
         "ordering": ("eligible first by effective_total, then gated by "
                      "effective_total; the two groups are never interleaved"),
         "note": ("Both computed_total and effective_total are returned for "

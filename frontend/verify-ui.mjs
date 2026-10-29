@@ -119,16 +119,61 @@ check("no banner when every score is reliable",
   !cleanHtml.includes("not fully verified"));
 
 console.log("\nRANKED LIST — grouping");
+// "Cannot tell" and "does not qualify" shared one heading reading
+// "Needs review / not eligible", so a candidate whose doctorate was
+// merely unconfirmed appeared to have been judged ineligible. These
+// checks pin the two apart.
+const uncertain = { ...reliable, candidate_id: "Uncertain_High",
+  candidate_name: "Thesis Submitted", computed_total: 99, effective_total: 99,
+  computed_eligibility: "indeterminate", effective_eligibility: "indeterminate" };
+const failing = { ...reliable, candidate_id: "Failing_Case",
+  candidate_name: "No Doctorate", computed_total: 31, effective_total: 31,
+  computed_eligibility: "not_met", effective_eligibility: "not_met" };
+
 const groupedHtml = globalThis.renderList({
-  eligible: [reliable],
-  gated: [{ ...reliable, candidate_id: "Gated_High", computed_total: 99,
-            effective_total: 99, computed_eligibility: "indeterminate",
-            effective_eligibility: "indeterminate" }],
+  eligible: [reliable], needs_review: [uncertain], not_eligible: [failing],
+  gated: [uncertain, failing],
 });
-check("gated group is rendered separately",
-  groupedHtml.includes("Needs review / not eligible"));
-check("gated group warns a high score is not appointability",
-  groupedHtml.includes("does not mean the candidate is appointable"));
+check("an uncertain candidate gets their own heading",
+  groupedHtml.includes("Needs your review"));
+check("a failing candidate is NOT filed under that same heading",
+  groupedHtml.includes("Does not meet the requirement"));
+check("the uncertain group says it is a gap in evidence, not a finding",
+  groupedHtml.includes("not a finding against the"));
+check("the failing group still warns a high score is not appointability",
+  groupedHtml.includes("does not make a candidate appointable"));
+check("both candidates are rendered",
+  groupedHtml.includes("Uncertain_High") && groupedHtml.includes("Failing_Case"));
+check("raw eligibility codes never reach the reviewer",
+  !groupedHtml.includes(">indeterminate<") && !groupedHtml.includes(">not_met<"),
+  "the database's words are not the reviewer's words");
+check("eligibility is shown in plain language instead",
+  groupedHtml.includes("Needs review") &&
+  groupedHtml.includes("Does not meet requirement"));
+
+const keyHtml = globalThis.renderList({
+  eligible: [reliable], needs_review: [], not_eligible: [], gated: [],
+  eligibility_explained: {
+    plain_requirement: "A candidate must hold an awarded doctorate, or have passed NET.",
+    independent_of_score: "Eligibility is decided on its own and never from the score.",
+    outcomes: {
+      met: { label: "Eligible", meaning: "m1", what_to_do: "w1" },
+      indeterminate: { label: "Needs your review", meaning: "m2", what_to_do: "w2" },
+      not_met: { label: "Does not meet the requirement", meaning: "m3", what_to_do: "w3" },
+    },
+    override: "Every outcome can be overridden with a written reason.",
+    needs_faculty_approval: ["Whether NET alone suffices for this post."],
+    disclaimer: "DEMO/RESEARCH gate.",
+  },
+});
+check("the requirement is stated above the table in plain language",
+  keyHtml.includes("must hold an awarded doctorate"));
+check("the key says eligibility does not come from the score",
+  keyHtml.includes("never from the score"));
+check("a stale backend without the split still renders its candidates",
+  globalThis.renderList({ eligible: [], gated: [failing] })
+    .includes("Failing_Case"),
+  "falling back to the old single bucket beats showing an empty page");
 
 console.log("\nDETAIL VIEW");
 const detailHtml = globalThis.renderDetail(unreliable);
@@ -344,16 +389,20 @@ const withCategories = {
 };
 const categoryHtml = globalThis.renderDetail(withCategories);
 check("the three approved categories are shown with their subtotals",
-  categoryHtml.includes("Research and related contributions") &&
-  categoryHtml.includes("Teaching and industry experience") &&
+  categoryHtml.includes("Research and Related Contributions") &&
+  categoryHtml.includes("Teaching and Industry Experience") &&
   categoryHtml.includes("Education"));
 check("each category shows earned against available",
   categoryHtml.includes("21.50") && categoryHtml.includes("40") &&
   categoryHtml.includes("24.30") && categoryHtml.includes("35"));
 check("every multiplier behind an education mark is named",
-  categoryHtml.includes("equivalence") &&
-  categoryHtml.includes("institution") &&
-  categoryHtml.includes("branch"));
+  categoryHtml.includes("Qualification match") &&
+  categoryHtml.includes("Awarding institution") &&
+  categoryHtml.includes("Subject relevance"));
+check("a criterion row carries a human label, not a database key",
+  categoryHtml.includes("Master&#x27;s Degree") &&
+  !categoryHtml.includes(">masters<"),
+  "the score breakdown showed bachelors / doctorate / teaching_experience");
 check("each factor shows its value and its reason",
   categoryHtml.includes("0.85") &&
   categoryHtml.includes("a neighbouring field"),
@@ -377,6 +426,49 @@ check("an unclassified institution is surfaced for confirmation",
   confirmHtml.includes("Please confirm"));
 check("a criterion awaiting confirmation is badged",
   confirmHtml.includes("needs your review"));
+
+// ---------------------------------------------------------------------------
+// PROFILE SUMMARY — orientation above the numbers
+//
+// Assembled by Python from validated fields, never written by a model.
+// It has to reach the screen ABOVE the score cards: a reviewer reads a
+// number faster than prose, and the prose is what makes the number mean
+// something.
+// ---------------------------------------------------------------------------
+console.log("\nPROFILE SUMMARY");
+
+const summarised = {
+  ...reliable,
+  profile_summary: {
+    text: "Highest completed qualification is M.Tech in Embedded Systems " +
+      "from Mewar University (2016); the candidate has submitted a doctoral " +
+      "thesis at BITS Pilani, which is awaiting the award.",
+    sentences: ["one", "two"],
+    unavailable: [],
+    generated_by: "deterministic",
+  },
+};
+const summaryHtml = globalThis.renderDetail(summarised);
+check("the summary is rendered",
+  summaryHtml.includes("Highest completed qualification is M.Tech"));
+check("the summary sits ABOVE the score cards",
+  summaryHtml.indexOf("Highest completed qualification")
+    < summaryHtml.indexOf("Computed (pipeline)"),
+  "prose below the numbers is prose the reviewer reads second");
+
+const thinSummary = globalThis.renderDetail({
+  ...reliable,
+  profile_summary: {
+    text: "The CV did not provide enough information we could read.",
+    sentences: [], unavailable: ["no completed degree is recorded"],
+    generated_by: "deterministic",
+  },
+});
+check("a gap in the CV is named rather than left blank",
+  thinSummary.includes("Not stated in the CV") &&
+  thinSummary.includes("no completed degree is recorded"));
+check("a candidate with no summary renders nothing rather than an empty box",
+  !globalThis.renderDetail(reliable).includes("profile-summary"));
 
 rmSync(entry, { force: true });
 rmSync(bundle, { force: true });

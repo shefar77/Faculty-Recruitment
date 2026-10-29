@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { isUnreliable, reliabilityReasons } from "./reliability.js";
 import { generateExplanations } from "./api.js";
+import {
+  criterionLabel,
+  categoryLabel,
+  eligibilityLabel,
+  factorLabel,
+} from "./labels.js";
 import OverrideForm from "./OverrideForm.jsx";
 
 /** Per-criterion evidence, override history, publication verdicts, flags. */
@@ -36,11 +42,27 @@ function needsReview(criterion) {
   );
 }
 
-const CATEGORY_LABEL = {
-  research: "Research and related contributions",
-  experience: "Teaching and industry experience",
-  education: "Education",
-};
+/**
+ * A few sentences of orientation, above the numbers.
+ *
+ * Assembled by Python from validated fields, never written by a model,
+ * so it cannot state a qualification the record does not hold. It sits
+ * above the score cards because a reviewer reads a number faster than
+ * they read prose, and the prose is what makes the number mean something.
+ */
+function ProfileSummary({ summary }) {
+  if (!summary?.text) return null;
+  return (
+    <div className="profile-summary">
+      <p>{summary.text}</p>
+      {summary.unavailable?.length > 0 && (
+        <p className="muted small">
+          Not stated in the CV: {summary.unavailable.join("; ")}.
+        </p>
+      )}
+    </div>
+  );
+}
 
 /**
  * How the 100 marks divide across the three approved categories.
@@ -56,7 +78,7 @@ function CategoryTotals({ scores }) {
     <div className="totals">
       {names.map((name) => (
         <div key={name}>
-          <div className="muted small">{CATEGORY_LABEL[name] || name}</div>
+          <div className="muted small">{categoryLabel(name)}</div>
           <div>
             <strong>{scores[name].earned?.toFixed(2)}</strong>
             <span className="muted"> / {scores[name].available}</span>
@@ -81,7 +103,7 @@ function Factors({ factors }) {
     <ul className="factors">
       {factors.map((factor, i) => (
         <li key={i}>
-          <strong>{factor.factor}</strong> &times;{factor.value}
+          <strong>{factorLabel(factor.factor)}</strong> &times;{factor.value}
           <span className="muted"> — {factor.reason}</span>
         </li>
       ))}
@@ -173,7 +195,7 @@ function Criteria({ criteria }) {
             key={criterion.criterion}
             className={criterion.indeterminate ? "row-unreliable" : ""}
           >
-            <td>{criterion.criterion.replace(/_/g, " ")}</td>
+            <td>{criterionLabel(criterion.criterion)}</td>
             <td className="num">{criterion.computed_points?.toFixed(2)}</td>
             <td className="num">
               <strong>{criterion.effective_points?.toFixed(2)}</strong>
@@ -372,6 +394,8 @@ export default function CandidateDetail({ candidate, onOverridden }) {
       {/* Immediately under the name, before any number. */}
       <Warnings candidate={candidate} />
 
+      <ProfileSummary summary={candidate.profile_summary} />
+
       <div className="totals">
         <div>
           <div className="muted small">Computed (pipeline)</div>
@@ -384,11 +408,11 @@ export default function CandidateDetail({ candidate, onOverridden }) {
         <div>
           <div className="muted small">Eligibility</div>
           <div>
-            <strong>{candidate.effective_eligibility}</strong>
+            <strong>{eligibilityLabel(candidate.effective_eligibility)}</strong>
             {candidate.effective_eligibility !==
               candidate.computed_eligibility && (
               <div className="muted small">
-                computed: {candidate.computed_eligibility}
+                pipeline said: {eligibilityLabel(candidate.computed_eligibility)}
               </div>
             )}
           </div>
@@ -453,7 +477,7 @@ export default function CandidateDetail({ candidate, onOverridden }) {
           <ul className="small">
             {candidate.override_history.map((entry) => (
               <li key={entry.id}>
-                <strong>{entry.field}</strong>: {entry.original_value} →{" "}
+                <strong>{entry.field === "eligibility" ? "Eligibility" : criterionLabel(entry.field)}</strong>: {entry.original_value} →{" "}
                 {entry.new_value} — {entry.overridden_by},{" "}
                 {entry.created_at}
                 <div className="muted">“{entry.reason}”</div>

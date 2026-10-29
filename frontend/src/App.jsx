@@ -34,11 +34,6 @@ export default function App() {
     <div className="page">
       <header>
         <h1>Faculty Recruitment Screening</h1>
-        <p className="muted small">
-          DEMO/RESEARCH rubric — not LNMIIT hiring criteria. Publication
-          checks are assisted matching, never proof of authorship. Every
-          decision remains the reviewer's.
-        </p>
       </header>
 
       {error && <div className="alert alert-danger">{error}</div>}

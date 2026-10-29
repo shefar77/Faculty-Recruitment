@@ -94,7 +94,8 @@ def test_listing_separates_eligible_from_gated(client):
     body = client.get("/candidates").json()
     assert [c["candidate_id"] for c in body["eligible"]] == ["Cand_A", "Cand_B"]
     assert [c["candidate_id"] for c in body["gated"]] == ["Cand_C"]
-    assert body["counts"] == {"eligible": 2, "gated": 1, "total": 3}
+    assert body["counts"] == {"eligible": 2, "gated": 1, "needs_review": 1,
+                              "not_eligible": 0, "total": 3}
 
 
 def test_a_high_scoring_gated_candidate_never_enters_the_eligible_group(client):
@@ -299,6 +300,54 @@ def test_the_evidence_merge_cannot_change_a_score(evidenced):
     assert criterion["weight"] == 25
 
 
+# ---------------------------------------------------------------------------
+# "Cannot tell" and "does not qualify" are opposite findings.
+#
+# They shared one bucket, and the dashboard printed the pair under a
+# single heading reading "Needs review / not eligible". A candidate whose
+# doctorate was merely unconfirmed appeared to have been judged
+# ineligible - an unproven conclusion put in front of a reviewer.
+# ---------------------------------------------------------------------------
+
+def test_the_listing_separates_uncertain_from_failing(client):
+    body = client.get("/candidates").json()
+    assert [c["candidate_id"] for c in body["needs_review"]] == ["Cand_C"]
+    assert body["not_eligible"] == []
+
+
+def test_gated_remains_the_union_so_existing_clients_keep_working(client):
+    body = client.get("/candidates").json()
+    assert body["gated"] == body["needs_review"] + body["not_eligible"]
+    assert body["counts"]["gated"] == (body["counts"]["needs_review"]
+                                       + body["counts"]["not_eligible"])
+
+
+def test_a_failing_candidate_lands_in_not_eligible_not_in_review(client):
+    client.patch("/candidates/Cand_C/score", json={
+        "field": "eligibility", "new_value": "not_met",
+        "reason": "No doctorate and no NET pass on the CV.",
+        "overridden_by": "Prof. Reviewer"})
+    body = client.get("/candidates").json()
+    assert [c["candidate_id"] for c in body["not_eligible"]] == ["Cand_C"]
+    assert body["needs_review"] == []
+
+
+def test_the_listing_explains_the_three_outcomes_in_plain_language(client):
+    explained = client.get("/candidates").json()["eligibility_explained"]
+    assert set(explained["outcomes"]) == {"met", "indeterminate", "not_met"}
+    for outcome in explained["outcomes"].values():
+        assert outcome["label"] and outcome["meaning"] and outcome["what_to_do"]
+    # The distinction that matters, stated where a professor will read it.
+    assert "NOT a finding that the candidate falls short" in         explained["outcomes"]["indeterminate"]["meaning"]
+    assert "never from the score" in explained["independent_of_score"]
+
+
+def test_the_listing_names_the_rules_that_need_faculty_approval(client):
+    explained = client.get("/candidates").json()["eligibility_explained"]
+    assert explained["needs_faculty_approval"]
+    assert "DEMO" in explained["disclaimer"]
+
+
 def test_detail_404(client):
     assert client.get("/candidates/Nobody").status_code == 404
 
@@ -391,7 +440,8 @@ def test_eligibility_override_moves_a_candidate_between_groups(client):
         "reason": "Award letter sighted; degree conferred."})
 
     body = client.get("/candidates").json()
-    assert body["counts"] == {"eligible": 3, "gated": 0, "total": 3}
+    assert body["counts"] == {"eligible": 3, "gated": 0, "needs_review": 0,
+                              "not_eligible": 0, "total": 3}
     promoted = next(c for c in body["eligible"] if c["candidate_id"] == "Cand_C")
     assert promoted["computed_eligibility"] == "indeterminate"   # preserved
     assert promoted["effective_eligibility"] == "met"            # applied

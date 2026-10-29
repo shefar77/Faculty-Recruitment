@@ -76,3 +76,21 @@ a { color: #1a4fa0; }
 .factors { margin: 4px 0 4px 16px; padding: 0; font-size: 13px; }
 .factors li { margin-bottom: 2px; }
 .factors strong { text-transform: capitalize; }
+
+/* The eligibility key above the ranked table. */
+.eligibility-key dl.keylist { margin: 8px 0 0; }
+.eligibility-key dt { font-weight: 650; margin-top: 8px; }
+.eligibility-key dd { margin: 2px 0 0 14px; }
+button.linkish {
+  background: none; border: none; padding: 0; color: #1a4fa0;
+  font: inherit; text-decoration: underline; cursor: pointer;
+}
+
+/* Orientation prose above the score cards. Set apart from the figures
+   so the two are never read as the same kind of statement. */
+.profile-summary {
+  background: #fff; border: 1px solid var(--line); border-left: 3px solid #9db6dd;
+  border-radius: 6px; padding: 10px 13px; margin: 10px 0;
+}
+.profile-summary p { margin: 0; }
+.profile-summary p + p { margin-top: 6px; }

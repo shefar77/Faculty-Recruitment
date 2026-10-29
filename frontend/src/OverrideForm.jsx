@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { overrideScore } from "./api.js";
+import { criterionLabel } from "./labels.js";
 
 /**
  * Records a human override. The reason is mandatory here as well as in
@@ -49,14 +50,17 @@ export default function OverrideForm({ candidate, onDone }) {
       <div className="formrow">
         <label>
           Field
+          {/* The option VALUE stays the internal id - that is what the
+              API receives and what the audit log records. Only the text
+              a reviewer reads is relabelled. */}
           <select value={field} onChange={(e) => setField(e.target.value)}>
             {criteria.map((c) => (
               <option key={c.criterion} value={c.criterion}>
-                {c.criterion.replace(/_/g, " ")} (now{" "}
+                {criterionLabel(c.criterion)} (now{" "}
                 {c.effective_points?.toFixed(2)} / {c.weight})
               </option>
             ))}
-            <option value="eligibility">eligibility</option>
+            <option value="eligibility">Eligibility</option>
           </select>
         </label>
 

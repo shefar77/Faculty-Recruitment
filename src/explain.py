@@ -239,20 +239,24 @@ def check_explanation(text: str, criterion: dict) -> tuple[bool, str]:
 # Plain-English names for the criteria, and for what each one measures.
 # The reviewer is a professor reading a candidate, not a developer reading
 # a schema: "positions[].start_date" tells them nothing they want to know.
+# Kept word-for-word in step with frontend/src/labels.js, so the prose a
+# reviewer reads under a heading uses the same name as the heading. The
+# internal keys are untouched - they are what the API, the scoring code
+# and the override log record.
 CRITERION_LABEL = {
-    "publications": "Research output",
-    "research_visibility": "Research visibility",
-    "teaching_experience": "Teaching experience",
-    "industry_experience": "Industry experience",
-    "doctorate": "Doctoral qualification",
-    "postdoctoral": "Postdoctoral experience",
-    "masters": "Master's degree",
-    "bachelors": "Bachelor's degree",
+    "publications": "Research Publications",
+    "research_visibility": "Research Visibility",
+    "teaching_experience": "Teaching Experience",
+    "industry_experience": "Industry Experience",
+    "doctorate": "PhD",
+    "postdoctoral": "Postdoctoral Experience",
+    "masters": "Master's Degree",
+    "bachelors": "Bachelor's Degree",
 }
 
 CATEGORY_LABEL = {
-    "research": "Research and related contributions",
-    "experience": "Teaching and industry experience",
+    "research": "Research and Related Contributions",
+    "experience": "Teaching and Industry Experience",
     "education": "Education",
 }
 

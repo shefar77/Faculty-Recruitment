@@ -848,6 +848,81 @@ GATE_IS_INDEPENDENT_OF_SCORE = True  # Stage 6 must not read gate outcomes.
 
 
 # ---------------------------------------------------------------------------
+# THE SAME THREE OUTCOMES, WRITTEN FOR A PROFESSOR
+# ---------------------------------------------------------------------------
+# One source of truth, served to the dashboard, so the wording a reviewer
+# reads cannot drift away from the rule the code applies. Everything here
+# describes GATE_OUTCOMES above; it introduces no new policy.
+#
+# THE DISTINCTION THIS EXISTS TO MAKE. "not_met" and "indeterminate" were
+# shown under a single heading reading "Needs review / not eligible", and
+# they are opposites:
+#
+#   not_met       - we checked, and the requirement is not satisfied.
+#                   A conclusion about the CANDIDATE.
+#   indeterminate - we checked, and could not tell. A statement about OUR
+#                   EVIDENCE, never about the candidate. Nobody has been
+#                   rejected; somebody has to look.
+#
+# Printing the second as though it were the first asks a reviewer to act
+# on a conclusion the pipeline never reached.
+ELIGIBILITY_EXPLAINED = {
+    "requirement": ELIGIBILITY_GATES[0]["requirement"],
+    "plain_requirement": (
+        "To be considered, a candidate must either hold a doctorate that "
+        "has already been awarded, or have passed a national "
+        "teaching-eligibility examination (UGC NET, CSIR NET, SET or SLET)."
+    ),
+    "independent_of_score": (
+        "Eligibility is decided on its own and never from the score. A "
+        "candidate can score highly and still not be appointable, and a "
+        "modest score does not make anyone ineligible."
+    ),
+    "outcomes": {
+        "met": {
+            "label": "Eligible",
+            "meaning": "The CV evidences a qualification that satisfies the "
+                       "requirement.",
+            "what_to_do": "Assess on merit using the score and evidence.",
+        },
+        "indeterminate": {
+            "label": "Needs your review",
+            "meaning": "We could not confirm the requirement either way from "
+                       "the CV. This is a gap in the evidence we could read, "
+                       "NOT a finding that the candidate falls short - for "
+                       "example a doctorate with no award year printed, or a "
+                       "thesis submitted but not yet conferred.",
+            "what_to_do": "Look at the CV yourself and record a decision. "
+                          "Nobody here has been rejected.",
+        },
+        "not_met": {
+            "label": "Does not meet the requirement",
+            "meaning": "The CV evidences neither an awarded doctorate nor a "
+                       "NET/SET pass.",
+            "what_to_do": "No further work is needed unless you know of an "
+                          "exception, which you can record as an override.",
+        },
+    },
+    "override": (
+        "Every outcome can be overridden by a reviewer with a written "
+        "reason. The pipeline's own verdict is kept alongside and is never "
+        "altered."
+    ),
+    "needs_faculty_approval": [
+        "Whether a submitted-but-unconferred doctorate should be eligible "
+        "to apply, rather than routed to review. The code currently routes "
+        "it to review and takes no position.",
+        "Whether NET/SET alone remains sufficient for this specific post, "
+        "or whether the advert requires a doctorate in hand.",
+        "Whether an institution absent from the approved list should ever "
+        "affect eligibility. It currently does not - it affects marks only.",
+    ],
+    "disclaimer": ("DEMO/RESEARCH gate for a student project. Not approved "
+                   "recruitment policy."),
+}
+
+
+# ---------------------------------------------------------------------------
 # REVIEWER FLAGS - observations that inform a human and NEVER move a number
 # ---------------------------------------------------------------------------
 # A third category, distinct from both gates and scores. A flag is something

@@ -27,6 +27,8 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
+import summary  # the deterministic profile prose; no model call
+
 BUSY_TIMEOUT_SECONDS = 10.0
 
 DB_PATH = Path(__file__).resolve().parent.parent / "output" / "recruitment.db"
@@ -521,6 +523,10 @@ def candidate_detail(connection: sqlite3.Connection, candidate_id: str) -> dict:
 
     state.update({
         "eligibility": scored.get("eligibility", {}),
+        # Assembled from the stored audit record at read time, not during
+        # upload: it costs microseconds, it needs no model call, and a
+        # candidate scored before this existed gets one without a re-run.
+        "profile_summary": summary.build_summary(audit),
         # Category subtotals come from the stored audit record rather than
         # being re-summed here: the pipeline's own arithmetic is the
         # record, and a second implementation of it could disagree.

@@ -155,6 +155,35 @@ def name_from_evidence(stated: str | None, evidence: str | None,
     return None, None
 
 
+# How a qualification is spelled in front of a reviewer. CVs and the
+# extractor between them produce "mtech", "M. Tech.", "M.Tech" and
+# "Master of Technology" for one degree; printing the first of those in a
+# summary looks like a database leak, which is what it is.
+_DISPLAY_FORMS = (
+    (re.compile(r"^\s*m\s*\.?\s*tech\s*\.?\s*$", re.I), "M.Tech"),
+    (re.compile(r"^\s*b\s*\.?\s*tech\s*\.?\s*$", re.I), "B.Tech"),
+    (re.compile(r"^\s*m\s*\.?\s*e\s*\.?\s*$", re.I), "M.E."),
+    (re.compile(r"^\s*b\s*\.?\s*e\s*\.?\s*$", re.I), "B.E."),
+    (re.compile(r"^\s*m\s*\.?\s*s\s*\.?\s*c\s*\.?\s*$", re.I), "M.Sc"),
+    (re.compile(r"^\s*b\s*\.?\s*s\s*\.?\s*c\s*\.?\s*$", re.I), "B.Sc"),
+    (re.compile(r"^\s*m\s*\.?\s*c\s*\.?\s*a\s*\.?\s*$", re.I), "MCA"),
+    (re.compile(r"^\s*b\s*\.?\s*c\s*\.?\s*a\s*\.?\s*$", re.I), "BCA"),
+    (re.compile(r"^\s*m\s*\.?\s*phil\s*\.?\s*$", re.I), "M.Phil"),
+    (re.compile(r"^\s*ph\s*\.?\s*d\s*\.?\s*$", re.I), "PhD"),
+)
+
+
+def display_name(text: str | None) -> str | None:
+    """A qualification name tidied for a reviewer, or None."""
+    if not text:
+        return None
+    cleaned = re.sub(r"\s+", " ", str(text)).strip()
+    for pattern, form in _DISPLAY_FORMS:
+        if pattern.match(cleaned):
+            return form
+    return cleaned
+
+
 def equivalence(text: str | None, level: str) -> tuple[float, str, bool]:
     """
     (ratio, label, needs_review) for a qualification at `level`.
