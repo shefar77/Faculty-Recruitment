@@ -462,7 +462,12 @@ def score_publications(verified: list[dict],
         exclusions = entry.get("credit_exclusions") or []
 
         if exclusions:
-            credit, reason = 0.0, f"excluded: {', '.join(exclusions)}"
+            # Plain words for the professor, from the same table that
+            # defines the rule, so wording and policy cannot drift apart.
+            # The raw ids stay in "exclusions" for the audit.
+            credit, reason = 0.0, "not counted: " + "; ".join(
+                schema.EXCLUSION_LABEL.get(e, e.replace("_", " "))
+                for e in exclusions)
         else:
             matrix = schema.CREDIT_MATRIX[(status_class, outcome)]
             if matrix is schema.INDETERMINATE:
@@ -479,12 +484,22 @@ def score_publications(verified: list[dict],
                 "not_found", "weak_match", "unconfirmed_author"):
             note = "Unlabeled claim, not independently verifiable."
 
+        # Credited, but Stage 4 could not place the quoted citation line.
+        # The entry stays scored - its title is in the CV - and the doubt
+        # is shown rather than resolved by deleting the entry.
+        if entry.get("validation_verdict") == "needs_review":
+            note = (note + " " if note else "") + (
+                "The quoted citation line could not be matched to the CV; "
+                "the title was. Please check this entry.")
+
         total += credit
         rows.append({
             "title": entry.get("title"),
             "status": status,
             "status_class": status_class,
             "excluded": bool(exclusions),
+            "exclusions": list(exclusions),
+            "duplicate_of": entry.get("duplicate_of"),
             "verification": outcome,
             "credit": credit,
             "reason": reason,

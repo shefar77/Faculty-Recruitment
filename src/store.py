@@ -486,10 +486,27 @@ def candidate_detail(connection: sqlite3.Connection, candidate_id: str) -> dict:
     audit = json.loads(row["audit_json"]) if row and row["audit_json"] else {}
     scored = audit.get("scoring", {})
 
+    # The credit each entry actually earned, from the scored criterion.
+    # score_publications emits one row per verified entry, in the same
+    # order, before any patent rows - so position is the join key.
+    scored_rows = [r for r in next(
+        (c.get("evidence") or [] for c in scored.get("criteria", [])
+         if c.get("criterion") == "publications"), [])
+        if r.get("kind") != "patent"]
+
     publications = []
-    for entry in audit.get("verification", {}).get("publications", []):
+    for index, entry in enumerate(
+            audit.get("verification", {}).get("publications", [])):
         verification = entry.get("verification", {})
+        credited = scored_rows[index] if index < len(scored_rows) else {}
         publications.append({
+            "credit": credited.get("credit"),
+            "credit_reason": credited.get("reason"),
+            "review_note": credited.get("note"),
+            "validation_verdict": entry.get("validation_verdict"),
+            "duplicate_of": entry.get("duplicate_of"),
+            "resolved_by": verification.get("resolved_by"),
+            "doi_note": verification.get("doi_note"),
             "title": entry.get("title"),
             "status": entry.get("status"),
             "outcome": verification.get("outcome"),

@@ -216,7 +216,10 @@ def test_credit_exclusions_override_the_matrix():
     result = scoring.score_candidate(validated(), w, as_of=AS_OF)
     row = criterion(result, "publications")["evidence"][0]
     assert row["credit"] == 0.0
-    assert "excluded" in row["reason"]
+    # The machine id stays for the audit; the reason is for a professor.
+    assert row["exclusions"] == ["thesis_or_dissertation"]
+    assert row["reason"].startswith("not counted:")
+    assert "thesis_or_dissertation" not in row["reason"]
     assert schema.CREDIT_MATRIX[("unknown", "matched")] == 1.00  # would have been full
 
 

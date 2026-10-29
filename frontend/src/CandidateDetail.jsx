@@ -6,6 +6,8 @@ import {
   categoryLabel,
   eligibilityLabel,
   factorLabel,
+  verificationLabel,
+  exclusionLabel,
 } from "./labels.js";
 import OverrideForm from "./OverrideForm.jsx";
 
@@ -338,7 +340,8 @@ function Publications({ publications }) {
         <tr>
           <th>Title</th>
           <th>Declared</th>
-          <th>Verdict</th>
+          <th>External check</th>
+          <th>Credit</th>
           <th>Evidence</th>
         </tr>
       </thead>
@@ -348,14 +351,30 @@ function Publications({ publications }) {
             <td className="small">{publication.title}</td>
             <td className="small muted">{publication.status}</td>
             <td className="small">
-              {publication.outcome}
+              {verificationLabel(publication.outcome)}
+              {publication.resolved_by === "doi" && (
+                <div className="muted">identified by the DOI in the CV</div>
+              )}
               {publication.author_match && (
                 <div className="muted">author: {publication.author_match}</div>
               )}
+              {publication.doi_note && (
+                <div className="muted">{publication.doi_note}</div>
+              )}
+            </td>
+            <td className="small">
+              {publication.credit ?? "—"}
               {publication.credit_exclusions?.length > 0 && (
-                <span className="badge">
-                  excluded: {publication.credit_exclusions.join(", ")}
-                </span>
+                <div>
+                  <span className="badge">
+                    {publication.credit_exclusions.map(exclusionLabel).join("; ")}
+                  </span>
+                </div>
+              )}
+              {publication.validation_verdict === "needs_review" && (
+                <div>
+                  <span className="badge">needs your review</span>
+                </div>
               )}
             </td>
             <td className="small">

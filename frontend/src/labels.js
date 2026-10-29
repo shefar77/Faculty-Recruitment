@@ -45,6 +45,29 @@ const FACTOR = {
 };
 
 /**
+ * What the external check concluded about a publication.
+ *
+ * Kept as distinct phrases on purpose. "Not in the index" and "the check
+ * could not run" were both easy to read as "fake", and neither is: the
+ * first is a gap in OpenAlex's coverage, the second an outage.
+ */
+const VERIFICATION = {
+  matched: "Confirmed in the index",
+  matched_by_biblio: "Confirmed by journal, volume and page",
+  weak_match: "Probable match, title or year differs",
+  unconfirmed_author: "Found, but candidate not among the authors",
+  not_found: "Not in the index (coverage gap, not a finding)",
+  lookup_failed: "Check could not run, needs review",
+};
+
+/** Why an entry earned nothing. Mirrors schema.CREDIT_EXCLUSIONS. */
+const EXCLUSION = {
+  failed_validation: "Title not found in the CV",
+  thesis_or_dissertation: "A thesis, already counted by the degree",
+  duplicate_publication: "Listed more than once, counted once",
+};
+
+/**
  * Last resort for an identifier no table covers.
  *
  * Title-casing a raw key is exactly what this module exists to avoid, so
@@ -63,5 +86,7 @@ export const criterionLabel = (key) => CRITERION[key] || humanise(key);
 export const categoryLabel = (key) => CATEGORY[key] || humanise(key);
 export const eligibilityLabel = (key) => ELIGIBILITY[key] || humanise(key);
 export const factorLabel = (key) => FACTOR[key] || humanise(key);
+export const verificationLabel = (key) => VERIFICATION[key] || humanise(key);
+export const exclusionLabel = (key) => EXCLUSION[key] || humanise(key);
 
-export { CRITERION, CATEGORY, ELIGIBILITY, FACTOR };
+export { CRITERION, CATEGORY, ELIGIBILITY, FACTOR, VERIFICATION, EXCLUSION };

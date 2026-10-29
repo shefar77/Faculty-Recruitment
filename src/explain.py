@@ -441,7 +441,8 @@ def _research_sentences(criterion: dict) -> list[str]:
                          f"its reason shown in the list")
         if other:
             parts.append(f"{len(other)} that could not be confirmed and "
-                         f"carry no status the CV states")
+                         f"{'carries' if len(other) == 1 else 'carry'} no "
+                         f"status the CV states")
         sentences.append(parts[0] + ": " + "; ".join(parts[1:]) + "."
                          if len(parts) > 1 else parts[0] + ".")
 

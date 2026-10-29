@@ -106,19 +106,122 @@ DOCTORATE_HINT = re.compile(
 # returned "awarded", which would have flipped a mid-PhD candidate to
 # ELIGIBLE. The prompt already forbids this and the prompt did not hold.
 #
-# So Python cross-checks the claim against the rest of the CV. The guard
-# only ever moves an answer toward "needs a human" - it can withhold an
-# unsupported "awarded", never manufacture one.
+# So Python cross-checks the claim against the CV. The guard only ever
+# moves an answer toward "needs a human" - it can withhold an unsupported
+# "awarded", never manufacture one.
+#
+# WHAT IT MUST READ, AND WHAT IT MUST NOT. The check originally searched
+# the WHOLE document for these words, and that was wrong in a way no test
+# caught: Candidate_08's CV supervises three doctoral students, so the
+# word "ongoing" appears under "Research Student Supervision (Ph.D.)".
+# That word - about his STUDENTS - withheld his OWN doctorate, awarded in
+# 2022, costing 15 marks and routing a qualified professor to review.
+# Every candidate senior enough to supervise would have hit it.
+#
+# These are ordinary CV words. "Ongoing" describes projects, "Present"
+# ends an employment row, "pursuing" belongs to a student being
+# supervised. They mean "this degree is unfinished" ONLY inside the
+# candidate's own doctorate entry, which is why they are matched against
+# doctorate_context() and never against the document. The same reasoning
+# is already written out in cross_check_thesis_submitted below; it simply
+# was never applied here.
 
 PHD_IN_PROGRESS_HINT = re.compile(
     "(research scholar|phd scholar|ph d scholar|doctoral scholar|"
-    "pursuing|ongoing|thesis submitted|under submission|"
-    "perusing)"
+    "pursuing|perusing|ongoing|in progress|continuing|"
+    "thesis submitted|under submission|under evaluation|under examination|"
+    "present|till date|to date|expected|anticipated|awaiting|not yet)"
 )
 
 # A doctorate awarded within two years of starting is not credible; it
 # almost always means a start year was misread as a completion year.
 MIN_PLAUSIBLE_PHD_YEARS = 2
+
+# The rows that quote the candidate's own doctorate. Their evidence spans
+# are always in scope: a stage printed inside the row is the most direct
+# evidence of it there is.
+DOCTORATE_ROW_FIELDS = ("phd_status", "highest_degree", "phd_subject",
+                        "phd_institution", "phd_start_year", "phd_year")
+
+# How many lines after the degree line still belong to the same entry.
+#
+# SCOPE IS MEASURED IN LINES, NOT CHARACTERS. A character window was tried
+# first and is not safe at any size: it has no idea where the entry ends,
+# so on a densely-set CV 240 characters runs straight out of the education
+# block and into the next section, while on a sparse one it stops halfway
+# through the institution name. A CV entry is a small group of lines that
+# ends at a blank line or the next heading, and reading it that way is the
+# only version that behaves the same on both layouts.
+#
+# Nothing BEFORE the degree line is read. Dates printed above it arrive
+# anyway through the phd_start_year / phd_year evidence spans, and
+# stepping backwards risks picking up the previous entry - an employment
+# row ending "2023 - Till Date" would otherwise read as an unfinished
+# degree.
+DOCTORATE_CONTEXT_LINES = 4
+
+# Where one CV entry stops and the next begins. Matched against a
+# normalised line of at most SECTION_HEADING_WORDS words, so an ordinary
+# sentence that happens to open with one of these words is not mistaken
+# for a heading.
+# Each stem ends in \w*, because CV headings are almost all plural
+# ("Projects", "Publications", "Activities") and a \b here matched none of
+# them. The looseness is safe: _ends_the_entry() exempts any line carrying
+# a stage word before it ever asks whether the line is a heading, so the
+# worst a stem can do is end the entry early, which narrows scope rather
+# than widening it.
+SECTION_HEADING = re.compile(
+    r"^(education|qualification|academic|experience|employment|appointment|"
+    r"position|publication|journal|conference|book|chapter|patent|project|"
+    r"research|supervision|student|teaching|award|achievement|honour|honor|"
+    r"workshop|seminar|training|certification|membership|skill|reference|"
+    r"funding|grant|scholarship|fellowship|editorial|review|personal|"
+    r"declaration|interest|profile|summary|objective|highlight|activit|"
+    r"responsibilit|contact|language|hobb|course)\w*")
+SECTION_HEADING_WORDS = 8
+
+# Sections that describe OTHER PEOPLE. Matched anywhere in a heading, so
+# "Research Student Supervision (Ph.D.)" is caught by "student" even
+# though the heading opens with "Research".
+OTHER_PEOPLE_SECTION = re.compile(
+    r"(^| )(reference|referee|supervision|supervised|supervisor|student|"
+    r"examiner|committee|collaborat|acknowledg|testimonial|mentee)\w*")
+
+
+def mentions_own_doctorate(source_text: str) -> bool:
+    """
+    Does the CV name a doctorate that could be the CANDIDATE'S own?
+
+    This backs the absence check: "phd_status: none" is a negative claim,
+    and no quotation can evidence an absence, so it is confirmed instead
+    by establishing that the CV really is silent about a doctorate.
+
+    Silence has to be judged over the candidate's OWN sections. An
+    academic CV names referees, doctoral students, examiners and
+    committee members, and every one of those carries somebody else's
+    PhD. Searching the whole document found a referee's doctorate on a
+    master's-only candidate and reported "doctorate evidenced but its
+    award is not confirmed" - sending a reviewer to look for a degree
+    that does not exist. Same scope error as cross_check_doctorate, in
+    the other direction.
+
+    The safety net it exists for is untouched: a doctorate printed under
+    Education still contradicts a "none" claim and still routes to a
+    human.
+    """
+    in_other_people = False
+    for raw in (source_text or "").splitlines():
+        line = normalise(raw)
+        if not line.strip():
+            continue
+        if len(line.split()) <= SECTION_HEADING_WORDS and \
+                SECTION_HEADING.match(line):
+            # Set before the mention check below, so a heading that names
+            # a doctorate itself is judged by its own section.
+            in_other_people = bool(OTHER_PEOPLE_SECTION.search(line))
+        if not in_other_people and DOCTORATE_HINT.search(line):
+            return True
+    return False
 
 
 COMPLETION_YEAR_FIELDS = ("bachelors_year", "masters_year", "phd_year")
@@ -237,7 +340,71 @@ def cross_check_thesis_submitted(results: list[dict]) -> list[str]:
     return notes
 
 
-def cross_check_doctorate(results: list[dict], source_norm: str) -> list[dict]:
+def _ends_the_entry(line_norm: str) -> bool:
+    """A blank line or a section heading closes the entry above it."""
+    if not line_norm.strip():
+        return True
+    # A line carrying a stage word is content, never a heading. Without
+    # this, "Research Scholar, 2018 onwards" - the very thing the guard
+    # exists to catch - would be discarded as a heading starting
+    # "Research".
+    if PHD_IN_PROGRESS_HINT.search(line_norm):
+        return False
+    return (len(line_norm.split()) <= SECTION_HEADING_WORDS
+            and bool(SECTION_HEADING.match(line_norm)))
+
+
+def doctorate_context(results: list[dict], source_text: str) -> str:
+    """
+    The part of the CV that actually describes THIS candidate's doctorate.
+
+    Two sources, both narrow:
+      - the doctorate rows' own evidence spans, always. A stage printed
+        inside the quoted row is the most direct evidence there is, and
+        "2019 - Present" usually arrives as the phd_start_year span.
+      - the degree's own entry in the CV, read forward line by line until
+        a blank line or the next heading. That catches a qualifier set on
+        the line below the degree without crossing into the next section.
+
+    Returns "" when nothing is traceable. That is the correct answer, not
+    a failure: with no anchor there is no evidence about the stage, and an
+    untraceable phd_status row is already marked unverified by
+    check_scalar. Falling back to the whole document here is exactly the
+    bug this function exists to remove.
+    """
+    by_field = {r["field"]: r for r in results}
+
+    def span(name: str) -> str:
+        row = by_field.get(name) or {}
+        # Only read a span that was actually found in the CV. Reading a
+        # stage out of unproven text would launder a hallucination.
+        if row.get("status") not in ("verified", "partial"):
+            return ""
+        return normalise(row.get("evidence") or "")
+
+    context = [s for s in (span(f) for f in DOCTORATE_ROW_FIELDS) if s]
+
+    lines = [normalise(line) for line in (source_text or "").splitlines()]
+    for anchor in ("phd_status", "highest_degree", "phd_subject",
+                   "phd_institution"):
+        needle = span(anchor)
+        if not needle:
+            continue
+        start = next((i for i, line in enumerate(lines)
+                      if line and _locate(needle, line) >= 0), None)
+        if start is None:
+            continue
+        for offset, line in enumerate(lines[start:start
+                                            + DOCTORATE_CONTEXT_LINES]):
+            if offset and _ends_the_entry(line):
+                break
+            context.append(line)
+        break
+
+    return " ".join(context)
+
+
+def cross_check_doctorate(results: list[dict], source_text: str) -> list[dict]:
     """
     Withhold an 'awarded' claim the CV does not actually support.
 
@@ -250,9 +417,11 @@ def cross_check_doctorate(results: list[dict], source_norm: str) -> list[dict]:
         return []
 
     reasons = []
-    if PHD_IN_PROGRESS_HINT.search(source_norm):
-        reasons.append("the CV describes the doctorate as in progress "
-                       "(e.g. 'Research Scholar' / 'Present')")
+    marker = PHD_IN_PROGRESS_HINT.search(doctorate_context(results, source_text))
+    if marker:
+        reasons.append(f"the doctorate's own entry in the CV reads "
+                       f"{marker.group(0)!r}, which describes a degree still "
+                       f"in progress")
 
     start = (by_field.get("phd_start_year") or {}).get("value")
     end = (by_field.get("phd_year") or {}).get("value")
@@ -354,7 +523,8 @@ def appears_in(needle: str, haystack_norm: str) -> tuple[bool, float]:
 # Field-level validation
 # ---------------------------------------------------------------------------
 
-def check_scalar(name: str, wrapper, source_norm: str) -> dict:
+def check_scalar(name: str, wrapper, source_norm: str,
+                 own_doctorate_mention: bool | None = None) -> dict:
     """Validate one {"value", "evidence"} pair."""
     if not isinstance(wrapper, dict):
         return {"field": name, "status": "malformed", "value": wrapper,
@@ -406,7 +576,12 @@ def check_scalar(name: str, wrapper, source_norm: str) -> dict:
         # Such claims are verified the only way they can be: by confirming
         # the CV really is silent on the subject.
         if str(value).lower() in ABSENCE_VALUES:
-            mentioned = DOCTORATE_HINT.search(source_norm) is not None
+            # Scoped to the candidate's own sections - see
+            # mentions_own_doctorate. The fallback keeps this function
+            # usable on its own, where there is no line structure to read.
+            mentioned = (own_doctorate_mention
+                         if own_doctorate_mention is not None
+                         else DOCTORATE_HINT.search(source_norm) is not None)
             result["status"] = "unverified" if mentioned else "verified"
             result["detail"] = (
                 "claims no doctorate, but the CV does mention one"
@@ -550,7 +725,59 @@ def _bibliographically_complete(pub: dict, evidence: str) -> tuple[bool, str]:
         f"as published even though no status word is printed beside it")
 
 
-def check_publication(index: int, pub: dict, source_norm: str) -> dict:
+# The start of the NEXT reference in a list: "10 Mahala, A.", "[3] ...",
+# "3. ...", or a bullet. One to three digits only, so a continuation line
+# that opens with a page range or a DOI fragment ("30881-30909.",
+# "1016/j.cep...") is not mistaken for a new entry.
+ENTRY_START = re.compile(r"^\s*(?:\[\d{1,3}\]|\d{1,3}[.)]?|[-*•●▪])\s+\S")
+ENTRY_MAX_LINES = 6
+
+
+def entry_text(title: str, source_text: str) -> str:
+    """
+    The lines of the CV that make up ONE publication entry.
+
+    Used when the extractor returned no quotation. Without it, the status
+    guard and the citation-completeness check had nothing to read and
+    concluded the worst: Candidate_08's "...Deep Enhancement Approach for
+    Low-Light Images ... Accepted and Presented." was correctly read as
+    accepted, then downgraded to "unknown" because the status word was not
+    in a quotation that did not exist.
+
+    Read forward from the line where the title begins, stopping at a blank
+    line or the start of the next numbered or bulleted entry - so the
+    status of the paper BELOW cannot be borrowed by this one. Returns ""
+    when the title cannot be placed; the caller then has no evidence
+    either way, which is the honest position.
+    """
+    if not title or not source_text:
+        return ""
+    lines = source_text.splitlines()
+    norm = [normalise(line) for line in lines]
+    head = " ".join(normalise(title).split()[:5])
+    if not head:
+        return ""
+    # _locate, not "in": it also matches with spaces removed, which is what
+    # a hyphenated PDF line break inside a title needs - "A Sys-/tematic"
+    # reads "a sys tematic" once normalised.
+    start = next((i for i, line in enumerate(norm)
+                  if line and _locate(head, line) >= 0), None)
+    if start is None:
+        # The opening words straddle a line break.
+        start = next((i for i in range(len(norm) - 1)
+                      if _locate(head, f"{norm[i]} {norm[i + 1]}") >= 0), None)
+    if start is None:
+        return ""
+    kept = [lines[start]]
+    for line in lines[start + 1:start + ENTRY_MAX_LINES]:
+        if not line.strip() or ENTRY_START.match(line):
+            break
+        kept.append(line)
+    return " ".join(kept)
+
+
+def check_publication(index: int, pub: dict, source_norm: str,
+                      source_text: str = "") -> dict:
     """Validate one publication entry and apply the status guard."""
     issues: list[str] = []
     flags: list[str] = []
@@ -558,12 +785,51 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
     evidence = pub.get("evidence") or ""
 
     title_ok, title_score = appears_in(title, source_norm) if title else (False, 0.0)
-    ev_ok, _ = appears_in(evidence, source_norm) if evidence.strip() else (False, 0.0)
+    has_span = bool(evidence.strip())
+    ev_ok, ev_score = (appears_in(evidence, source_norm) if has_span
+                       else (False, 0.0))
 
-    if not title_ok:
+    # TRACEABILITY IS DECIDED BY THE TITLE, AND ONLY BY THE TITLE.
+    #
+    # This block used to fail an entry whenever the evidence span was not
+    # found - including when the extractor never returned one. The message
+    # said "evidence span not found in CV", which was not true: nothing had
+    # been looked for. Thirty-three of Candidate_08's forty-two
+    # publications came back with evidence: null, and every one was
+    # written off, although each title appeared in the CV word for word at
+    # similarity 1.00. Twenty-five of them had already been confirmed
+    # against OpenAlex, title AND author, several with twenty-odd
+    # citations. The strongest evidence the system can obtain was being
+    # overruled by the weakest: whether the model happened to echo a quote.
+    #
+    # It also contradicted the written policy. schema.CREDIT_EXCLUSIONS
+    # defines failed_validation as "its title could not be found in the
+    # CV" - the title, not the quotation. The code now does what the
+    # policy says.
+    #
+    # The question Stage 4 exists to answer is whether this entry comes
+    # from the CV. A title found verbatim answers it. The span is
+    # corroboration, so its ABSENCE is an omission by the extractor, while
+    # a span that was supplied and cannot be found is a different thing
+    # entirely - a sign the text may have been invented - and is kept
+    # apart below rather than lumped in with it.
+    if not title:
+        issues.append("the entry has no title, so nothing can be traced "
+                      "to the CV")
+    elif not title_ok:
         issues.append(f"title not found in CV (best {title_score})")
-    if not ev_ok:
-        issues.append("evidence span not found in CV")
+
+    if has_span and not ev_ok:
+        flags.append(
+            f"the quoted citation line could not be found in the CV (best "
+            f"match {ev_score}). The title itself was found, so the entry is "
+            f"kept and scored; the quotation needs a reviewer's eye in case "
+            f"the extractor invented it.")
+    elif not has_span:
+        flags.append(
+            "the extractor returned no citation line for this entry. The "
+            "title was matched against the CV directly, so traceability "
+            "does not depend on the quotation.")
 
     # Authors are NOTED here, never used to fail validation.
     #
@@ -605,10 +871,26 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
             f"unstated and needs a reviewer's eye - it has NOT been read "
             f"as a claim that the work is published.")
 
+    # What the status word and citation details are read from: the
+    # quotation when there is one, otherwise the entry's own lines. An
+    # absent quotation is the extractor's omission and must not be read as
+    # the CV saying nothing.
+    entry = evidence if has_span else entry_text(title, source_text)
+
     guard = None
-    if declared != "unknown" and not STATUS_MARKER.search(evidence):
+    if has_span:
+        corroborated = bool(STATUS_MARKER.search(evidence))
+    else:
+        # Stricter than the quotation case: the word found in the entry
+        # must state the SAME status, not merely some status.
+        corroborated = any(
+            schema.normalise_status(m.group(0))[0] == declared
+            for m in STATUS_MARKER.finditer(entry))
+    if declared != "unknown" and not corroborated:
         guard = {"from": declared, "to": "unknown",
-                 "reason": "no status marker present in the evidence span"}
+                 "reason": ("no status marker present in the evidence span"
+                            if has_span else
+                            "the CV entry does not state this status")}
         declared = "unknown"
 
     # --- a complete citation is itself a publication claim ----------------
@@ -616,7 +898,7 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
     # labelled as still under review. See schema.BIBLIOGRAPHIC_COMPLETENESS.
     citation = None
     if declared == "unknown" and recognised:
-        complete, why = _bibliographically_complete(pub, evidence)
+        complete, why = _bibliographically_complete(pub, entry)
         if complete:
             citation = {"from": "unknown", "to": "published", "reason": why}
             declared = "published"
@@ -634,10 +916,21 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
         "status_recognised": recognised,
         "title_in_source": title_ok,
         "evidence_in_source": ev_ok,
+        "evidence_span_supplied": has_span,
         "unsupported_authors": unsupported,
         "issues": issues,
         "flags": flags,
-        "verdict": "verified" if not issues else "unverified",
+        # Three outcomes, because two could not tell "we could not place
+        # this in the CV at all" from "we placed it, but one quotation
+        # looks wrong". Only the first is a reason to refuse credit.
+        #   verified     - title traceable; any supplied span checks out
+        #   needs_review - title traceable, supplied span did not match
+        #   unverified   - title not traceable: the one veto, and the
+        #                  only value verify_pubs turns into
+        #                  failed_validation
+        "verdict": ("unverified" if issues
+                    else "needs_review" if (has_span and not ev_ok)
+                    else "verified"),
     }
 
 
@@ -853,8 +1146,10 @@ def validate_record(record: dict, source_text: str) -> dict:
     source_norm = normalise(source_text)
     profile = record.get("profile", {})
 
+    own_doctorate = mentions_own_doctorate(source_text)
     scalar_results = [
-        check_scalar(name, profile.get(name), source_norm)
+        check_scalar(name, profile.get(name), source_norm,
+                     own_doctorate_mention=own_doctorate)
         for name in (FREE_TEXT_FIELDS + NUMERIC_FIELDS + CLASSIFICATION_FIELDS
                      + ELIGIBILITY_FLAG_FIELDS)
     ]
@@ -869,7 +1164,10 @@ def validate_record(record: dict, source_text: str) -> dict:
     # doctorate_cross_check_failed - and recognising a stated stage is not
     # a failed check.
     thesis_notes = cross_check_thesis_submitted(scalar_results)
-    doctorate_notes = cross_check_doctorate(scalar_results, source_norm)
+    # The RAW text, not source_norm: this check reasons about which lines
+    # belong to the doctorate's own entry, and normalising the document
+    # collapses the line breaks that mark where that entry ends.
+    doctorate_notes = cross_check_doctorate(scalar_results, source_text)
 
     # Build the cleaned profile: unverified values are REMOVED, not kept.
     clean: dict = {}
@@ -904,7 +1202,7 @@ def validate_record(record: dict, source_text: str) -> dict:
         reviewed_positions, source_norm)
     position_issues = position_issues + category_notes
 
-    pub_results = [check_publication(i, p, source_norm)
+    pub_results = [check_publication(i, p, source_norm, source_text)
                    for i, p in enumerate(record.get("publications", []))]
 
     clean_pubs = []

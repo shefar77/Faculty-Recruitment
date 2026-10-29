@@ -264,6 +264,7 @@ CREDIT_MATRIX = {
 CREDIT_EXCLUSIONS = (
     {
         "id": "thesis_or_dissertation",
+        "label": "recorded as a thesis, which the degree already counts",
         "rule": "Stage 4 flagged the entry as a thesis/dissertation.",
         "credit": 0.00,
         "overrides_matrix": True,
@@ -275,10 +276,15 @@ CREDIT_EXCLUSIONS = (
     },
     {
         "id": "failed_validation",
+        "label": "its title could not be found in the CV",
         "rule": (
             "Stage 4 returned verdict 'unverified' for the entry - its "
-            "title could not be found in the CV, or its claimed authors "
-            "appear nowhere near it."
+            "title could not be found in the CV. NOT fired by a missing "
+            "evidence quotation (the extractor's omission, not the "
+            "candidate's) nor by a quotation that fails to match while the "
+            "title does (verdict 'needs_review': scored, and flagged). "
+            "Author placement is likewise informational only; authorship "
+            "is decided against the external index in Stage 5."
         ),
         "credit": 0.00,
         "overrides_matrix": True,
@@ -288,7 +294,27 @@ CREDIT_EXCLUSIONS = (
             "accusation."
         ),
     },
+    {
+        "id": "duplicate_publication",
+        "label": "the same publication is listed earlier in the CV",
+        "rule": (
+            "Another entry carries the same DOI, or a title at or above "
+            "TITLE_SIMILARITY_EXACT. The entry with the strongest "
+            "verification outcome is credited; the others are kept, shown, "
+            "and earn nothing."
+        ),
+        "credit": 0.00,
+        "overrides_matrix": True,
+        "reviewer_note": (
+            "Listed more than once - a journal version and a conference "
+            "version under one title, or the same entry in two sections. "
+            "Counted once. Reviewer may override if they are genuinely "
+            "different works."
+        ),
+    },
 )
+
+EXCLUSION_LABEL = {e["id"]: e["label"] for e in CREDIT_EXCLUSIONS}
 # Stage 6 MUST apply these before consulting CREDIT_MATRIX, and MUST record
 # which exclusion fired next to the zero, so the audit shows WHY a listed
 # publication scored nothing.

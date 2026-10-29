@@ -202,6 +202,89 @@ def openalex_search(title: str, *, use_cache: bool = True) -> tuple[dict, str, s
     return payload, url, ""
 
 
+# A DOI as CVs print it: bare, as a URL, with or without a scheme, and
+# occasionally with a trailing full stop from the sentence it sits in.
+DOI_IN_TEXT = re.compile(
+    r"(10\.\d{4,9}/[^\s\"<>]+?)[.,;)\]]*\s*$", re.I)
+DOI_PREFIX = re.compile(
+    r"^\s*(?:https?://)?(?:dx\.)?(?:www\.)?doi\.org/|^\s*doi:\s*", re.I)
+
+
+def normalise_doi(raw) -> str | None:
+    """
+    "https://doi.org/10.1109/ACCESS.2021.3059342" -> "10.1109/access.2021.3059342"
+
+    CVs print the same identifier half a dozen ways. Everything before the
+    "10." is decoration, and DOIs are case-insensitive by specification,
+    so both are folded away before the value is used as a key.
+    """
+    if not raw:
+        return None
+    # A DOI never contains whitespace, so any found inside one was put
+    # there by PDF typesetting: "https : / / doi . org / 10 . 1016/..." is
+    # how a justified line of monospace URL comes out of PyMuPDF.
+    text = DOI_PREFIX.sub("", re.sub(r"\s+", "", str(raw)))
+    match = DOI_IN_TEXT.search(text)
+    return match.group(1).lower() if match else None
+
+
+def rule_outcome(similarity: float, author: str | None,
+                 cv_year, oa_year) -> tuple[str, bool, bool]:
+    """
+    schema.VERDICT_RULES, in one place. Returns (outcome, exact, year_ok).
+
+    Both routes to a record - the title search and the DOI - decide
+    through this function. The DOI route was first written with its own
+    looser test (a CLOSE title, no year check) and so would have
+    confirmed papers the title route rejects. A DOI changes how the
+    record is FOUND; it must not change what counts as a match.
+    """
+    exact = similarity >= schema.TITLE_SIMILARITY_EXACT
+    year_ok = (cv_year is None or oa_year is None
+               or abs(int(cv_year) - int(oa_year)) <= schema.YEAR_TOLERANCE)
+    if author and exact and year_ok:
+        return "matched", exact, year_ok
+    if author:
+        return "weak_match", exact, year_ok
+    if exact:
+        return "unconfirmed_author", exact, year_ok
+    return "not_found", exact, year_ok
+
+
+def openalex_by_doi(doi: str, *, use_cache: bool = True) -> tuple[dict, str, str]:
+    """
+    Fetch the one work a DOI identifies. Returns (work, url, error).
+
+    A DOI names a specific article, which a title search only approximates
+    - so when the CV supplies one it is tried first. It is not treated as
+    proof of authorship: the caller still checks the returned title and
+    author list against the CV, because a DOI can be mistyped, copied from
+    a neighbouring entry, or simply belong to somebody else's paper.
+    """
+    url = f"{OPENALEX_WORKS}/doi:{doi}?mailto={MAILTO}"
+    cached = _cache_path(url)
+
+    if use_cache and cached.is_file():
+        return json.loads(cached.read_text(encoding="utf-8")), url, ""
+
+    try:
+        time.sleep(RATE_LIMIT_SECONDS)
+        response = requests.get(url, timeout=REQUEST_TIMEOUT)
+        # A DOI that resolves to nothing is an answer, not an outage: the
+        # caller falls back to the title search either way, but only a
+        # genuine failure should be reported as one.
+        if response.status_code == 404:
+            return {}, url, "not in OpenAlex"
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        return {}, url, f"{type(exc).__name__}: {exc}"
+
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cached.write_text(json.dumps(payload), encoding="utf-8")
+    return payload, url, ""
+
+
 # ---------------------------------------------------------------------------
 # Verdict
 # ---------------------------------------------------------------------------
@@ -316,14 +399,47 @@ def biblio_fallback(pub: dict, candidate_name: str, *,
     return None, url, "no record matched on author + year + volume/page"
 
 
+# "A. B. C." - a piece that is nothing but initials, i.e. the second half
+# of a "Surname, Initials" pair that a comma split has cut in two.
+_INITIALS_ONLY = re.compile(r"^(?:[A-Z]\.?\s*){1,4}$")
+
+
+def split_author_blob(name: str) -> list[str]:
+    """
+    One authorship record that is really a whole author list, split apart.
+
+    OpenAlex indexes some book chapters with a single "author" whose name
+    is the entire byline: "A. Banerjee, A. Das, S. Chatterjee &
+    A. Acharyya". Matching a candidate against that string compares one
+    name to five, and the answer depends on the ORDER of the names - two
+    chapters of the same book, by the same people listed in a different
+    order, came back one matched and one not. Neither result meant
+    anything.
+
+    A single name in "Surname, Given" form has one comma and no "&" or
+    "and", so it is left untouched. Anything else is split on separators,
+    and "Surname, Initials" pairs that the split cut apart are rejoined.
+    """
+    if not (" & " in name or ";" in name or name.count(",") >= 2
+            or re.search(r"\sand\s", name, re.I)):
+        return [name]
+    parts = [p.strip() for p in re.split(r";|,|&|\sand\s", name, flags=re.I)
+             if p.strip()]
+    if len(parts) >= 2 and len(parts) % 2 == 0 and \
+            all(_INITIALS_ONLY.match(p) for p in parts[1::2]):
+        parts = [f"{parts[i]}, {parts[i + 1]}" for i in range(0, len(parts), 2)]
+    return parts
+
+
 def _authors_of(work: dict) -> list[str]:
     names = []
     for authorship in work.get("authorships", []) or []:
         author = (authorship.get("author") or {}).get("display_name")
         raw = authorship.get("raw_author_name")
         for name in (author, raw):
-            if name and name not in names:
-                names.append(name)
+            for piece in split_author_blob(name) if name else []:
+                if piece not in names:
+                    names.append(piece)
     return names
 
 
@@ -342,6 +458,77 @@ def verify_publication(pub: dict, candidate_name: str, *,
     title = pub.get("title") or ""
     cv_year = pub.get("year")
 
+    # --- the DOI, when the CV gives one ----------------------------------
+    # A DOI identifies one article exactly, where a title search only
+    # guesses, so it is tried first. It is never taken as proof on its
+    # own: the article it returns still has to look like the one the CV
+    # describes, and the candidate still has to appear among its authors.
+    # A DOI can be mistyped, copied from the entry above, or belong to
+    # someone else's paper entirely. If it does not check out, nothing is
+    # concluded from it - the title search below runs as usual and the
+    # discrepancy is recorded for a reviewer.
+    doi = normalise_doi(pub.get("doi"))
+    doi_note = ""
+    if doi:
+        work, doi_url, doi_error = openalex_by_doi(doi, use_cache=use_cache)
+        if work:
+            doi_title = work.get("display_name") or ""
+            similarity = title_similarity(title, doi_title)
+            authors = _authors_of(work)
+            match = next((a for a in authors
+                          if names_match(candidate_name, a)), None)
+            outcome, exact, year_ok = rule_outcome(
+                similarity, match, cv_year, work.get("publication_year"))
+            # Taken only when the article it names plausibly IS this entry.
+            # A "not_found" here means the DOI leads somewhere else; that
+            # tells us nothing about this entry, so the title search runs.
+            if similarity >= schema.TITLE_SIMILARITY_CLOSE and \
+                    outcome != "not_found":
+                why = []
+                if not exact:
+                    why.append(f"the title only partly agrees ({similarity:.2f})")
+                if not year_ok:
+                    why.append(f"the year differs ({cv_year} in the CV, "
+                               f"{work.get('publication_year')} indexed)")
+                return {
+                    "query_url": doi_url,
+                    "openalex_id": work.get("id"),
+                    "matched_title": doi_title,
+                    "title_similarity": similarity,
+                    "year_cv": cv_year,
+                    "year_openalex": work.get("publication_year"),
+                    "authors_openalex": authors,
+                    "author_match": match,
+                    "cited_by_count": work.get("cited_by_count"),
+                    "doi": work.get("doi"),
+                    "resolved_by": "doi",
+                    "outcome": outcome,
+                    "checked_at": datetime.now(timezone.utc).isoformat(
+                        timespec="seconds"),
+                    "note": (
+                        f"Identified by the DOI printed in the CV "
+                        f"({doi}), which names one specific article. "
+                        + (f"Title, year and author ({match}) all agree."
+                           if outcome == "matched" else
+                           f"The candidate ({match}) is among its authors, "
+                           f"but {' and '.join(why)}, so it is a probable "
+                           f"match rather than a confirmed one."
+                           if outcome == "weak_match" else
+                           "The title agrees, but the candidate is NOT among "
+                           "its authors, so it earns no credit and needs "
+                           "review. A DOI identifies a paper, not its "
+                           "authors.")),
+                }
+            # Resolved, but to something else. Record it and move on.
+            doi_note = (f"The DOI printed in the CV ({doi}) resolves to a "
+                        f"different article, {doi_title!r} (similarity "
+                        f"{similarity:.2f}). The DOI was ignored and the "
+                        f"title searched instead; please check it.")
+        elif doi_error:
+            doi_note = (f"The DOI printed in the CV ({doi}) could not be "
+                        f"looked up ({doi_error}). This is not held against "
+                        f"the publication; the title was searched instead.")
+
     payload, url, error = openalex_search(title, use_cache=use_cache)
 
     record = {
@@ -356,6 +543,9 @@ def verify_publication(pub: dict, candidate_name: str, *,
         "outcome": "not_found",
         "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "note": "",
+        # Kept in its own field rather than appended to "note", because
+        # the paths below rebuild "note" wholesale and would drop it.
+        "doi_note": doi_note,
     }
 
     if error:
@@ -424,8 +614,7 @@ def verify_publication(pub: dict, candidate_name: str, *,
     authors = _authors_of(best)
     matched_author = next((a for a in authors if names_match(candidate_name, a)), None)
     oa_year = best.get("publication_year")
-    year_ok = (cv_year is None or oa_year is None
-               or abs(int(cv_year) - int(oa_year)) <= schema.YEAR_TOLERANCE)
+    _, _, year_ok = rule_outcome(best_sim, matched_author, cv_year, oa_year)
 
     record.update({
         "openalex_id": best.get("id"),
@@ -438,20 +627,20 @@ def verify_publication(pub: dict, candidate_name: str, *,
         "doi": best.get("doi"),
     })
 
-    exact = best_sim >= schema.TITLE_SIMILARITY_EXACT
+    outcome, exact, _ = rule_outcome(best_sim, matched_author, cv_year, oa_year)
 
-    if matched_author and exact and year_ok:
+    if outcome == "matched":
         record["outcome"] = "matched"
         record["note"] = (f"title and author both consistent with this candidate. "
                           f"NOT proof of authorship - a name match is not an "
                           f"identity match.")
-    elif matched_author:
+    elif outcome == "weak_match":
         record["outcome"] = "weak_match"
         why = [] if exact else [f"title similarity {best_sim}"]
         if not year_ok:
             why.append(f"year {cv_year} vs indexed {oa_year}")
         record["note"] = "author consistent, but " + " and ".join(why)
-    elif exact:
+    elif outcome == "unconfirmed_author":
         record["outcome"] = "unconfirmed_author"
         record["note"] = ("this exact paper is indexed, but the candidate's name "
                           "was not found among its authors. Could not confirm "
@@ -485,6 +674,11 @@ def verify_candidate(validated: dict, *, use_cache: bool = True) -> dict:
         exclusions = []
         if any("thesis" in f or "dissertation" in f for f in validation.get("flags", [])):
             exclusions.append("thesis_or_dissertation")
+        # ONLY 'unverified' - the entry could not be placed in the CV at
+        # all. 'needs_review' means it was placed and one quotation looks
+        # wrong; that is carried forward for a human to look at, not used
+        # to delete the entry's credit. Silently excluding an uncertain
+        # record hides the uncertainty instead of resolving it.
         if validation.get("verdict") == "unverified":
             exclusions.append("failed_validation")
 
@@ -494,8 +688,14 @@ def verify_candidate(validated: dict, *, use_cache: bool = True) -> dict:
             "title": pub.get("title"),
             "status": pub.get("status"),
             "credit_exclusions": exclusions,
+            # Carried through so Stage 6 can put the doubt in front of the
+            # reviewer beside the credit it did award.
+            "validation_verdict": validation.get("verdict"),
+            "validation_flags": validation.get("flags", []),
             "verification": verification,
         })
+
+    mark_duplicates(results, validated.get("publications", []))
 
     return {
         "candidate_id": validated.get("candidate_id"),
@@ -503,6 +703,69 @@ def verify_candidate(validated: dict, *, use_cache: bool = True) -> dict:
         "verified_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "publications": results,
     }
+
+
+# Which copy of a duplicated entry earns the credit: the one the index
+# corroborated most strongly. Ordering by position in the CV instead would
+# let a truncated second listing win over a complete first one.
+OUTCOME_STRENGTH = {"matched": 5, "matched_by_biblio": 4, "weak_match": 3,
+                    "unconfirmed_author": 2, "not_found": 1,
+                    "lookup_failed": 0}
+
+
+def mark_duplicates(results: list[dict], publications: list[dict]) -> None:
+    """
+    Count a publication once, however many times the CV lists it.
+
+    Two entries are the same work when they carry the same DOI, or when
+    their titles meet TITLE_SIMILARITY_EXACT - the bar already used to say
+    "these titles are the same work" against the index. Nothing is
+    deleted: the extra copies stay in the record with a
+    duplicate_publication exclusion and a pointer to the copy that was
+    credited, so a reviewer can see and reverse the decision.
+
+    Patents have had this since they were added; publications never did,
+    which was harmless only while most entries were being excluded for an
+    unrelated reason.
+    """
+    def key_doi(i):
+        return normalise_doi((publications[i] if i < len(publications)
+                              else {}).get("doi"))
+
+    groups: list[list[int]] = []
+    for i, row in enumerate(results):
+        if "failed_validation" in row["credit_exclusions"]:
+            continue    # not traceable to the CV; cannot be "the same" as anything
+        doi, title = key_doi(i), row.get("title") or ""
+        for group in groups:
+            j = group[0]
+            other_doi = key_doi(j)
+            # Two DIFFERENT DOIs are two different works, however alike
+            # the titles. "...Part I: Wurtzite-GaN" and "...Part II:
+            # Type-IIb diamond" score 0.91 against each other - one
+            # hundredth under the threshold. A Part III would cross it.
+            if doi and other_doi and doi != other_doi:
+                continue
+            same_doi = doi and doi == other_doi
+            same_title = (title and title_similarity(
+                title, results[j].get("title") or "")
+                >= schema.TITLE_SIMILARITY_EXACT)
+            if same_doi or same_title:
+                group.append(i)
+                break
+        else:
+            groups.append([i])
+
+    for group in groups:
+        if len(group) < 2:
+            continue
+        keep = max(group, key=lambda i: (
+            OUTCOME_STRENGTH.get(results[i]["verification"].get("outcome"), 0),
+            -i))
+        for i in group:
+            if i != keep:
+                results[i]["credit_exclusions"].append("duplicate_publication")
+                results[i]["duplicate_of"] = keep
 
 
 # ---------------------------------------------------------------------------
