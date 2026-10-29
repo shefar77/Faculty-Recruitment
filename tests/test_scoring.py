@@ -12,6 +12,8 @@ Run:  python -m pytest tests/ -v
 from __future__ import annotations
 
 import sys
+
+import pytest
 from datetime import date
 from pathlib import Path
 
@@ -93,12 +95,16 @@ def test_hand_calculated_total():
       publications: 5 matched x 1.00 = 5.0 credit; 5/20 saturation = 0.25
                     -> 0.25 x 40 = 10.00
       teaching:     2020-01 to 2023-01 = 36 months = 3.0 yr; 3/5 = 0.6
-                    -> 0.6 x 25 = 15.00
-      doctorate:    awarded -> 1.0 x 20 = 20.00
+                    -> 0.6 x 20 = 12.00   ("Lecturer" = base rank, x1.0)
+      doctorate:    awarded, institution not named -> unknown tier x0.7
+                    -> 1.0 x 0.7 x 15 = 10.50
+      postdoctoral: none -> 0.00
+      masters:      none stated -> 0.00
+      bachelors:    none stated -> 0.00
       industry:     none -> 0.00
       visibility:   5 papers x 10 citations = 50; 50/100 = 0.5
                     -> 0.5 x 5 = 2.50
-      TOTAL = 10 + 15 + 20 + 0 + 2.5 = 47.50
+      TOTAL = 8.75 + 12 + 10.5 + 0 + 0 + 0 + 0 + 2.5 = 33.75
 
     Teaching here is a "Lecturer", classified as a faculty appointment, so
     it counts at the full per-month rate.
@@ -112,12 +118,15 @@ def test_hand_calculated_total():
 
     result = scoring.score_candidate(v, w, as_of=AS_OF)
 
-    assert criterion(result, "publications")["points"] == 10.00
-    assert criterion(result, "teaching_experience")["points"] == 15.00
-    assert criterion(result, "doctorate")["points"] == 20.00
+    assert criterion(result, "publications")["points"] == 8.75
+    assert criterion(result, "teaching_experience")["points"] == 12.00
+    assert criterion(result, "doctorate")["points"] == 10.50
+    assert criterion(result, "postdoctoral")["points"] == 0.00
+    assert criterion(result, "masters")["points"] == 0.00
+    assert criterion(result, "bachelors")["points"] == 0.00
     assert criterion(result, "industry_experience")["points"] == 0.00
     assert criterion(result, "research_visibility")["points"] == 2.50
-    assert result["total_score"] == 47.50
+    assert result["total_score"] == 33.75
 
 
 def test_criteria_are_capped_at_their_weight():
@@ -125,7 +134,7 @@ def test_criteria_are_capped_at_their_weight():
     w = verified([pub(f"P{i}", "published", "matched", citations=500)
                   for i in range(40)])
     result = scoring.score_candidate(validated(), w, as_of=AS_OF)
-    assert criterion(result, "publications")["points"] == 40.0
+    assert criterion(result, "publications")["points"] == 35.0
     assert criterion(result, "research_visibility")["points"] == 5.0
     assert result["total_score"] <= result["max_score"]
 
@@ -401,10 +410,28 @@ def test_in_progress_doctorate_earns_no_credit():
     assert result["eligibility"]["outcome"] == "indeterminate"
 
 
-def test_awarded_doctorate_still_earns_full_credit():
-    v = validated({"phd_status": wrap("awarded"), "phd_year": wrap(2021)})
+def test_awarded_doctorate_at_a_listed_institution_earns_full_credit():
+    v = validated({"phd_status": wrap("awarded"), "phd_year": wrap(2021),
+                   "phd_institution": wrap("IIT Bombay")})
     result = scoring.score_candidate(v, verified(), as_of=AS_OF)
-    assert criterion(result, "doctorate")["points"] == scoring.WEIGHTS["doctorate"]
+    doctorate = criterion(result, "doctorate")
+    assert doctorate["points"] == scoring.WEIGHTS["doctorate"]
+    assert doctorate["needs_review"] is False
+
+
+def test_awarded_doctorate_with_no_institution_named_is_flagged_not_failed():
+    """
+    The tier multiplier scales a doctorate; it must never decide whether
+    one exists. An unnamed institution costs the tier difference and
+    raises a review flag - it does not zero the criterion.
+    """
+    v = validated({"phd_status": wrap("awarded"), "phd_year": wrap(2021)})
+    doctorate = criterion(
+        scoring.score_candidate(v, verified(), as_of=AS_OF), "doctorate")
+    assert doctorate["points"] == pytest.approx(15 * 0.7)
+    assert doctorate["points"] > 0
+    assert doctorate["needs_review"] is True
+    assert doctorate["insufficient_evidence"] is False
 
 
 # ---------------------------------------------------------------------------
@@ -485,8 +512,9 @@ def test_publication_threshold_is_twenty():
     nineteen = verified([pub(f"P{i}", "published", "matched") for i in range(19)])
     a = scoring.score_candidate(validated(), ten, as_of=AS_OF)
     b = scoring.score_candidate(validated(), nineteen, as_of=AS_OF)
-    assert criterion(a, "publications")["points"] == 20.0
-    assert criterion(b, "publications")["points"] == 38.0
+    # 10/20 = 0.50 -> 17.50 ; 19/20 = 0.95 -> 33.25, on the 35-mark weight
+    assert criterion(a, "publications")["points"] == 17.5
+    assert criterion(b, "publications")["points"] == 33.25
     assert criterion(a, "publications")["points"] != criterion(b, "publications")["points"]
 
 
@@ -584,8 +612,9 @@ def test_currently_held_professorship_scores_teaching_points():
     result = scoring.score_candidate(
         validated(positions=positions), verified(), as_of=date(2026, 10, 20))
     teaching = criterion(result, "teaching_experience")
-    # 2.0 / 5.0 saturation = 0.4 -> 0.4 x 25 = 10.00
-    assert teaching["points"] == 10.0
+    # 2.0 / 5.0 saturation = 0.4 -> 0.4 x 20 = 8.00 (Assistant Professor
+    # is the base rank, so no rank multiplier applies)
+    assert teaching["points"] == 8.0
     assert teaching["insufficient_evidence"] is False
 
 

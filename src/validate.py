@@ -57,10 +57,13 @@ FUZZY_THRESHOLD = 0.90
 
 FREE_TEXT_FIELDS = (
     "full_name", "email", "orcid", "scholar_url",
-    "phd_institution", "masters_degree", "masters_institution",
+    "phd_institution", "phd_subject",
+    "masters_degree", "masters_institution", "masters_subject",
+    "bachelors_degree", "bachelors_institution", "bachelors_subject",
     "research_area",
 )
-NUMERIC_FIELDS = ("phd_start_year", "phd_year", "masters_year")
+NUMERIC_FIELDS = ("phd_start_year", "phd_year", "masters_year",
+                  "bachelors_year")
 CLASSIFICATION_FIELDS = ("highest_degree", "phd_status")
 ELIGIBILITY_FLAG_FIELDS = ("net_qualified",)
 
@@ -118,7 +121,7 @@ PHD_IN_PROGRESS_HINT = re.compile(
 MIN_PLAUSIBLE_PHD_YEARS = 2
 
 
-COMPLETION_YEAR_FIELDS = ("masters_year", "phd_year")
+COMPLETION_YEAR_FIELDS = ("bachelors_year", "masters_year", "phd_year")
 YEAR_IN_TEXT = re.compile(r"\b(19|20)\d{2}\b")
 
 
@@ -160,6 +163,76 @@ def cross_check_completion_years(results: list[dict]) -> list[str]:
                     f"START year. Corrected to the completion year {later}.")
             row["detail"] = note
             notes.append(note)
+
+    return notes
+
+
+def cross_check_thesis_submitted(results: list[dict]) -> list[str]:
+    """
+    Recognise a submitted thesis from the doctorate row's OWN evidence.
+
+    The extractor has no reliable slot for this stage and returns
+    "pursuing" (or, worse, "awarded") for a row that reads
+    "Ph.D. (Thesis Submitted)". The stage is stated in the CV's own words,
+    so Python reads it there - the same division of labour as the
+    completion-year correction above.
+
+    SCOPE IS THE ROW'S EVIDENCE SPAN, NOT THE WHOLE CV. A CV can contain
+    "thesis submitted" about someone else entirely - a student the
+    candidate supervised, a referee's note - and searching the whole text
+    would credit the candidate for it.
+
+    DIRECTION. Moves "pursuing" or a missing value UP to thesis_submitted,
+    and moves "awarded" DOWN to it. The downgrade matters more: a model
+    reading "Ph.D. (Thesis Submitted) 2021 - 2026" as awarded in 2026 has
+    manufactured a qualification, and that is the error this project
+    treats as the most dangerous it can make. "none" is left alone - a
+    negative claim is handled by its own absence check.
+    """
+    notes = []
+    by_field = {r["field"]: r for r in results}
+    markers = schema.THESIS_SUBMITTED_MARKERS
+
+    def states_submission(row) -> str | None:
+        text = re.sub(r"\s+", " ", (row or {}).get("evidence") or "").lower()
+        return next((m for m in markers if m in text), None)
+
+    def traceable(row) -> bool:
+        # Only correct a row whose evidence span was actually found in the
+        # CV. A span that failed traceability is unproven text, and
+        # reading a stage out of it would launder a hallucination into a
+        # correction.
+        return (row or {}).get("status") in ("verified", "partial")
+
+    status_row = by_field.get("phd_status")
+    marker = states_submission(status_row)
+    if status_row and marker and traceable(status_row) and \
+            status_row.get("value") in ("pursuing", "awarded", None, ""):
+        before = status_row.get("value")
+        status_row["value"] = "thesis_submitted"
+        status_row["corrected_from"] = before
+        note = (f"phd_status: the doctorate row reads {marker!r}, so the "
+                f"stage is 'thesis submitted' rather than {before!r}. The "
+                f"award is NOT treated as conferred.")
+        status_row["detail"] = note
+        notes.append(note)
+
+        # An award year cannot coexist with an unconferred award; the end
+        # of an enrolment range is not one.
+        year_row = by_field.get("phd_year")
+        if year_row and year_row.get("value") is not None:
+            year_row["corrected_from"] = year_row["value"]
+            year_row["value"] = None
+            year_row["detail"] = ("cleared: the thesis is submitted, so no "
+                                  "award year exists yet")
+
+    degree_row = by_field.get("highest_degree")
+    if degree_row and states_submission(degree_row) and traceable(degree_row) \
+            and degree_row.get("value") in ("phd", "phd_pursuing"):
+        degree_row["corrected_from"] = degree_row["value"]
+        degree_row["value"] = "phd_submitted"
+        degree_row["detail"] = ("highest_degree: the row states the thesis "
+                                "is submitted, not that the degree is held")
 
     return notes
 
@@ -433,6 +506,50 @@ def _unsupported_authors(authors: list, title: str, evidence: str,
             if normalise(a) and normalise(a) not in haystack]
 
 
+# A page range, a volume, or a DOI. Each is a locator that only exists
+# once a work has actually appeared somewhere.
+_PAGES = re.compile(r"\bpp?\.?\s*\d+\s*[-‐-―]+\s*\d+", re.I)
+_VOLUME = re.compile(r"\bvol(?:ume)?\.?\s*\d+", re.I)
+_DOI = re.compile(r"\b10\.\d{4,9}/\S+", re.I)
+# "Proceedings of ...", "in 2017 2nd International Conference ..." - a
+# named venue in the citation line itself, for CVs that print the venue
+# inline rather than in a separate field.
+_VENUE_WORDS = re.compile(
+    r"\b(journal|transactions|proceedings|conference|symposium|workshop"
+    r"|letters|magazine|annual technical volume|lecture notes|springer"
+    r"|ieee|acm|elsevier|wiley)\b", re.I)
+
+
+def _bibliographically_complete(pub: dict, evidence: str) -> tuple[bool, str]:
+    """
+    Is this entry a specific, checkable claim that the work appeared?
+
+    Requires a venue AND one locator (pages, volume or DOI). Both halves
+    matter: a venue alone is an intention ("submitted to Nature"), and a
+    locator alone could be anything. Together they are a citation a
+    reader could follow, which is what publication means.
+    """
+    venue = (pub.get("venue") or "").strip()
+    haystack = f"{venue} {evidence}"
+    has_venue = bool(venue) or bool(_VENUE_WORDS.search(haystack))
+    if not has_venue:
+        return False, ""
+
+    if pub.get("doi") or _DOI.search(haystack):
+        locator = "a DOI"
+    elif _PAGES.search(haystack):
+        locator = "a page range"
+    elif _VOLUME.search(haystack):
+        locator = "a volume number"
+    else:
+        return False, ""
+
+    return True, (
+        f"the CV gives a complete citation - a named venue and {locator} - "
+        f"which is a specific claim that the work appeared, so it is read "
+        f"as published even though no status word is printed beside it")
+
+
 def check_publication(index: int, pub: dict, source_norm: str) -> dict:
     """Validate one publication entry and apply the status guard."""
     issues: list[str] = []
@@ -474,12 +591,35 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
             f"not from CV layout.")
 
     # --- the status guard -------------------------------------------------
-    declared = pub.get("status") or "unknown"
+    # Normalise FIRST. The extractor returns whatever word the CV used,
+    # and Stage 6 used to read it with STATUS_CLASS.get(status, "unknown")
+    # - which handed every unrecognised word the one class that has a
+    # full-credit promotion path. "[Communicated]" fell through exactly
+    # that way. See schema.normalise_status.
+    raw_status = pub.get("status")
+    declared, recognised = schema.normalise_status(raw_status)
+    if not recognised:
+        flags.append(
+            f"the CV states a publication status this rubric does not "
+            f"recognise ({str(raw_status)[:40]!r}). It is treated as "
+            f"unstated and needs a reviewer's eye - it has NOT been read "
+            f"as a claim that the work is published.")
+
     guard = None
     if declared != "unknown" and not STATUS_MARKER.search(evidence):
         guard = {"from": declared, "to": "unknown",
                  "reason": "no status marker present in the evidence span"}
         declared = "unknown"
+
+    # --- a complete citation is itself a publication claim ----------------
+    # Promotes "unknown" only, and never an entry the candidate has
+    # labelled as still under review. See schema.BIBLIOGRAPHIC_COMPLETENESS.
+    citation = None
+    if declared == "unknown" and recognised:
+        complete, why = _bibliographically_complete(pub, evidence)
+        if complete:
+            citation = {"from": "unknown", "to": "published", "reason": why}
+            declared = "published"
 
     if THESIS_HINT.search(evidence) or THESIS_HINT.search(title):
         flags.append("evidence mentions a thesis/dissertation - may not be a "
@@ -490,6 +630,8 @@ def check_publication(index: int, pub: dict, source_norm: str) -> dict:
         "title": title,
         "status_final": declared,
         "status_downgraded": guard,
+        "status_from_citation": citation,
+        "status_recognised": recognised,
         "title_in_source": title_ok,
         "evidence_in_source": ev_ok,
         "unsupported_authors": unsupported,
@@ -720,6 +862,13 @@ def validate_record(record: dict, source_text: str) -> dict:
     # Order matters: correct completion years BEFORE the doctorate
     # cross-check, which reasons about the start/end year gap.
     year_notes = cross_check_completion_years(scalar_results)
+    # BEFORE the doctorate cross-check: a row reading "Thesis Submitted"
+    # that the model called "awarded" is corrected here, so the check
+    # below never sees an award that does not exist. Its notes are kept
+    # apart from doctorate_notes, because those set
+    # doctorate_cross_check_failed - and recognising a stated stage is not
+    # a failed check.
+    thesis_notes = cross_check_thesis_submitted(scalar_results)
     doctorate_notes = cross_check_doctorate(scalar_results, source_norm)
 
     # Build the cleaned profile: unverified values are REMOVED, not kept.
@@ -798,7 +947,7 @@ def validate_record(record: dict, source_text: str) -> dict:
             "publications_with_issues": sum(1 for r in pub_results if r["issues"]),
             "publication_statuses_downgraded": downgraded,
             "flags": ([f for r in pub_results for f in r["flags"]]
-                  + doctorate_notes + year_notes),
+                  + doctorate_notes + year_notes + thesis_notes),
         "doctorate_cross_check_failed": bool(doctorate_notes),
         },
         "scalar_detail": scalar_results,

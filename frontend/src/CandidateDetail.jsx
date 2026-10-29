@@ -30,8 +30,62 @@ function Warnings({ candidate }) {
 function needsReview(criterion) {
   return Boolean(
     criterion.indeterminate ||
+      criterion.needs_review ||
       criterion.unscored_positions?.length ||
       criterion.unclassified_roles?.length,
+  );
+}
+
+const CATEGORY_LABEL = {
+  research: "Research and related contributions",
+  experience: "Teaching and industry experience",
+  education: "Education",
+};
+
+/**
+ * How the 100 marks divide across the three approved categories.
+ *
+ * A reviewer comparing candidates needs to see WHERE a score came from,
+ * not only how big it is: 60 earned on research and 60 earned on
+ * education describe two very different people.
+ */
+function CategoryTotals({ scores }) {
+  const names = Object.keys(scores || {});
+  if (!names.length) return null;
+  return (
+    <div className="totals">
+      {names.map((name) => (
+        <div key={name}>
+          <div className="muted small">{CATEGORY_LABEL[name] || name}</div>
+          <div>
+            <strong>{scores[name].earned?.toFixed(2)}</strong>
+            <span className="muted"> / {scores[name].available}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The named multipliers behind an education mark.
+ *
+ * Shown rather than folded into one number because a reviewer who
+ * disagrees with the score has to be able to see WHICH factor they
+ * disagree with - the qualification, the institution or the subject -
+ * and each one is separately overridable.
+ */
+function Factors({ factors }) {
+  if (!factors?.length) return null;
+  return (
+    <ul className="factors">
+      {factors.map((factor, i) => (
+        <li key={i}>
+          <strong>{factor.factor}</strong> &times;{factor.value}
+          <span className="muted"> — {factor.reason}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -143,6 +197,18 @@ function Criteria({ criteria }) {
               )}
 
               <Evidence criterion={criterion} />
+              <Factors factors={criterion.factors} />
+
+              {criterion.review_reasons?.length > 0 && (
+                <div className="alert alert-note small">
+                  <strong>Please confirm.</strong>
+                  <ul>
+                    {criterion.review_reasons.map((reason, i) => (
+                      <li key={i}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {criterion.unscored_positions?.length > 0 && (
                 <div className="alert alert-note small">
@@ -331,6 +397,9 @@ export default function CandidateDetail({ candidate, onOverridden }) {
           </div>
         </div>
       </div>
+
+      <h3>Score by category</h3>
+      <CategoryTotals scores={candidate.category_scores} />
 
       <h3>Criteria</h3>
       <ExplanationControl candidate={candidate} onDone={onOverridden} />

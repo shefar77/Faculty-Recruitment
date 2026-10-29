@@ -311,6 +311,73 @@ check("an internal field name in the evidence is not rendered",
   !internalHtml.includes("phd_status"),
   "the audit record legitimately stores field names; the reviewer's view must not show them");
 
+// ---------------------------------------------------------------------------
+// REVISED RUBRIC - categories and the factors behind an education mark
+//
+// The 100 marks now divide into three approved categories, and an
+// education mark is the product of three named multipliers. Both have to
+// REACH THE SCREEN: a score the reviewer cannot decompose is a score they
+// cannot contest, which is the whole point of the rubric being explicit.
+// ---------------------------------------------------------------------------
+console.log("\nREVISED RUBRIC — CATEGORIES AND FACTORS");
+
+const withCategories = {
+  ...reliable,
+  category_scores: {
+    research: { earned: 21.5, available: 40 },
+    experience: { earned: 12.0, available: 25 },
+    education: { earned: 24.3, available: 35 },
+  },
+  criteria: [criterion({
+    criterion: "masters", weight: 8, category: "education",
+    computed_points: 4.76, effective_points: 4.76, measured: 0.595,
+    factors: [
+      { factor: "equivalence", value: 0.85,
+        reason: "MCA counts as a computing master's" },
+      { factor: "institution", value: 0.85,
+        reason: "recognised as Central University" },
+      { factor: "branch", value: 0.8,
+        reason: "the subject is ECE, a neighbouring field" },
+    ],
+    needs_review: false, review_reasons: [],
+  })],
+};
+const categoryHtml = globalThis.renderDetail(withCategories);
+check("the three approved categories are shown with their subtotals",
+  categoryHtml.includes("Research and related contributions") &&
+  categoryHtml.includes("Teaching and industry experience") &&
+  categoryHtml.includes("Education"));
+check("each category shows earned against available",
+  categoryHtml.includes("21.50") && categoryHtml.includes("40") &&
+  categoryHtml.includes("24.30") && categoryHtml.includes("35"));
+check("every multiplier behind an education mark is named",
+  categoryHtml.includes("equivalence") &&
+  categoryHtml.includes("institution") &&
+  categoryHtml.includes("branch"));
+check("each factor shows its value and its reason",
+  categoryHtml.includes("0.85") &&
+  categoryHtml.includes("a neighbouring field"),
+  "a reviewer must see WHICH factor to disagree with, not one opaque number");
+
+const needsConfirming = {
+  ...reliable,
+  criteria: [criterion({
+    criterion: "doctorate", weight: 15, category: "education",
+    computed_points: 10.5, effective_points: 10.5, measured: 0.7,
+    needs_review: true,
+    review_reasons: [
+      "The awarding institution (Greenfield Institute) is not in the " +
+      "approved list, so it was scored at the base rate.",
+    ],
+  })],
+};
+const confirmHtml = globalThis.renderDetail(needsConfirming);
+check("an unclassified institution is surfaced for confirmation",
+  confirmHtml.includes("Greenfield Institute") &&
+  confirmHtml.includes("Please confirm"));
+check("a criterion awaiting confirmation is badged",
+  confirmHtml.includes("needs your review"));
+
 rmSync(entry, { force: true });
 rmSync(bundle, { force: true });
 

@@ -1,0 +1,150 @@
+{
+  "_README": [
+    "INSTITUTION TIERS - a configuration file, not code.",
+    "",
+    "Maintainers edit THIS file to add or re-tier an institution. Nothing in",
+    "src/ hardcodes an institution name. GET /rubric/institutions serves this",
+    "file so an administrator can read the live classification without shell",
+    "access.",
+    "",
+    "DEMO/RESEARCH values. The tiers below are a proposal for a student",
+    "project and carry no authority. They need faculty approval before any",
+    "real use.",
+    "",
+    "HOW A NAME IS MATCHED",
+    "  1. The institution string is normalised (lowercased, punctuation",
+    "     stripped, ampersand to 'and', whitespace collapsed).",
+    "  2. Aliases are expanded - abbreviations, former names, merged names.",
+    "  3. never_match is checked, so a lookalike cannot claim a tier.",
+    "  4. Each tier's patterns are tried IN FILE ORDER; first match wins.",
+    "  5. No match gives tier 'unknown', which earns the UNKNOWN multiplier",
+    "     AND is flagged for human review. It is never silently penalised.",
+    "",
+    "WHY PATTERNS AND NOT A NAME LIST: CVs print 'IIT Bombay', 'Indian",
+    "Institute of Technology Bombay' and 'I.I.T. Bombay' for one place. A",
+    "pattern absorbs the variation; a literal list would miss two of three."
+  ],
+
+  "version": "institutions-v1",
+  "approved_by": null,
+  "approved_on": null,
+
+  "multipliers": {
+    "tier_1": 1.0,
+    "tier_2": 0.85,
+    "tier_3": 0.7,
+    "unknown": 0.7
+  },
+
+  "tiers": {
+    "tier_1": {
+      "label": "Institutes of national importance and equivalent",
+      "rationale": "Centrally funded technical and research institutes established by Act of Parliament, plus their direct international equivalents. Standing rests on statute and published admission standards rather than on reputation.",
+      "patterns": [
+        {"match": "indian institute of technology", "label": "IIT"},
+        {"match": "\\biit\\b", "label": "IIT"},
+        {"match": "indian institute of science(?! education)", "label": "IISc"},
+        {"match": "\\biisc\\b", "label": "IISc"},
+        {"match": "national institute of technology", "label": "NIT"},
+        {"match": "\\bnit\\b", "label": "NIT"},
+        {"match": "indian institute of information technology", "label": "IIIT"},
+        {"match": "international institute of information technology", "label": "IIIT"},
+        {"match": "\\biiit\\b", "label": "IIIT"},
+        {"match": "birla institute of technology and science", "label": "BITS Pilani"},
+        {"match": "\\bbits\\b", "label": "BITS Pilani"},
+        {"match": "indian institute of science education and research", "label": "IISER"},
+        {"match": "\\biiser\\b", "label": "IISER"},
+        {"match": "indian statistical institute", "label": "ISI"},
+        {"match": "indian institute of management", "label": "IIM"},
+        {"match": "\\biim\\b", "label": "IIM"},
+        {"match": "indian institute of engineering science and technology", "label": "IIEST"},
+        {"match": "\\biiest\\b", "label": "IIEST"},
+        {"match": "tata institute of fundamental research", "label": "TIFR"},
+        {"match": "\\btifr\\b", "label": "TIFR"},
+        {"match": "massachusetts institute of technology", "label": "MIT"},
+        {"match": "stanford university", "label": "Stanford"},
+        {"match": "carnegie mellon", "label": "CMU"},
+        {"match": "university of oxford|university of cambridge", "label": "Oxford/Cambridge"},
+        {"match": "eth zurich|ecole polytechnique federale", "label": "ETH/EPFL"},
+        {"match": "nanyang technological university", "label": "NTU Singapore"},
+        {"match": "national university of singapore", "label": "NUS"}
+      ]
+    },
+
+    "tier_2": {
+      "label": "Central, state and deemed universities, and recognised international universities",
+      "rationale": "Degree-awarding bodies recognised by the UGC or by a national accreditation authority abroad. The qualification is unquestioned; the institution is not one of the nationally designated technical institutes above.",
+      "patterns": [
+        {"match": "central university", "label": "Central University"},
+        {"match": "university of delhi|delhi university", "label": "University of Delhi"},
+        {"match": "jawaharlal nehru university", "label": "JNU"},
+        {"match": "banaras hindu university", "label": "BHU"},
+        {"match": "aligarh muslim university", "label": "AMU"},
+        {"match": "jamia millia islamia", "label": "Jamia Millia Islamia"},
+        {"match": "university of mumbai|university of calcutta|university of madras|university of hyderabad|university of pune|university of rajasthan", "label": "State university"},
+        {"match": "anna university", "label": "Anna University"},
+        {"match": "jadavpur university", "label": "Jadavpur University"},
+        {"match": "osmania university", "label": "Osmania University"},
+        {"match": "visvesvaraya technological university", "label": "VTU"},
+        {"match": "\\bvtu\\b", "label": "VTU"},
+        {"match": "delhi technological university", "label": "DTU"},
+        {"match": "\\bdtu\\b", "label": "DTU"},
+        {"match": "netaji subhas university of technology", "label": "NSUT"},
+        {"match": "\\bnsut\\b", "label": "NSUT"},
+        {"match": "thapar institute", "label": "Thapar"},
+        {"match": "vellore institute of technology", "label": "VIT"},
+        {"match": "\\bvit\\b", "label": "VIT"},
+        {"match": "manipal academy|manipal institute|manipal university", "label": "Manipal"},
+        {"match": "amrita vishwa vidyapeetham", "label": "Amrita"},
+        {"match": "shiv nadar university", "label": "Shiv Nadar University"},
+        {"match": "ashoka university", "label": "Ashoka University"},
+        {"match": "state university", "label": "State university"},
+        {"match": "deemed to be university", "label": "Deemed university"},
+        {"match": "deemed university", "label": "Deemed university"}
+      ]
+    },
+
+    "tier_3": {
+      "label": "Other recognised degree-awarding institutions",
+      "rationale": "Affiliated colleges and private institutions whose degrees are recognised but for which this project holds no independent standing evidence. Assigned explicitly by a maintainer; it is NOT the default for an unrecognised name.",
+      "patterns": []
+    }
+  },
+
+  "aliases": {
+    "_README": "Expanded BEFORE tier matching. The key is matched as a whole word on the normalised string and replaced by the value. Covers abbreviations, former names and mergers.",
+    "iitb": "indian institute of technology bombay",
+    "iitd": "indian institute of technology delhi",
+    "iitk": "indian institute of technology kanpur",
+    "iitkgp": "indian institute of technology kharagpur",
+    "iitm": "indian institute of technology madras",
+    "iitr": "indian institute of technology roorkee",
+    "iitg": "indian institute of technology guwahati",
+    "bhu": "banaras hindu university",
+    "jnu": "jawaharlal nehru university",
+    "amu": "aligarh muslim university",
+    "nitk": "national institute of technology karnataka",
+    "nitt": "national institute of technology tiruchirappalli",
+    "mnnit": "motilal nehru national institute of technology",
+    "mnit": "malaviya national institute of technology",
+    "vnit": "visvesvaraya national institute of technology",
+    "svnit": "sardar vallabhbhai national institute of technology",
+    "bengal engineering and science university": "indian institute of engineering science and technology",
+    "university of roorkee": "indian institute of technology roorkee",
+    "delhi college of engineering": "delhi technological university",
+    "netaji subhas institute of technology": "netaji subhas university of technology",
+    "curaj": "central university of rajasthan",
+    "cuhp": "central university of himachal pradesh"
+  },
+
+  "never_match": {
+    "_README": "Names that LOOK like a tier-1 institute but are a different body. Checked FIRST; a hit bars the named tier for that string. This is the guard against crediting an unrelated college for a famous acronym.",
+    "entries": [
+      {"match": "national institute of fashion technology", "not_tier": "tier_1", "why": "NIFT is not an NIT"},
+      {"match": "\\bnift\\b", "not_tier": "tier_1", "why": "NIFT is not an NIT"},
+      {"match": "birla institute of technology mesra", "not_tier": "tier_1", "why": "BIT Mesra is a distinct institution from BITS Pilani"},
+      {"match": "\\bbit mesra\\b", "not_tier": "tier_1", "why": "BIT Mesra is a distinct institution from BITS Pilani"},
+      {"match": "national institute of technical teachers training", "not_tier": "tier_1", "why": "NITTTR is a teacher-training body, not an NIT"}
+    ]
+  }
+}

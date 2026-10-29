@@ -241,11 +241,86 @@ def check_explanation(text: str, criterion: dict) -> tuple[bool, str]:
 # a schema: "positions[].start_date" tells them nothing they want to know.
 CRITERION_LABEL = {
     "publications": "Research output",
-    "teaching_experience": "Teaching experience",
-    "doctorate": "Doctoral qualification",
-    "industry_experience": "Industry experience",
     "research_visibility": "Research visibility",
+    "teaching_experience": "Teaching experience",
+    "industry_experience": "Industry experience",
+    "doctorate": "Doctoral qualification",
+    "postdoctoral": "Postdoctoral experience",
+    "masters": "Master's degree",
+    "bachelors": "Bachelor's degree",
 }
+
+CATEGORY_LABEL = {
+    "research": "Research and related contributions",
+    "experience": "Teaching and industry experience",
+    "education": "Education",
+}
+
+
+def _sentence(text: str) -> str:
+    """
+    Upper-case the first letter and nothing else.
+
+    NOT str.capitalize(), which lower-cases the whole remainder and turned
+    "awarded by IIT Delhi" into "awarded by iit delhi" in front of a
+    reviewer. Proper nouns are the one thing an explanation must not
+    mangle: the institution is part of the evidence.
+    """
+    text = (text or "").strip().rstrip(".")
+    if not text:
+        return ""
+    return text[0].upper() + text[1:] + "."
+
+
+def _education_sentences(criterion: dict) -> list[str]:
+    """
+    Why a qualification scored what it did, in a professor's language.
+
+    An education mark is a product of named multipliers, and a number
+    with no decomposition is a number nobody can argue with. Each factor
+    gets its own clause, with the institution and subject spelled as the
+    CV spells them.
+    """
+    sentences = []
+
+    for row in criterion.get("evidence") or []:
+        qualification = row.get("qualification")
+        if not qualification:
+            continue
+        parts = [f"The CV records {qualification}"]
+        if row.get("subject"):
+            parts.append(f"in {row['subject']}")
+        if row.get("organisation"):
+            parts.append(f"from {row['organisation']}")
+        if row.get("year"):
+            parts.append(f"({row['year']})")
+        sentences.append(" ".join(parts) + ".")
+        break
+
+    for row in (criterion.get("evidence") or [])[:3]:
+        if row.get("kind") == "postdoctoral":
+            where = f" at {row['organisation']}" if row.get("organisation") else ""
+            sentences.append(
+                f"Postdoctoral appointment{where} ran from {row.get('from')} "
+                f"to {row.get('to')}, {row.get('months')} months.")
+
+    spoken = {
+        "qualification": "the stage the qualification has reached",
+        "equivalence": "how closely the qualification matches the one "
+                       "advertised",
+        "institution": "the awarding institution",
+        "branch": "how closely the subject fits the department",
+    }
+    for factor in criterion.get("factors") or []:
+        label = spoken.get(factor.get("factor"))
+        if label and factor.get("value") is not None:
+            sentences.append(
+                f"Counted at {factor['value']} for {label}, because "
+                f"{factor.get('reason', 'no reason was recorded')}.")
+
+    if not sentences:
+        sentences = [_sentence(criterion.get("note", ""))]
+    return sentences
 
 
 def _years(value: float) -> str:
@@ -319,16 +394,61 @@ def _research_sentences(criterion: dict) -> list[str]:
     patents = [r for r in rows if r.get("kind") == "patent"]
     sentences = []
 
+    # Every paper is put in exactly ONE group, by the real reason it earned
+    # what it did. The previous wording counted anything with credit as
+    # "corroborated" and blamed every zero on the index - so a paper the
+    # candidate had labelled "under review" read as one the system failed
+    # to find, and a reviewer reasonably concluded the pipeline was
+    # losing papers. The cause of a zero is the most important thing this
+    # sentence has to get right.
     if papers:
-        credited = sum(1 for r in papers if (r.get("credit") or 0) > 0)
-        uncredited = len(papers) - credited
-        sentence = (f"The CV lists {len(papers)} publication"
-                    f"{'s' if len(papers) != 1 else ''}, of which {credited} "
-                    f"could be corroborated against the OpenAlex index")
-        if uncredited:
-            sentence += (f"; the remaining {uncredited} could not be "
-                         f"confirmed there and so earned no credit")
-        sentences.append(sentence + ".")
+        matched = [r for r in papers if r.get("verification") in (
+            "matched", "matched_by_biblio") and (r.get("credit") or 0) > 0]
+        partial = [r for r in papers if r not in matched
+                   and (r.get("credit") or 0) > 0]
+        # Excluded first, so an excluded entry that is ALSO labelled in
+        # review is counted once, under the reason that actually decided it.
+        excluded = [r for r in papers if r.get("excluded")]
+        in_review = [r for r in papers if r.get("status_class") == "in_progress"
+                     and not r.get("excluded")]
+        other = [r for r in papers if r not in matched + partial + in_review
+                 + excluded]
+
+        def n(count, word="paper"):
+            return f"{count} {word}{'s' if count != 1 else ''}"
+
+        parts = [f"The CV lists {n(len(papers), 'publication')}"]
+        if matched:
+            parts.append(f"{len(matched)} found in the OpenAlex index with "
+                         f"the candidate among the authors, each earning "
+                         f"full credit")
+        if partial:
+            parts.append(f"{len(partial)} given as a complete citation but "
+                         f"not found in the index, earning partial credit - "
+                         f"that index does not cover every venue, so this "
+                         f"is not a finding against the paper")
+        if in_review:
+            parts.append(f"{len(in_review)} still under review or submitted, "
+                         f"which earn no credit until accepted. That is not "
+                         f"a penalty - work in review is normal, it is "
+                         f"simply not yet counted")
+        if excluded:
+            parts.append(f"{len(excluded)} excluded from credit, each with "
+                         f"its reason shown in the list")
+        if other:
+            parts.append(f"{len(other)} that could not be confirmed and "
+                         f"carry no status the CV states")
+        sentences.append(parts[0] + ": " + "; ".join(parts[1:]) + "."
+                         if len(parts) > 1 else parts[0] + ".")
+
+    # Say where the number sits against the threshold. Without this,
+    # "9.19 out of 35 from nine papers" reads as an error rather than as
+    # arithmetic, because the reader cannot see what full marks requires.
+    threshold = criterion.get("full_marks_at")
+    if threshold and criterion.get("measured") is not None:
+        sentences.append(
+            f"Together these come to {criterion['measured']} of the "
+            f"{threshold:g} publication-equivalents needed for full marks.")
 
     if patents:
         counted = criterion.get("patent_credit_counted", 0)
@@ -390,8 +510,8 @@ def template_explanation(criterion: dict) -> str:
                        f"{_years(measured)} of documented experience.")
     elif key == "publications":
         body = _research_sentences(criterion)
-    elif key == "doctorate":
-        body = [criterion.get("note", "").capitalize() + "."]
+    elif key in ("doctorate", "masters", "bachelors", "postdoctoral"):
+        body = _education_sentences(criterion)
     elif key == "research_visibility":
         body = [f"Corroborated publications have attracted {measured} "
                 f"citation{'s' if measured != 1 else ''} in total."]

@@ -70,3 +70,9 @@ button:disabled { background: #a9b4c6; border-color: #a9b4c6; cursor: not-allowe
 .totals { display: flex; gap: 32px; flex-wrap: wrap; background: #fff;
   border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
 a { color: #1a4fa0; }
+
+/* The named multipliers behind an education mark, listed so a reviewer
+   can see which factor to disagree with rather than one opaque number. */
+.factors { margin: 4px 0 4px 16px; padding: 0; font-size: 13px; }
+.factors li { margin-bottom: 2px; }
+.factors strong { text-transform: capitalize; }

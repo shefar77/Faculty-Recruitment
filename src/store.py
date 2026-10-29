@@ -455,6 +455,13 @@ EVIDENCE_FIELDS = (
     "publication_credit",
     "patent_credit",
     "patent_credit_counted",
+    # Revised rubric: which approved category a criterion rolls up into,
+    # the named multipliers behind an education score, and the reasons a
+    # criterion wants a human to look at it.
+    "category",
+    "factors",
+    "needs_review",
+    "review_reasons",
 )
 
 
@@ -514,6 +521,11 @@ def candidate_detail(connection: sqlite3.Connection, candidate_id: str) -> dict:
 
     state.update({
         "eligibility": scored.get("eligibility", {}),
+        # Category subtotals come from the stored audit record rather than
+        # being re-summed here: the pipeline's own arithmetic is the
+        # record, and a second implementation of it could disagree.
+        "category_scores": scored.get("category_scores", {}),
+        "rubric_department": scored.get("rubric", {}).get("department"),
         "explanation_state": explanation_state(connection, candidate_id),
         "reviewer_flags": scored.get("reviewer_flags", []),
         "eligibility_explanation": audit.get("explanations", {})

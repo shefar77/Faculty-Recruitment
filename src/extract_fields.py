@@ -119,14 +119,20 @@ Return EXACTLY this JSON shape and no other keys:
   "email":               {{"value": <string|null>, "evidence": <string>}},
   "orcid":               {{"value": <string|null>, "evidence": <string>}},
   "scholar_url":         {{"value": <string|null>, "evidence": <string>}},
-  "highest_degree":      {{"value": <"phd"|"phd_pursuing"|"mphil"|"masters"|"bachelors"|"other"|null>, "evidence": <string>}},
-  "phd_status":          {{"value": <"awarded"|"pursuing"|"none"|null>, "evidence": <string>}},
+  "highest_degree":      {{"value": <"phd"|"phd_submitted"|"phd_pursuing"|"mphil"|"masters"|"bachelors"|"other"|null>, "evidence": <string>}},
+  "phd_status":          {{"value": <"awarded"|"thesis_submitted"|"pursuing"|"none"|null>, "evidence": <string>}},
   "phd_institution":     {{"value": <string|null>, "evidence": <string>}},
   "phd_start_year":      {{"value": <integer|null>, "evidence": <string>}},
   "phd_year":            {{"value": <integer|null>, "evidence": <string>}},
+  "phd_subject":         {{"value": <string|null>, "evidence": <string>}},
   "masters_degree":      {{"value": <string|null>, "evidence": <string>}},
   "masters_institution": {{"value": <string|null>, "evidence": <string>}},
   "masters_year":        {{"value": <integer|null>, "evidence": <string>}},
+  "masters_subject":     {{"value": <string|null>, "evidence": <string>}},
+  "bachelors_degree":      {{"value": <string|null>, "evidence": <string>}},
+  "bachelors_institution": {{"value": <string|null>, "evidence": <string>}},
+  "bachelors_year":        {{"value": <integer|null>, "evidence": <string>}},
+  "bachelors_subject":     {{"value": <string|null>, "evidence": <string>}},
   "research_area":       {{"value": <string|null>, "evidence": <string>}}
 }}
 
@@ -135,8 +141,31 @@ FIELD NOTES
   If the person is enrolled, a research scholar, or the PhD row has no end
   year (e.g. "2020 - Present"), use "pursuing" and leave phd_year null.
   Never treat an open-ended date range as a completion year.
+  Use "thesis_submitted" ONLY when the CV says the thesis is submitted or
+  under evaluation ("Ph.D. (Thesis Submitted)", "awaiting viva"). That is
+  NOT "awarded": leave phd_year null, because a range like "2021 - 2026"
+  is the enrolment period, not the year the degree was conferred.
 - highest_degree: use "phd" only when phd_status is "awarded"; use
   "phd_pursuing" when they are enrolled but not finished.
+- *_degree: the QUALIFICATION NAME exactly as printed - "B.Tech",
+  "M.Tech", "MCA", "B.Sc", "Integrated M.Tech", "Dual Degree B.Tech-M.Tech".
+  Do NOT put the subject here, and do NOT put a controlled-vocabulary word
+  like "masters" or "bachelors" here. If the CV prints "Master of
+  Technology", copy that.
+- *_subject: the FIELD OF STUDY only, with no degree name attached -
+  "Computer Science and Engineering", "Electronics and Communication",
+  "Physics". If the CV prints "B.Tech in Civil Engineering", then
+  bachelors_degree is "B.Tech" and bachelors_subject is "Civil
+  Engineering". Null when the CV names no subject.
+- *_institution: the awarding university or college, exactly as printed,
+  with no campus address or department attached.
+- bachelors_*: the FIRST degree - B.Tech, B.E., B.Sc, BCA, BS or similar.
+  A CV that lists only a master's and a doctorate leaves these null.
+- An INTEGRATED or DUAL degree ("Integrated M.Tech", "B.Tech-M.Tech Dual
+  Degree") is ONE programme conferring two levels. Record it under the
+  HIGHER level and copy the programme name verbatim so the word
+  "Integrated" or "Dual" survives; leave the lower level null unless the
+  CV lists a separate degree for it.
 - Do NOT include positions or publications here. Separate requests handle
   those, each reading only the relevant section of the CV.
 

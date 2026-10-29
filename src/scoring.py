@@ -36,18 +36,60 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import schema  # noqa: E402
 import roles   # noqa: E402  the shared role taxonomy
+import degrees        # noqa: E402  degree level, equivalence, branch
+import institutions   # noqa: E402  institution tiers (config-driven)
 
-RUBRIC_VERSION = "demo-rubric-v1"
+RUBRIC_VERSION = "demo-rubric-v2"
 
 # --- Weights. They sum to 100 (asserted at import). ------------------------
+#
+# REVISED 2026-10-29 on faculty instruction. The three top-level
+# categories and their totals were set by the department; the split
+# WITHIN each category is recorded here with its reasoning so that a
+# later reviewer can see which numbers were mandated and which were
+# proposed.
+#
+#   Research and related contributions .... 40   (mandated)
+#   Experience ............................ 25   (mandated)
+#   Education ............................. 35   (mandated)
+#
+# WHAT CHANGED INSIDE RESEARCH, and why. The previous rubric spent 45
+# marks on research (publications 40 + visibility 5), which the revised
+# total of 40 cannot accommodate. Publications absorbed the whole
+# reduction, 40 -> 35, and visibility was left at 5. Rescaling the larger
+# component is the change that disturbs least: every reviewed rule
+# underneath it - the credit matrix, the exclusions, the patent ratios and
+# the 25% patent ceiling - keeps working untouched, and only the
+# multiplier moves. Moving marks onto citations instead would have
+# quietly re-weighted the rubric towards established researchers and
+# against strong early-career candidates, which nobody asked for.
+CATEGORIES = {
+    "research": ("publications", "research_visibility"),
+    "experience": ("teaching_experience", "industry_experience"),
+    "education": ("doctorate", "postdoctoral", "masters", "bachelors"),
+}
+
 WEIGHTS = {
-    "publications": 40,     # corroborated peer-reviewed output
-    "teaching_experience": 25,
-    "doctorate": 20,
-    "industry_experience": 10,
-    "research_visibility": 5,   # citations of corroborated work
+    # --- Research and related contributions: 40 ---------------------------
+    "publications": 35,          # papers + patents, patents capped at 25%
+    "research_visibility": 5,    # citations of corroborated work
+    # --- Experience: 25 ---------------------------------------------------
+    "teaching_experience": 20,
+    "industry_experience": 5,
+    # --- Education: 35 ----------------------------------------------------
+    "doctorate": 15,
+    "postdoctoral": 5,
+    "masters": 8,
+    "bachelors": 7,
 }
 assert sum(WEIGHTS.values()) == 100, "weights must sum to 100"
+
+CATEGORY_TOTALS = {name: sum(WEIGHTS[k] for k in keys)
+                   for name, keys in CATEGORIES.items()}
+assert CATEGORY_TOTALS == {"research": 40, "experience": 25, "education": 35}, \
+    "category totals must match the approved rubric"
+assert set(WEIGHTS) == {k for keys in CATEGORIES.values() for k in keys}, \
+    "every weight must belong to exactly one category"
 
 # --- Saturation points: the level at which a criterion earns full marks. ---
 # Set deliberately low for a DEMO rubric; they are not sector norms.
@@ -60,6 +102,17 @@ FULL_MARKS_PUBLICATION_CREDIT = 20.0   # credited publications (see schema)
 FULL_MARKS_TEACHING_YEARS = 5.0
 FULL_MARKS_INDUSTRY_YEARS = 3.0
 FULL_MARKS_CITATIONS = 100
+
+# Postdoctoral experience, measured the same way as every other duration:
+# overlapping appointments merged, ongoing posts resolved against as_of.
+#
+# WHY TWO YEARS. A postdoc is normally a fixed two-to-three year term, so
+# two years represents one completed appointment. Saturating there means
+# the criterion rewards having done a postdoc rather than rewarding a long
+# one - a candidate on their fourth consecutive short contract is not
+# twice the scholar of one who finished a single term and moved on.
+# DEMO/RESEARCH value; needs faculty approval.
+FULL_MARKS_POSTDOC_YEARS = 2.0
 
 MONTHS = {m: i for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun",
@@ -292,10 +345,29 @@ class Criterion:
     # scoring zero on evidence. See DESIGN_DECISIONS.md section 12.
     indeterminate: bool = False
     indeterminate_entries: int = 0
+    # Which of the three approved categories this criterion rolls up into.
+    category: str = ""
+    # The multipliers behind an education score, kept as separate named
+    # factors rather than folded into one opaque number. A reviewer who
+    # disagrees with the score needs to see WHICH factor they disagree
+    # with, and each of these is independently overridable by a human.
+    factors: list = field(default_factory=list)
+    # A criterion whose score rests on something a human should confirm.
+    needs_review: bool = False
+    review_reasons: list = field(default_factory=list)
+    # The level at which this criterion earns full marks, in its own
+    # units. Carried on the criterion so an explanation can say "5.25 of
+    # the 20 needed" without re-deriving a scoring rule of its own.
+    full_marks_at: float | None = None
 
     def as_dict(self) -> dict:
         return {
             "criterion": self.name,
+            "full_marks_at": self.full_marks_at,
+            "category": self.category,
+            "factors": self.factors,
+            "needs_review": self.needs_review,
+            "review_reasons": self.review_reasons,
             "weight": self.weight,
             "measured": self.raw,
             "unit": self.unit,
@@ -379,7 +451,12 @@ def score_publications(verified: list[dict],
     total, rows, indeterminate = 0.0, [], 0
 
     for entry in verified:
-        status = entry.get("status") or "unknown"
+        # Normalised HERE as well as in Stage 4. Validation already does
+        # it, but this is the line that turns a status into credit, and it
+        # must not depend on every caller having validated first: an
+        # unrecognised word read straight as "unknown" inherits the
+        # full-credit promotion path. See schema.normalise_status.
+        status, _ = schema.normalise_status(entry.get("status"))
         status_class = schema.STATUS_CLASS.get(status, "unknown")
         outcome = entry["verification"]["outcome"]
         exclusions = entry.get("credit_exclusions") or []
@@ -406,6 +483,8 @@ def score_publications(verified: list[dict],
         rows.append({
             "title": entry.get("title"),
             "status": status,
+            "status_class": status_class,
+            "excluded": bool(exclusions),
             "verification": outcome,
             "credit": credit,
             "reason": reason,
@@ -437,6 +516,7 @@ def score_publications(verified: list[dict],
         note=(f"full marks at {FULL_MARKS_PUBLICATION_CREDIT} "
               f"publication-equivalents"),
     )
+    criterion.full_marks_at = FULL_MARKS_PUBLICATION_CREDIT
     criterion.patent_credit = round(patent_total, 2)
     criterion.patent_credit_counted = round(patent_counted, 2)
     criterion.publication_credit = round(total, 2)
@@ -483,10 +563,22 @@ def teaching_years_weighted(positions: list[dict],
     as the professorship - the higher-responsibility role wins rather than
     the two stacking past wall-clock time.
 
+    RANK (added 2026-10-29). Appointments are bucketed by seniority and
+    each bucket is merged on its own, then every bucket has the months
+    already claimed by a MORE senior one subtracted from it. That keeps
+    the original guarantee intact: a month can be counted once and only
+    once, at the best rate it qualifies for. Simply multiplying each
+    role's months by its rank would have let a concurrent Assistant and
+    Associate professorship bill 2.15 months of credit for one month of
+    work, which is the exact inflation the merge exists to prevent.
+
     Returns (effective years, evidence rows, date problems, uncertainty notes).
     """
+    # Ordered most senior first - the subtraction below depends on it.
+    rank_order = ["professor", "associate_professor", "assistant_professor",
+                  "faculty"]
     buckets: dict[str, list[tuple[int, int]]] = {
-        "appointment": [], "assistantship": []}
+        **{rank: [] for rank in rank_order}, "assistantship": []}
     evidence, problems, uncertain = [], [], []
 
     for position in positions:
@@ -527,27 +619,43 @@ def teaching_years_weighted(positions: list[dict],
                 f"CV - counted at the full rate; please check.")
             kind = "appointment"
 
-        buckets[kind].append((start_m, end_m))
+        if kind == "appointment":
+            rank, rate, rank_why = roles.faculty_rank(position)
+            bucket = rank
+        else:
+            rank, rate, rank_why = (
+                "assistantship", ASSISTANTSHIP_CREDIT,
+                "a teaching assistantship, counted at half rate because it "
+                "carries less load and less autonomy than a faculty post")
+            bucket = "assistantship"
+
+        buckets[bucket].append((start_m, end_m))
         evidence.append({
             "title": position.get("title"),
             "organisation": position.get("organisation"),
             "kind": kind,
             "kind_reason": why,
-            "credit_per_month": (1.0 if kind == "appointment"
-                                 else ASSISTANTSHIP_CREDIT),
+            "rank": rank,
+            "rank_reason": rank_why,
+            "credit_per_month": rate,
             "from": position.get("start_date"),
             "to": position.get("end_date") or f"present ({as_of.isoformat()})",
             "months": end_m - start_m,
             "evidence": position.get("evidence", ""),
         })
 
-    appointment = merge_intervals(buckets["appointment"])
-    assistantship = subtract_intervals(
-        merge_intervals(buckets["assistantship"]), appointment)
+    # Each tier keeps only the months no more senior tier already claimed,
+    # so overlapping appointments can never bill the same month twice.
+    effective = 0.0
+    claimed: list[tuple[int, int]] = []
+    for rank in rank_order:
+        own = subtract_intervals(merge_intervals(buckets[rank]), claimed)
+        effective += roles.RANK_CREDIT[rank] * sum(e - s for s, e in own)
+        claimed = merge_intervals(claimed + own)
 
-    appointment_months = sum(e - s for s, e in appointment)
-    assistantship_months = sum(e - s for s, e in assistantship)
-    effective = appointment_months + ASSISTANTSHIP_CREDIT * assistantship_months
+    assistantship = subtract_intervals(
+        merge_intervals(buckets["assistantship"]), claimed)
+    effective += ASSISTANTSHIP_CREDIT * sum(e - s for s, e in assistantship)
 
     return round(effective / 12.0, 2), evidence, problems, uncertain
 
@@ -659,6 +767,17 @@ def score_doctorate(profile: dict, gate: dict) -> Criterion:
 
     if status == "awarded" and year:
         fraction, note, thin = 1.0, f"doctorate awarded {year}", False
+    elif status == "thesis_submitted" or _value(
+            profile, "highest_degree") == "phd_submitted":
+        # Part marks, and flagged. The scholarly work is complete and
+        # under examination; the award is not conferred. See
+        # schema.DOCTORATE_STAGE_CREDIT for why this is not zero and not
+        # one, and note that the eligibility gate stays 'indeterminate'.
+        fraction = schema.DOCTORATE_STAGE_CREDIT["thesis_submitted"]
+        thin = False
+        note = (f"doctoral thesis submitted and under examination, award "
+                f"not yet conferred - counted at "
+                f"{int(fraction * 100)}% of the doctorate marks")
     elif status == "pursuing" or _value(profile, "highest_degree") == "phd_pursuing":
         # ZERO, not a part-mark (user decision, 2026-10-15). Awarding 0.5
         # for an unfinished doctorate would be guessing how far along it
@@ -675,18 +794,312 @@ def score_doctorate(profile: dict, gate: dict) -> Criterion:
     else:
         fraction, note, thin = 0.0, "no doctorate evidenced - insufficient evidence", True
 
+    # The awarding institution scales a doctorate that EXISTS. It can
+    # never create one: a tier-1 name cannot lift an unfinished PhD above
+    # zero, which is why the multiplier is applied to `fraction` after the
+    # award test rather than inside it.
+    factors = [{"factor": "qualification", "value": fraction,
+                "reason": note}]
+    review_reasons = []
+    institution_name = _value(profile, "phd_institution")
+
+    if status == "thesis_submitted" or _value(
+            profile, "highest_degree") == "phd_submitted":
+        review_reasons.append(
+            "The CV states the doctoral thesis has been submitted but does "
+            "not show the degree as awarded. It has been given part of the "
+            "doctorate marks, not all of them, and the candidate is NOT "
+            "treated as holding a PhD for eligibility. Please confirm the "
+            "stage, and override once the award is evidenced.")
+
+    if fraction > 0:
+        tier = institutions.classify(institution_name)
+        fraction *= tier["multiplier"]
+        factors.append({
+            "factor": "institution",
+            "value": tier["multiplier"],
+            "tier": tier["tier"],
+            "label": tier["label"],
+            "institution": institution_name,
+            "reason": tier["reason"],
+        })
+        note += (f"; awarded by {institution_name or 'an unnamed institution'}"
+                 f" ({tier['tier'].replace('_', ' ')}, "
+                 f"x{tier['multiplier']})")
+        if tier["needs_review"]:
+            review_reasons.append(
+                f"The awarding institution "
+                f"({institution_name or 'not named on the CV'}) is not in "
+                f"the approved list, so it was scored at the base rate. "
+                f"{tier['reason'].capitalize()}.")
+
     return Criterion(
         name="doctorate",
         weight=weight,
-        raw=fraction,
-        unit="fraction (1.0 awarded, 0.0 until awarded)",
+        raw=round(fraction, 4),
+        unit="fraction of the doctorate marks earned",
         fraction=fraction,
         points=weight * fraction,
-        sources=["phd_status", "phd_year", "highest_degree"],
-        evidence=[{"field": "phd_status",
-                   "evidence": _evidence(profile, "phd_status")}],
+        sources=["phd_status", "phd_year", "highest_degree",
+                 "phd_institution"],
+        evidence=[{
+            "qualification": ("a doctorate (thesis submitted, not yet "
+                              "awarded)"
+                              if status == "thesis_submitted"
+                              else "a doctorate (in progress)"
+                              if status == "pursuing"
+                              else "a doctorate (PhD)"),
+            "organisation": institution_name,
+            "status": status or "not stated",
+            "year": year,
+            "reason": note,
+        }],
         insufficient_evidence=thin,
         note=note,
+        factors=factors,
+        needs_review=bool(review_reasons),
+        review_reasons=review_reasons,
+    )
+
+
+def score_postdoctoral(positions: list[dict], profile: dict,
+                       as_of: date) -> Criterion:
+    """
+    Postdoctoral research experience - its own category, 5 marks.
+
+    Scored on verified duration, with overlapping appointments merged so
+    two concurrent fellowships cannot bill the same months twice.
+
+    WHAT IS DELIBERATELY NOT COUNTED. Only positions roles.is_postdoc()
+    recognises from explicit wording. A doctorate itself ("Research
+    Scholar", "JRF/SRF") is the stage BEFORE this one, and ordinary
+    research employment ("Research Associate", "Research Scientist") is
+    held before, during and after a doctorate. Crediting either would
+    hand this category to candidates who never held a postdoc.
+
+    A post that genuinely is a postdoc but is printed under an unusual
+    title scores nothing HERE - it is still counted as research
+    experience, and the reviewer is told we could not identify it, so it
+    never becomes a silent zero.
+    """
+    weight = WEIGHTS["postdoctoral"]
+    intervals, evidence, problems = [], [], []
+    review_reasons = []
+
+    for position in positions:
+        postdoc, why = roles.is_postdoc(position)
+        if not postdoc:
+            continue
+
+        start = parse_date(position.get("start_date"))
+        if start is None:
+            problems.append(
+                f"{position.get('title') or 'untitled role'}: unreadable or "
+                f"missing start date {position.get('start_date')!r}")
+            continue
+        if position.get("is_current") or not position.get("end_date"):
+            end = (as_of.year, as_of.month)
+        else:
+            end = parse_date(position.get("end_date"))
+            if end is None:
+                problems.append(
+                    f"{position.get('title') or 'untitled role'}: unreadable "
+                    f"end date {position.get('end_date')!r}")
+                continue
+
+        start_m, end_m = _months(start), _months(end)
+        if end_m < start_m:
+            problems.append(f"{position.get('title') or 'untitled role'}: "
+                            f"end precedes start")
+            continue
+
+        intervals.append((start_m, end_m))
+        evidence.append({
+            "title": position.get("title"),
+            "organisation": position.get("organisation"),
+            "kind": "postdoctoral",
+            "kind_reason": why,
+            "from": position.get("start_date"),
+            "to": position.get("end_date") or f"present ({as_of.isoformat()})",
+            "months": end_m - start_m,
+            "evidence": position.get("evidence", ""),
+        })
+
+    months = sum(end - start for start, end in merge_intervals(intervals))
+    years = round(months / 12.0, 2)
+    fraction = _capped(years, FULL_MARKS_POSTDOC_YEARS)
+
+    note = f"full marks at {FULL_MARKS_POSTDOC_YEARS} years"
+    if not evidence:
+        note = ("no postdoctoral appointment stated in the CV - "
+                "insufficient evidence")
+    if problems:
+        note += "; unusable entries: " + "; ".join(problems)
+
+    # A postdoc without a completed doctorate is a contradiction, not a
+    # score. Flagged rather than silently discounted: the usual cause is a
+    # CV that states the postdoc and omits the PhD award year, and
+    # punishing that would be punishing our own reading.
+    if evidence and _value(profile, "phd_status") != "awarded":
+        review_reasons.append(
+            "A postdoctoral appointment is listed but the CV does not "
+            "confirm a completed doctorate. Both have been scored as "
+            "stated; please confirm the sequence.")
+
+    return Criterion(
+        name="postdoctoral",
+        weight=weight,
+        raw=years,
+        unit="years (overlapping appointments merged)",
+        fraction=fraction,
+        points=weight * fraction,
+        sources=["positions[].title", "positions[].start_date",
+                 "positions[].end_date"],
+        evidence=evidence,
+        insufficient_evidence=(not evidence),
+        note=note,
+        factors=[{"factor": "duration", "value": years,
+                  "reason": f"{years} years of documented postdoctoral work"}],
+        needs_review=bool(review_reasons),
+        review_reasons=review_reasons,
+    )
+
+
+def _score_degree(profile: dict, level: str, research_context: str,
+                  department: str) -> Criterion:
+    """
+    One education category below the doctorate: bachelor's or master's.
+
+    FOUR INDEPENDENT FACTORS, multiplied, each reported by name:
+
+        points = weight x equivalence x institution x branch
+
+      equivalence  how close the qualification is to the one advertised
+                   at this level (B.Tech 1.00, BCA 0.85, B.Sc 0.75 ...)
+      institution  the awarding body's tier
+      branch       whether the SUBJECT fits the department
+
+    They are kept as separate named factors rather than collapsed into
+    one number because a reviewer who disagrees with the score needs to
+    see which factor they disagree with - and each is independently
+    overridable.
+
+    INTEGRATED AND DUAL DEGREES confer both levels, so a single
+    "Integrated M.Tech" row is scored in BOTH this category and the one
+    below it. It cannot double-count within a category: each category
+    takes its single best qualification and is capped at its own weight.
+    """
+    weight = WEIGHTS[level]
+    institution_name = _value(profile, f"{level}_institution")
+    year = _value(profile, f"{level}_year")
+    review_reasons = []
+
+    # The extractor intermittently returns the controlled-vocabulary word
+    # ("masters") where the qualification name belongs. Reading the
+    # verbatim CV span it quoted recovers the real name without inventing
+    # one; when the span does not settle it either, the name stays None
+    # and the criterion is flagged rather than guessed.
+    name, recovered = degrees.name_from_evidence(
+        _value(profile, f"{level}_degree"),
+        _evidence(profile, f"{level}_degree"), level)
+    if recovered:
+        review_reasons.append(
+            f"The qualification name was recovered from the CV text because "
+            f"{recovered}. Please confirm it.")
+
+    subject = _value(profile, f"{level}_subject") or name
+
+    # An integrated degree one level up also confers this level.
+    conferred_by = None
+    if not name:
+        higher = "masters" if level == "bachelors" else None
+        higher_name = _value(profile, f"{higher}_degree") if higher else None
+        if higher_name and degrees.is_integrated(higher_name):
+            name, conferred_by = higher_name, higher
+            institution_name = (institution_name
+                                or _value(profile, f"{higher}_institution"))
+            subject = subject or _value(profile, f"{higher}_subject")
+
+    if not name:
+        return Criterion(
+            name=level, weight=weight, raw=0.0,
+            unit="fraction of the category earned", fraction=0.0, points=0.0,
+            sources=[f"{level}_degree", f"{level}_institution"],
+            evidence=[], insufficient_evidence=True,
+            note=(f"no {level[:-1] if level.endswith('s') else level} degree "
+                  f"is stated in the CV - insufficient evidence, which is "
+                  f"not the same as a finding that the candidate holds none"),
+            needs_review=True,
+            review_reasons=[
+                f"The CV states no {'bachelor' if level == 'bachelors' else 'master'}"
+                f"'s degree. Scored 0 because there is nothing to score, not "
+                f"because the qualification was judged absent. Please check "
+                f"the CV."],
+        )
+
+    ratio, equivalence_label, equivalence_unclear = degrees.equivalence(
+        name, level)
+    tier = institutions.classify(institution_name)
+    branch = degrees.branch_relevance(subject, department, research_context)
+
+    fraction = ratio * tier["multiplier"] * branch["ratio"]
+
+    if equivalence_unclear:
+        review_reasons.append(
+            f"The qualification {name!r} does not match any entry in the "
+            f"approved equivalence table, so it was scored at the generic "
+            f"rate of {ratio}. Please confirm.")
+    if tier["needs_review"]:
+        review_reasons.append(
+            f"The awarding institution "
+            f"({institution_name or 'not named on the CV'}) is not in the "
+            f"approved list, so it was scored at the base rate. "
+            f"{tier['reason'].capitalize()}.")
+    if branch["needs_review"]:
+        review_reasons.append(
+            f"This degree's subject could not be read from the CV, so it "
+            f"was counted at full branch relevance. Please confirm it fits "
+            f"the {department.upper()} post.")
+
+    note = (f"{equivalence_label} (x{ratio}); "
+            f"{tier['tier'].replace('_', ' ')} institution "
+            f"(x{tier['multiplier']}); "
+            f"branch {branch['verdict']} (x{branch['ratio']})")
+    if conferred_by:
+        note = (f"conferred by an integrated/dual programme recorded under "
+                f"{conferred_by}; " + note)
+
+    return Criterion(
+        name=level,
+        weight=weight,
+        raw=round(fraction, 4),
+        unit="fraction of the category earned",
+        fraction=fraction,
+        points=weight * fraction,
+        sources=[f"{level}_degree", f"{level}_institution",
+                 f"{level}_subject"],
+        evidence=[{
+            "qualification": name,
+            "organisation": institution_name,
+            "subject": subject,
+            "year": year,
+            "reason": note,
+        }],
+        insufficient_evidence=False,
+        note=note,
+        factors=[
+            {"factor": "equivalence", "value": ratio,
+             "label": equivalence_label,
+             "reason": f"{name} counts as {equivalence_label}"},
+            {"factor": "institution", "value": tier["multiplier"],
+             "tier": tier["tier"], "label": tier["label"],
+             "institution": institution_name, "reason": tier["reason"]},
+            {"factor": "branch", "value": branch["ratio"],
+             "verdict": branch["verdict"], "family": branch["family"],
+             "reason": branch["reason"]},
+        ],
+        needs_review=bool(review_reasons),
+        review_reasons=review_reasons,
     )
 
 
@@ -754,8 +1167,14 @@ def evaluate_gate(profile: dict, summary: dict) -> dict:
     net = _value(profile, "net_qualified")
     cross_check_failed = bool(summary.get("doctorate_cross_check_failed"))
 
+    # A submitted thesis is evidence of a doctorate in progress, so it
+    # lands on 'indeterminate' below. It must NEVER satisfy the 'met'
+    # branch: the award is not conferred, and a gate that manufactured a
+    # qualification would be the worst error this system could make.
     doctorate_evidenced = bool(
-        _value(profile, "highest_degree") in ("phd", "phd_pursuing")
+        _value(profile, "highest_degree") in ("phd", "phd_submitted",
+                                               "phd_pursuing")
+        or phd_status == "thesis_submitted"
         or _value(profile, "phd_institution")
         or cross_check_failed
         or _rejected(profile, "phd_status")
@@ -771,9 +1190,13 @@ def evaluate_gate(profile: dict, summary: dict) -> dict:
         evidence = _evidence(profile, "net_qualified")
     elif doctorate_evidenced:
         outcome = "indeterminate"
-        reason = ("doctorate evidenced but its award is not confirmed"
-                  + (" - Stage 4 withheld the claim" if cross_check_failed
-                     else " (no award year stated)"))
+        if phd_status == "thesis_submitted":
+            reason = ("doctoral thesis submitted, award not yet conferred - "
+                      "eligible for review, not yet a PhD holder")
+        else:
+            reason = ("doctorate evidenced but its award is not confirmed"
+                      + (" - Stage 4 withheld the claim" if cross_check_failed
+                         else " (no award year stated)"))
         evidence = _evidence(profile, "phd_status")
     else:
         outcome = "not_met"
@@ -861,12 +1284,18 @@ def reviewer_flags(profile: dict, as_of: date) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def score_candidate(validated: dict, verified: dict,
-                    as_of: date | None = None) -> dict:
+                    as_of: date | None = None,
+                    department: str = degrees.DEFAULT_DEPARTMENT) -> dict:
     """
-    Score one candidate. Deterministic given (validated, verified, as_of).
+    Score one candidate. Deterministic given the four arguments.
 
     `as_of` is recorded in the output: ongoing roles are measured against
     it, so a result can be reproduced exactly at any later date.
+
+    `department` is the advertised post's discipline. It affects branch
+    relevance on the two degree categories and nothing else, and it is
+    recorded in the rubric block so a score can never be reproduced
+    against a different department by accident.
     """
     as_of = as_of or date.today()
     profile = validated.get("profile", {})
@@ -875,17 +1304,45 @@ def score_candidate(validated: dict, verified: dict,
     patents = validated.get("patents", []) or []
     positions = profile.get("positions") or []
 
+    # Branch relevance may be LIFTED by documented research in the
+    # department's field, so the research record is gathered first and
+    # handed to the degree criteria as supporting evidence. It is read
+    # only - nothing here can change a publication's credit.
+    research_context = " ".join(filter(None, [
+        str(_value(profile, "research_area") or ""),
+        *(str(p.get("title") or "") for p in pubs),
+    ]))
+
     criteria = [
+        # --- Research and related contributions: 40 -----------------------
         score_publications(pubs, patents),
+        score_visibility(pubs),
+        # --- Experience: 25 -----------------------------------------------
         score_experience(positions, {"teaching"}, "teaching_experience",
                          FULL_MARKS_TEACHING_YEARS, as_of),
-        score_doctorate(profile, {}),
         score_experience(positions, {"industry"}, "industry_experience",
                          FULL_MARKS_INDUSTRY_YEARS, as_of),
-        score_visibility(pubs),
+        # --- Education: 35 -------------------------------------------------
+        score_doctorate(profile, {}),
+        score_postdoctoral(positions, profile, as_of),
+        _score_degree(profile, "masters", research_context, department),
+        _score_degree(profile, "bachelors", research_context, department),
     ]
 
+    for criterion in criteria:
+        criterion.category = next(
+            name for name, keys in CATEGORIES.items()
+            if criterion.name in keys)
+
     total = round(sum(c.points for c in criteria), 2)
+    category_scores = {
+        name: {
+            "earned": round(sum(c.points for c in criteria
+                                if c.category == name), 2),
+            "available": CATEGORY_TOTALS[name],
+        }
+        for name in CATEGORIES
+    }
 
     # A score built on lookups that never happened is not a score. It is
     # surfaced at the top level, not buried in a criterion note, because
@@ -904,11 +1361,17 @@ def score_candidate(validated: dict, verified: dict,
         "rubric": {
             "version": RUBRIC_VERSION,
             "weights": dict(WEIGHTS),
+            "categories": {name: list(keys)
+                           for name, keys in CATEGORIES.items()},
+            "category_totals": dict(CATEGORY_TOTALS),
+            "department": department,
+            "institution_config": institutions.config()["version"],
             "disclaimer": ("DEMO/RESEARCH rubric for a student project. NOT "
                            "LNMIIT hiring criteria."),
         },
         "eligibility": evaluate_gate(profile, summary),
         "total_score": total,
+        "category_scores": category_scores,
         "max_score": sum(WEIGHTS.values()),
         "scoring_reliable": not unreliable,
         "unreliable_reasons": unreliable,

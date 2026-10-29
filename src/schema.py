@@ -34,11 +34,67 @@ from __future__ import annotations
 
 DEGREE_LEVELS = (
     "phd",          # doctorate AWARDED
+    "phd_submitted",# thesis submitted, award not yet conferred
     "phd_pursuing", # enrolled, not yet awarded - see the gate section
     "mphil",
     "masters",      # M.Tech / M.E. / M.Sc / MS / MCA
     "bachelors",    # B.Tech / B.E. / B.Sc
     "other",
+)
+
+# ---------------------------------------------------------------------------
+# DOCTORAL STAGES - and why "thesis submitted" needed its own slot
+# ---------------------------------------------------------------------------
+# The original rule gave an unfinished doctorate ZERO, and the reasoning
+# was explicit: awarding a part-mark "would be guessing how far along it
+# is - a first-year and a thesis-submitted candidate are not the same,
+# and NOTHING IN A CV RELIABLY TELLS THEM APART."
+#
+# That premise is false whenever the CV states the stage. A real CV reads
+#
+#     Ph.D. (Thesis Submitted), CSIS Department        2021 - 2026
+#
+# which is not a guess about how far along the candidate is - it is the
+# candidate telling us, in the same words a university registry would
+# use. Collapsing that to "pursuing" and scoring 0 threw away stated
+# evidence, and it treated someone whose thesis is under examination
+# identically to someone in their first semester.
+#
+# WHAT IT IS NOT. "Thesis submitted" is NOT an awarded doctorate. The
+# viva may not have happened; the degree is not conferred; the person
+# cannot yet be appointed to a post that requires a PhD in hand. So:
+#   - it earns PART of the doctorate marks, not all of them;
+#   - the eligibility GATE stays 'indeterminate', never 'met';
+#   - it is flagged, so a reviewer confirms the stage themselves.
+#
+# Scoring it as awarded would be the most dangerous error this system can
+# make - manufacturing a qualification - and is the failure mode
+# KNOWN_DEFECTS.md section 5 exists to prevent.
+#
+# DEMO/RESEARCH value. 0.5 says the scholarly work is complete and under
+# examination while the award is not conferred. The split needs faculty
+# approval; it is a policy question, not a technical one.
+DOCTORATE_STAGE_CREDIT = {
+    "awarded": 1.0,
+    "thesis_submitted": 0.5,
+    "pursuing": 0.0,
+    "none": 0.0,
+}
+
+# Wordings that mean the thesis is in, the award is not. Matched against
+# the CV's own text, never inferred from a date range: an end year on an
+# enrolment row says when the funding stops, not that a thesis exists.
+#
+# DELIBERATELY ABSENT: "pre-submission". A pre-submission seminar is held
+# BEFORE the thesis goes in, so a CV reading "pre-submission seminar
+# completed" describes a thesis that has not been submitted. Matching it
+# would hand part-marks to exactly the stage this rule must not cover.
+THESIS_SUBMITTED_MARKERS = (
+    "thesis submitted", "thesis has been submitted", "submitted thesis",
+    "submitted the thesis", "thesis under evaluation",
+    "thesis under examination", "awaiting viva", "viva pending",
+    "viva-voce pending", "defence pending", "defense pending",
+    "awaiting defence", "awaiting defense",
 )
 
 POSITION_CATEGORIES = (
@@ -426,6 +482,89 @@ DEFAULT_STATUS_WHEN_UNTAGGED = "unknown"
 # Surface forms seen in real CVs, mapped to the vocabulary. Candidate_02 uses
 # bracketed tags ("[Under Revision]"); Candidate_04 writes it inline
 # ("European Physical Letters, in press (2026)"). Both forms must be caught.
+# ---------------------------------------------------------------------------
+# NORMALISING A STATUS - and why an unrecognised word must not become "unknown"
+# ---------------------------------------------------------------------------
+# A LATENT SCORING HOLE, found 2026-10-29 and closed here.
+#
+# Stage 6 read the raw status with STATUS_CLASS.get(status, "unknown").
+# That looks harmless and is not: "unknown" is the ONE class with a
+# promotion path to full credit, because an untagged entry corroborated by
+# an index earns 1.00. So any status word the vocabulary did not recognise
+# silently acquired the most generous treatment available.
+#
+# A real CV triggered it. "[Communicated]" is listed in
+# STATUS_SURFACE_FORMS as a synonym for "submitted", but that map was only
+# ever used to build a regex - it was never applied to the extractor's
+# output. The word fell through to "unknown". It scored 0.00 only because
+# the paper was not indexed; a communicated paper with a preprint online
+# would have earned FULL credit for work that has passed no review at all.
+#
+# Two rules close it:
+#   1. Every status is normalised through the surface forms first.
+#   2. A word that is still unrecognised is reported, not absorbed. It
+#      keeps the "unknown" class (we genuinely do not know) but is flagged,
+#      so a human sees that the CV said something we could not read.
+def normalise_status(raw) -> tuple[str, bool]:
+    """
+    (status, recognised) for whatever the extractor returned.
+
+    recognised is False when the CV stated something this vocabulary
+    cannot place - which is a different thing from the CV stating
+    nothing, and must be visible rather than absorbed.
+    """
+    if raw is None or str(raw).strip() == "":
+        return DEFAULT_STATUS_WHEN_UNTAGGED, True
+
+    text = str(raw).strip().lower().replace("_", " ")
+    if text.replace(" ", "_") in PUBLICATION_STATUSES:
+        return text.replace(" ", "_"), True
+    if text in STATUS_SURFACE_FORMS:
+        return STATUS_SURFACE_FORMS[text], True
+    for surface in sorted(STATUS_SURFACE_FORMS, key=len, reverse=True):
+        if surface in text:
+            return STATUS_SURFACE_FORMS[surface], True
+    return "unknown", False
+
+
+# ---------------------------------------------------------------------------
+# A COMPLETE CITATION IS ITSELF A PUBLICATION CLAIM
+# ---------------------------------------------------------------------------
+# DEFAULT_STATUS_WHEN_UNTAGGED is "unknown", and the reasoning for it is
+# sound: if silence read as "published", the candidate who writes nothing
+# would be credited over the one who honestly writes "[Under Revision]".
+#
+# But it was applied too bluntly. The rule treated "a bare title" and "a
+# full bibliographic citation with venue, year and page range" as the same
+# kind of silence, and they are not. A candidate who writes
+#
+#     "Cheap Parking Assist System using 8051 Family", Annual Technical
+#     Volume, The Institution of Engineers (India), 2017, pp. 57-60
+#
+# has made a specific, checkable claim that the work appeared in print.
+# Page numbers do not exist for unpublished work. Under the old rule that
+# entry scored 0.00 when the venue happened to be outside OpenAlex, while
+# the identical entry with the word "[Published]" typed beside it scored
+# 0.25 - a difference of a word, not of evidence.
+#
+# So bibliographic completeness is read as the claim it is. This closes
+# the "residual cost" admitted in the DEFAULT_STATUS_WHEN_UNTAGGED note
+# without reopening the omission loophole: a bare title still earns
+# nothing, and fabricating a volume and page range is harder and far more
+# checkable than typing one word.
+#
+# PROMOTES "unknown" ONLY. An entry the candidate has labelled in-progress
+# stays in-progress however complete its citation - the disqualifier is
+# the state of peer review, not our ability to identify the venue.
+BIBLIOGRAPHIC_COMPLETENESS = {
+    "requires": "a venue, plus any one of pages, volume or DOI",
+    "promotes": "unknown -> completed",
+    "never_promotes": "under_revision, submitted, to_be_communicated",
+    "why": ("A citation precise enough for a reader to retrieve the work "
+            "is a claim that the work appeared, and is stronger evidence "
+            "than the word 'published' typed beside a bare title."),
+}
+
 STATUS_SURFACE_FORMS = {
     "published": "published",
     "in press": "in_press",
@@ -475,9 +614,14 @@ EDUCATION_FIELDS = {
         "it is the single highest-stakes field in the schema."
     ),
     "phd_status": (
-        "'awarded' | 'pursuing' | 'none'. Deliberately redundant with "
-        "highest_degree, because the gate depends on it and a second, "
-        "directly-asked signal lets Stage 4 catch disagreement between them."
+        "'awarded' | 'thesis_submitted' | 'pursuing' | 'none'. "
+        "Deliberately redundant with highest_degree, because the gate "
+        "depends on it and a second, directly-asked signal lets Stage 4 "
+        "catch disagreement between them. "
+        "'thesis_submitted' ONLY when the CV says so in those words "
+        "('Thesis Submitted', 'Thesis Under Evaluation', 'Submitted, "
+        "awaiting viva'). It is NOT an inference from a date range that "
+        "has ended, and it is NOT 'awarded'."
     ),
     "phd_institution": "Institution awarding/hosting the PhD, else null.",
     "phd_start_year":  "Integer year PhD began, else null.",
@@ -486,9 +630,30 @@ EDUCATION_FIELDS = {
         "range ('2020 - Present', '2025 - Present') means null, NOT the "
         "current year - inferring completion would manufacture eligibility."
     ),
-    "masters_degree":      "e.g. 'M.Tech Computer Science and Engineering'.",
+    "phd_subject": (
+        "Field of study of the doctorate, with no degree name attached. "
+        "Recorded but NOT scored for branch relevance - see the note under "
+        "EDUCATION_WEIGHTS."
+    ),
+    "masters_degree": (
+        "The QUALIFICATION NAME only, as printed: 'M.Tech', 'MCA', 'M.Sc', "
+        "'Integrated M.Tech'. Not the subject, and never a controlled-"
+        "vocabulary word like 'masters' - see KNOWN_DEFECTS.md section 2, "
+        "where the model returned the enum instead of the degree name."
+    ),
     "masters_institution": "Institution, else null.",
     "masters_year":        "Integer completion year, else null.",
+    "masters_subject": (
+        "Field of study only - 'Computer Science and Engineering'. Feeds "
+        "branch relevance, so it is scored and must never be guessed."
+    ),
+    "bachelors_degree": (
+        "First degree, qualification name only: 'B.Tech', 'B.E.', 'B.Sc', "
+        "'BCA', 'BS'. Null when the CV lists none."
+    ),
+    "bachelors_institution": "Institution, else null.",
+    "bachelors_year":        "Integer completion year, else null.",
+    "bachelors_subject":     "Field of study only. Feeds branch relevance.",
     "net_qualified": (
         "true/false/null. True only where the CV states the candidate "
         "qualified UGC NET, CSIR NET, or a State Eligibility Test "
@@ -566,9 +731,15 @@ PROFILE_SKELETON = {
     "phd_institution": {"value": None, "evidence": ""},
     "phd_start_year":  {"value": None, "evidence": ""},
     "phd_year":        {"value": None, "evidence": ""},
+    "phd_subject":         {"value": None, "evidence": ""},
     "masters_degree":      {"value": None, "evidence": ""},
     "masters_institution": {"value": None, "evidence": ""},
     "masters_year":        {"value": None, "evidence": ""},
+    "masters_subject":     {"value": None, "evidence": ""},
+    "bachelors_degree":      {"value": None, "evidence": ""},
+    "bachelors_institution": {"value": None, "evidence": ""},
+    "bachelors_year":        {"value": None, "evidence": ""},
+    "bachelors_subject":     {"value": None, "evidence": ""},
     "net_qualified":       {"value": None, "evidence": ""},
 
     "research_area": {"value": None, "evidence": ""},

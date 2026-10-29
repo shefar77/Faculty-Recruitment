@@ -45,6 +45,11 @@ sys.path.insert(0, str(ROOT / "src"))  # for the pipeline modules
 import run      # noqa: E402  the Stage 7 orchestrator, imported unchanged
 import store    # noqa: E402
 import explain  # noqa: E402
+import schema   # noqa: E402
+import scoring  # noqa: E402
+import roles    # noqa: E402
+import degrees       # noqa: E402
+import institutions  # noqa: E402
 
 CV_DIR = ROOT / "data" / "cvs"
 SAFE_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
@@ -121,6 +126,11 @@ async def upload_candidate(
     as_of: date | None = Query(None, description=(
         "Date against which ongoing roles are measured. Pin it to "
         "reproduce a past run exactly.")),
+    department: str = Query(degrees.DEFAULT_DEPARTMENT, description=(
+        "The advertised post's discipline. It affects branch relevance on "
+        "the bachelor's and master's categories and nothing else. Recorded "
+        "in the audit, so scores computed for different departments cannot "
+        "be compared by accident.")),
     connection: sqlite3.Connection = Depends(get_db),
 ) -> dict:
     """
@@ -156,7 +166,8 @@ async def upload_candidate(
         audit = await run_in_threadpool(
             run.run_candidate, destination,
             as_of=as_of or date.today(),
-            use_llm=use_llm, reuse_extraction=reuse_extraction)
+            use_llm=use_llm, reuse_extraction=reuse_extraction,
+            department=department)
     except Exception as exc:
         raise HTTPException(422, f"pipeline failed: {type(exc).__name__}: {exc}")
 
@@ -216,6 +227,54 @@ def get_candidate(candidate_id: str,
         return store.candidate_detail(connection, candidate_id)
     except KeyError:
         raise HTTPException(404, f"no candidate {candidate_id!r}")
+
+
+@app.get("/rubric")
+def get_rubric() -> dict:
+    """
+    The approved rubric, in full, for an administrator or maintainer.
+
+    Required by the revised policy: the classification criteria and the
+    scoring values must be visible to whoever maintains them. A rubric
+    nobody can read is a rubric nobody can contest, and every number
+    below is a policy decision rather than a technical one.
+
+    Read-only, and deliberately unauthenticated for now because the whole
+    service is - see the authentication gap in KNOWN_DEFECTS.md. Nothing
+    here is candidate data.
+    """
+    return {
+        "version": scoring.RUBRIC_VERSION,
+        "weights": dict(scoring.WEIGHTS),
+        "categories": {name: list(keys)
+                       for name, keys in scoring.CATEGORIES.items()},
+        "category_totals": dict(scoring.CATEGORY_TOTALS),
+        "saturation_points": {
+            "publication_credit": scoring.FULL_MARKS_PUBLICATION_CREDIT,
+            "teaching_years": scoring.FULL_MARKS_TEACHING_YEARS,
+            "industry_years": scoring.FULL_MARKS_INDUSTRY_YEARS,
+            "postdoctoral_years": scoring.FULL_MARKS_POSTDOC_YEARS,
+            "citations": scoring.FULL_MARKS_CITATIONS,
+        },
+        "teaching_rank_credit": dict(roles.RANK_CREDIT),
+        "assistantship_credit": scoring.ASSISTANTSHIP_CREDIT,
+        "patents": {
+            "credit_by_status": dict(schema.PATENT_CREDIT),
+            "share_of_research_criterion": schema.PATENT_SHARE_OF_RESEARCH,
+            "verification": schema.PATENT_VERIFICATION,
+        },
+        "degrees": degrees.visible_rubric(),
+        "institutions": institutions.visible_rubric(),
+        "eligibility_gates": [dict(g) for g in schema.ELIGIBILITY_GATES],
+        "separation_of_concerns": (
+            "Eligibility is a gate and never touches the score. Institution "
+            "standing, qualification equivalence and branch relevance are "
+            "three separate factors and are each applied once."),
+        "approval_status": (
+            "NOT APPROVED. Every value here is a DEMO/RESEARCH proposal for "
+            "a student project and requires faculty sign-off before use in "
+            "any real recruitment decision."),
+    }
 
 
 @app.get("/candidates/{candidate_id}/audit")

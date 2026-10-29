@@ -49,8 +49,16 @@ OUTPUT_DIR = ROOT / "output"
 
 def run_candidate(cv_path: Path, *, as_of: date, use_llm: bool = True,
                   use_cache: bool = True,
-                  reuse_extraction: bool = False) -> dict:
-    """Run one CV through every stage and return the complete audit record."""
+                  reuse_extraction: bool = False,
+                  department: str = scoring.degrees.DEFAULT_DEPARTMENT) -> dict:
+    """
+    Run one CV through every stage and return the complete audit record.
+
+    `department` is the advertised post's discipline. It reaches only the
+    branch-relevance factor on the two degree categories, and it is
+    recorded in the audit so a score can never be compared against one
+    computed for a different post.
+    """
     stem = cv_path.stem
     started = datetime.now(timezone.utc)
 
@@ -127,7 +135,8 @@ def run_candidate(cv_path: Path, *, as_of: date, use_llm: bool = True,
         json.dumps(verified, indent=2, ensure_ascii=False), encoding="utf-8")
 
     # --- Stage 6: deterministic scoring ----------------------------------
-    scored = scoring.score_candidate(validated, verified, as_of=as_of)
+    scored = scoring.score_candidate(validated, verified, as_of=as_of,
+                                     department=department)
     (OUTPUT_DIR / f"{stem}.scored.json").write_text(
         json.dumps(scored, indent=2, ensure_ascii=False), encoding="utf-8")
 

@@ -362,3 +362,156 @@ def classify_position(position: dict) -> dict:
                    f"either, so this post cannot be categorised from the CV"),
         "needs_review": True,
     }
+
+
+# ---------------------------------------------------------------------------
+# 4. ACADEMIC RANK
+# ---------------------------------------------------------------------------
+# Until now this module deliberately DISCARDED the modifier on a faculty
+# title: "Assistant", "Associate" and "Visiting" all collapsed to
+# "appointment", because the only question being asked was whether the
+# post carried independent teaching responsibility.
+#
+# The revised rubric asks a second, different question - how senior the
+# post was - so the modifier is now read as well. The two answers stay
+# separate: teaching_kind() still decides whether a role counts at all,
+# and faculty_rank() only scales what it is worth. A rank is never
+# allowed to turn an assistantship into an appointment.
+#
+# DEMO/RESEARCH multipliers. They need faculty approval.
+RANK_CREDIT = {
+    "professor": 1.30,
+    "associate_professor": 1.15,
+    "assistant_professor": 1.00,
+    "faculty": 1.00,          # a teaching post whose rank is not stated
+}
+
+# A junior modifier sitting immediately before the professor head noun.
+# Checked BEFORE the bare head noun, because "Assistant Professor"
+# contains "Professor" and the longer reading is the correct one.
+_ASSISTANT_PROF = re.compile(
+    r"\b(assistant|asst\.?|asstt\.?)\s+(?:prof(?:essor)?\.?)\b", re.I)
+_ASSOCIATE_PROF = re.compile(
+    r"\b(associate|assoc\.?)\s+(?:prof(?:essor)?\.?)\b", re.I)
+# Reader (UK/Commonwealth) and Senior Lecturer sit at associate level.
+_ASSOCIATE_EQUIVALENT = re.compile(r"\b(reader|senior lecturer)\b", re.I)
+# Modifiers that describe the CONTRACT, not the rank. A visiting or
+# adjunct professorship may be held by anyone, so it earns the base rate
+# rather than the full-professor rate.
+_UNRANKED_MODIFIER = re.compile(
+    r"\b(visiting|adjunct|guest|honorary|emeritus|sessional|contract"
+    r"|part[- ]time|research)\s+(?:prof(?:essor)?\.?)\b", re.I)
+_BARE_PROFESSOR = re.compile(r"\b(?:full\s+)?prof(?:essor)?\.?\b", re.I)
+
+
+def faculty_rank(position: dict) -> tuple[str, float, str]:
+    """
+    Seniority of a faculty appointment: (rank, credit_per_month, reason).
+
+    Only meaningful for roles teaching_kind() already called an
+    'appointment'. Assistantships do not have a rank and must not be
+    passed here.
+
+    PRECEDENCE, and why each step is before the next:
+      1. "Assistant Professor" - the junior modifier binds to the head
+         noun, so the longer phrase is the real title.
+      2. "Associate Professor", and Reader / Senior Lecturer, which are
+         the same level under a different national convention.
+      3. A contract modifier ("Visiting", "Adjunct") describes the terms
+         of the appointment, not its seniority, so it earns the base rate
+         rather than being read as a full professorship.
+      4. A bare "Professor" is a full professorship.
+      5. Anything else is a teaching post of unstated rank, at base rate.
+    """
+    title = position.get("title") or ""
+
+    # Contract guard. An assistantship has no academic rank, and calling
+    # this on one would quietly return the base faculty rate - turning a
+    # half-rate TA-ship into full-rate teaching. teaching_kind() is the
+    # only thing allowed to decide that, so disagreeing with it here is a
+    # programming error rather than a scoring judgement.
+    if teaching_kind(position)[0] == "assistantship":
+        raise ValueError(
+            f"faculty_rank() called on an assistantship ({title!r}); "
+            f"rank applies only to roles teaching_kind() calls an "
+            f"appointment")
+
+    if _ASSISTANT_PROF.search(title):
+        return ("assistant_professor", RANK_CREDIT["assistant_professor"],
+                "Assistant Professor - entry-grade faculty appointment")
+
+    if _ASSOCIATE_PROF.search(title):
+        return ("associate_professor", RANK_CREDIT["associate_professor"],
+                "Associate Professor - mid-grade faculty appointment")
+
+    equivalent = _ASSOCIATE_EQUIVALENT.search(title)
+    if equivalent:
+        return ("associate_professor", RANK_CREDIT["associate_professor"],
+                f"{equivalent.group(0)} - equivalent to Associate Professor "
+                f"under Commonwealth titling")
+
+    contract = _UNRANKED_MODIFIER.search(title)
+    if contract:
+        return ("faculty", RANK_CREDIT["faculty"],
+                f"{contract.group(0)} - the modifier describes the contract "
+                f"rather than the rank, so it is counted at the base rate")
+
+    if _BARE_PROFESSOR.search(title):
+        return ("professor", RANK_CREDIT["professor"],
+                "Professor - senior faculty appointment")
+
+    return ("faculty", RANK_CREDIT["faculty"],
+            "a teaching appointment whose rank the CV does not state, "
+            "counted at the base rate")
+
+
+# ---------------------------------------------------------------------------
+# 5. POSTDOCTORAL APPOINTMENTS
+# ---------------------------------------------------------------------------
+# A postdoc is a distinct career stage and the rubric scores it on its own
+# line, so it must be told apart from the two things it is most often
+# confused with:
+#
+#   - A PHD ITSELF. "Research Scholar", "Doctoral Fellow" and "JRF/SRF"
+#     are the doctorate, not what follows it. RESEARCH_HEAD matches them
+#     and this pattern deliberately does not.
+#   - ORDINARY RESEARCH EMPLOYMENT. "Research Associate" and "Research
+#     Scientist" are real research posts but are held before, during and
+#     after a doctorate. Crediting them as postdoctoral experience would
+#     award the category to people who never held a postdoc.
+#
+# So the test is explicit wording only. A post that IS a postdoc but is
+# printed under an unusual title scores nothing here - and shows up in the
+# research criterion instead, never as a silent zero.
+POSTDOC_HEAD = re.compile(
+    r"\b(post[\s\-]?doc(?:toral|torate)?"
+    r"|postdoctoral (?:fellow|researcher|research associate|associate|scholar|scientist)"
+    r"|post[\s\-]doctoral"
+    r"|\bpdf\b(?=\s*(?:fellow|position|at|,))"
+    r"|national post[\s\-]?doctoral fellow|\bnpdf\b"
+    r"|research fellow(?=.*\bpost[\s\-]?doc))\b",
+    re.I,
+)
+
+
+def is_postdoc(position: dict) -> tuple[bool, str]:
+    """
+    Is this position a postdoctoral appointment? (verdict, reason).
+
+    Reads the section heading as well as the title, because CVs routinely
+    print a bare institution name under a "Postdoctoral Experience"
+    heading and leave the title implicit.
+    """
+    title = position.get("title") or ""
+    match = POSTDOC_HEAD.search(title)
+    if match:
+        return True, f"title states {match.group(0)!r}"
+
+    section = position.get("source_section") or ""
+    section_match = POSTDOC_HEAD.search(section)
+    if section_match:
+        return True, (f"listed under a {section_match.group(0)!r} section "
+                      f"heading")
+
+    return False, "neither the title nor the section heading states a "\
+                  "postdoctoral appointment"

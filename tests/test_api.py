@@ -303,6 +303,52 @@ def test_detail_404(client):
     assert client.get("/candidates/Nobody").status_code == 404
 
 
+# ---------------------------------------------------------------------------
+# The rubric has to be readable by whoever maintains it.
+#
+# Required by the revised policy: the classification criteria and the
+# scoring values must be visible to administrators. A rubric nobody can
+# read is a rubric nobody can contest, and every number in it is a policy
+# decision rather than a technical one.
+# ---------------------------------------------------------------------------
+
+def test_rubric_endpoint_publishes_the_weights(client):
+    body = client.get("/rubric").json()
+    assert sum(body["weights"].values()) == 100
+    assert body["category_totals"] == {
+        "research": 40, "experience": 25, "education": 35}
+
+
+def test_rubric_endpoint_publishes_the_institution_tiers(client):
+    tiers = client.get("/rubric").json()["institutions"]
+    assert tiers["multipliers"]["tier_1"] == 1.0
+    assert tiers["tiers"]["tier_1"]["patterns"], \
+        "an administrator who cannot see the matching rule cannot audit it"
+    assert "never silently" in tiers["unknown_policy"]
+
+
+def test_rubric_endpoint_publishes_the_degree_and_branch_rules(client):
+    rules = client.get("/rubric").json()["degrees"]
+    assert rules["equivalence"]["bachelors"]
+    assert rules["branch_relevance"]["applied_to"] == ["bachelors", "masters"]
+    assert "doctorate" in rules["branch_relevance"]["not_applied_to"], \
+        "branch relevance must be applied once, not charged twice"
+
+
+def test_rubric_endpoint_states_it_is_not_approved(client):
+    body = client.get("/rubric").json()
+    assert "NOT APPROVED" in body["approval_status"]
+    assert body["teaching_rank_credit"]["associate_professor"] > \
+        body["teaching_rank_credit"]["assistant_professor"]
+
+
+def test_rubric_endpoint_leaks_no_candidate_data(client):
+    """It is served unauthenticated, so it must carry nothing personal."""
+    body = client.get("/rubric").text
+    for token in ("Alice", "Bob", "Cleo", "Cand_A", "candidate_name"):
+        assert token not in body
+
+
 def test_audit_endpoint_returns_every_stage(client):
     body = client.get("/candidates/Cand_A/audit").json()
     for stage in ("scoring", "verification", "explanations"):
