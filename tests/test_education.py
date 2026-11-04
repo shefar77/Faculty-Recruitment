@@ -123,24 +123,54 @@ def test_no_candidate_specific_logic_in_the_new_modules():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name,tier", [
+    # Tier 1 - the seven first-generation IITs, however they are spelled.
     ("IIT Bombay", "tier_1"),
     ("Indian Institute of Technology Bombay", "tier_1"),
     ("I.I.T. Bombay", "tier_1"),
     ("IIT-Kanpur", "tier_1"),
     ("iit kharagpur", "tier_1"),
+    ("IIT Delhi", "tier_1"),
+    ("Indian Institute of Technology, Chennai", "tier_1"),
+    ("IIT Roorkee", "tier_1"),
+    ("IIT Guwahati", "tier_1"),
+    ("IITKGP", "tier_1"),
+    # Tier 1 - IISc and the top NITs.
     ("Indian Institute of Science", "tier_1"),
     ("IISc Bangalore", "tier_1"),
     ("NIT Warangal", "tier_1"),
     ("National Institute of Technology, Trichy", "tier_1"),
+    ("NIT Surathkal", "tier_1"),
+    ("National Institute of Technology Karnataka", "tier_1"),
+    ("NIT Rourkela", "tier_1"),
+    ("NIT Calicut", "tier_1"),
+    # Tier 1 - the established peers, which the re-tiering left in place.
     ("IIIT Hyderabad", "tier_1"),
     ("BITS Pilani", "tier_1"),
     ("Birla Institute of Technology and Science, Pilani", "tier_1"),
+    ("Indian Statistical Institute", "tier_1"),
     ("Massachusetts Institute of Technology", "tier_1"),
     ("Nanyang Technological University", "tier_1"),
-    ("Central University of Rajasthan", "tier_2"),
-    ("University of Delhi", "tier_2"),
-    ("Delhi Technological University", "tier_2"),
-    ("Anna University", "tier_2"),
+    # Tier 2 - every other IIT, including the two converted institutes.
+    ("IIT Hyderabad", "tier_2"),
+    ("IIT Ropar", "tier_2"),
+    ("Indian Institute of Technology Gandhinagar", "tier_2"),
+    ("IIT (BHU) Varanasi", "tier_2"),
+    ("Indian Institute of Technology (Indian School of Mines) Dhanbad",
+     "tier_2"),
+    # Tier 2 - every other NIT, by city and by named-institute form.
+    ("NIT Delhi", "tier_2"),
+    ("NIT Durgapur", "tier_2"),
+    ("MNNIT Allahabad", "tier_2"),
+    ("Visvesvaraya National Institute of Technology, Nagpur", "tier_2"),
+    ("SVNIT Surat", "tier_2"),
+    # Tier 3 - other recognised degree-awarding institutions.
+    ("Central University of Rajasthan", "tier_3"),
+    ("University of Delhi", "tier_3"),
+    ("Delhi Technological University", "tier_3"),
+    ("Anna University", "tier_3"),
+    ("Banaras Hindu University", "tier_3"),
+    ("University of Hyderabad", "tier_3"),
+    ("Jadavpur University", "tier_3"),
 ])
 def test_known_institutions_and_their_spelling_variants(name, tier):
     assert institutions.classify(name)["tier"] == tier
@@ -185,7 +215,7 @@ def test_a_lookalike_name_cannot_claim_tier_one(lookalike, why):
 
 def test_renamed_and_merged_institutions_resolve_to_their_current_name():
     assert institutions.classify("University of Roorkee")["tier"] == "tier_1"
-    assert institutions.classify("Delhi College of Engineering")["tier"] == "tier_2"
+    assert institutions.classify("Delhi College of Engineering")["tier"] == "tier_3"
     assert institutions.classify(
         "Bengal Engineering and Science University")["tier"] == "tier_1"
 
@@ -520,16 +550,22 @@ def test_an_ongoing_phd_earns_no_doctorate_marks_however_good_the_institution():
 
 
 def test_a_completed_phd_is_scaled_by_its_institution():
-    tier_1 = score({"phd_status": wrap("awarded"), "phd_year": wrap(2020),
-                    "phd_institution": wrap("IIT Bombay")})
-    tier_2 = score({"phd_status": wrap("awarded"), "phd_year": wrap(2020),
-                    "phd_institution": wrap("University of Delhi")})
-    unknown = score({"phd_status": wrap("awarded"), "phd_year": wrap(2020),
-                     "phd_institution": wrap("Nowhere College")})
-    assert criterion(tier_1, "doctorate")["points"] == 15.0
-    assert criterion(tier_2, "doctorate")["points"] == pytest.approx(12.75)
-    assert criterion(unknown, "doctorate")["points"] == pytest.approx(10.5)
-    assert criterion(unknown, "doctorate")["needs_review"] is True
+    def phd(institution):
+        return criterion(score({"phd_status": wrap("awarded"),
+                                "phd_year": wrap(2020),
+                                "phd_institution": wrap(institution)}),
+                         "doctorate")
+
+    # One award, three tiers. The ordering is the whole point of the
+    # hierarchy: tier 1 highest, tier 2 lower, tier 3 the base rate.
+    assert phd("IIT Bombay")["points"] == 15.0
+    assert phd("IIT Hyderabad")["points"] == pytest.approx(12.75)
+    assert phd("University of Delhi")["points"] == pytest.approx(10.5)
+
+    unknown = phd("Nowhere College")
+    assert unknown["points"] == pytest.approx(10.5), \
+        "an unrecognised name earns the base rate, never less"
+    assert unknown["needs_review"] is True
 
 
 def test_the_eligibility_gate_stays_separate_from_the_education_marks():
@@ -652,10 +688,23 @@ def test_the_two_profiles_are_separated_by_evidence_not_by_a_thumb_on_the_scale(
     """
     Both shapes must be viable. Neither may be structurally incapable of
     competing, which is what a badly balanced rubric produces.
+
+    The two fixtures carry DIFFERENT institution tiers, which is realistic
+    but would make this measure institution standing as well as profile
+    shape - and institution standing is meant to separate candidates, so
+    it would mask the thing under test. The awarding institutions are
+    therefore held equal here, and only the shape differs.
     """
-    teacher = score(STRONG_TEACHER["profile"], STRONG_TEACHER["positions"],
-                    pubs=[_pub("A Paper")])
-    researcher = score(STRONG_RESEARCHER["profile"],
+    same_institution = "IIT Bombay"
+    teacher = score({**STRONG_TEACHER["profile"],
+                     "phd_institution": wrap(same_institution),
+                     "masters_institution": wrap(same_institution),
+                     "bachelors_institution": wrap(same_institution)},
+                    STRONG_TEACHER["positions"], pubs=[_pub("A Paper")])
+    researcher = score({**STRONG_RESEARCHER["profile"],
+                        "phd_institution": wrap(same_institution),
+                        "masters_institution": wrap(same_institution),
+                        "bachelors_institution": wrap(same_institution)},
                        STRONG_RESEARCHER["positions"],
                        pubs=[_pub(f"P{i}", citations=12) for i in range(20)])
     assert abs(teacher["total_score"] - researcher["total_score"]) < 30
@@ -726,9 +775,9 @@ def test_an_education_explanation_decomposes_the_score():
         "bachelors_year": wrap(2012),
     }), "bachelors"))
     assert "B.Sc" in prose and "University of Delhi" in prose
-    assert "0.75" in prose and "0.85" in prose and "0.5" in prose, \
+    assert "0.75" in prose and "0.7" in prose and "0.5" in prose, \
         "a reviewer must be able to see every multiplier in the sentence"
-    for internal in ("bachelors_degree", "_subject", "tier_2", "ratio"):
+    for internal in ("bachelors_degree", "_subject", "tier_3", "ratio"):
         assert internal not in prose
 
 

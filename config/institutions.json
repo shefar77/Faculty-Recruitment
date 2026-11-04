@@ -9,25 +9,58 @@
     "",
     "DEMO/RESEARCH values. The tiers below are a proposal for a student",
     "project and carry no authority. They need faculty approval before any",
-    "real use.",
+    "real use - set approved_by / approved_on when that happens.",
     "",
     "HOW A NAME IS MATCHED",
     "  1. The institution string is normalised (lowercased, punctuation",
     "     stripped, ampersand to 'and', whitespace collapsed).",
     "  2. Aliases are expanded - abbreviations, former names, merged names.",
     "  3. never_match is checked, so a lookalike cannot claim a tier.",
-    "  4. Each tier's patterns are tried IN FILE ORDER; first match wins.",
+    "  4. Each tier's patterns are tried IN FILE ORDER; first match wins,",
+    "     and tier_1 is tried before tier_2 before tier_3. A campus-specific",
+    "     pattern must therefore sit ABOVE any family-wide catch-all.",
     "  5. No match gives tier 'unknown', which earns the UNKNOWN multiplier",
     "     AND is flagged for human review. It is never silently penalised.",
     "",
     "WHY PATTERNS AND NOT A NAME LIST: CVs print 'IIT Bombay', 'Indian",
     "Institute of Technology Bombay' and 'I.I.T. Bombay' for one place. A",
-    "pattern absorbs the variation; a literal list would miss two of three."
+    "pattern absorbs the variation; a literal list would miss two of three.",
+    "",
+    "A PATTERN MAY SET needs_review: true. That means the tier follows the",
+    "approved rule but the identification is not certain, so a human is",
+    "asked to confirm it. It is used for the family-wide IIT/NIT catch-alls,",
+    "where we know the family but not the campus."
   ],
 
-  "version": "institutions-v1",
+  "version": "institutions-v2",
   "approved_by": null,
   "approved_on": null,
+
+  "tier_basis": [
+    "The top/mid split for IITs and NITs follows FOUNDING ERA, not an annual",
+    "ranking, so the list is stable and does not need re-approval whenever a",
+    "ranking is republished.",
+    "",
+    "TIER 1 IITs: the seven first-generation institutes - Kharagpur, Bombay,",
+    "Madras, Kanpur, Delhi, Roorkee, Guwahati.",
+    "TIER 1 NITs: Tiruchirappalli, Karnataka (Surathkal), Warangal, Rourkela,",
+    "Calicut.",
+    "TIER 1 also keeps IISc and the established non-IIT/NIT peers that were",
+    "already tier 1 - IIIT, BITS Pilani, IISER, ISI, IIM, IIEST, TIFR - and",
+    "the listed international institutions, so that (for example) an MIT",
+    "doctorate does not score below a mid-tier NIT one.",
+    "",
+    "TIER 2: every other IIT (the 2008-onward institutes, IIT (BHU) Varanasi",
+    "and IIT (ISM) Dhanbad included) and every other NIT.",
+    "",
+    "TIER 3: other recognised degree-awarding institutions - central, state,",
+    "deemed and private universities, and recognised universities abroad that",
+    "are not named in tier 1.",
+    "",
+    "An IIT or NIT whose campus is not named in tier 1 or tier 2 still lands",
+    "in tier 2 under the rule 'every other IIT/NIT', but is FLAGGED so a",
+    "human confirms it rather than the list silently deciding."
+  ],
 
   "multipliers": {
     "tier_1": 1.0,
@@ -38,15 +71,26 @@
 
   "tiers": {
     "tier_1": {
-      "label": "Institutes of national importance and equivalent",
-      "rationale": "Centrally funded technical and research institutes established by Act of Parliament, plus their direct international equivalents. Standing rests on statute and published admission standards rather than on reputation.",
+      "label": "First-generation IITs, top NITs, IISc and established peers",
+      "rationale": "The seven first-generation IITs, IISc, the top NITs, and the centrally funded technical and research institutes of comparable standing, plus their direct international equivalents. Standing rests on statute and founding era rather than on a ranking that moves each year.",
       "patterns": [
-        {"match": "indian institute of technology", "label": "IIT"},
-        {"match": "\\biit\\b", "label": "IIT"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bkharagpur\\b", "label": "IIT Kharagpur"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\b(bombay|mumbai)\\b", "label": "IIT Bombay"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\b(madras|chennai)\\b", "label": "IIT Madras"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bkanpur\\b", "label": "IIT Kanpur"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bdelhi\\b", "label": "IIT Delhi"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\broorkee\\b", "label": "IIT Roorkee"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bguwahati\\b", "label": "IIT Guwahati"},
+
         {"match": "indian institute of science(?! education)", "label": "IISc"},
         {"match": "\\biisc\\b", "label": "IISc"},
-        {"match": "national institute of technology", "label": "NIT"},
-        {"match": "\\bnit\\b", "label": "NIT"},
+
+        {"match": "(national institute of technology|\\bnit\\b).*\\b(tiruchirappalli|trichy|tiruchirapalli)\\b", "label": "NIT Tiruchirappalli"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\b(karnataka|surathkal)\\b", "label": "NIT Karnataka (Surathkal)"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bwarangal\\b", "label": "NIT Warangal"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\brourkela\\b", "label": "NIT Rourkela"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bcalicut\\b", "label": "NIT Calicut"},
+
         {"match": "indian institute of information technology", "label": "IIIT"},
         {"match": "international institute of information technology", "label": "IIIT"},
         {"match": "\\biiit\\b", "label": "IIIT"},
@@ -72,8 +116,73 @@
     },
 
     "tier_2": {
-      "label": "Central, state and deemed universities, and recognised international universities",
-      "rationale": "Degree-awarding bodies recognised by the UGC or by a national accreditation authority abroad. The qualification is unquestioned; the institution is not one of the nationally designated technical institutes above.",
+      "label": "Other IITs and NITs",
+      "rationale": "Indian Institutes of Technology and National Institutes of Technology that are not first-generation or top-ranked under tier 1. Institutes of national importance by statute, so the qualification carries the same legal standing; the tier reflects founding era only. Campus-specific patterns come first; the family-wide catch-alls at the end apply the approved rule 'every other IIT/NIT' but ask a human to confirm, because a name without a campus cannot be placed with certainty.",
+      "patterns": [
+        {"match": "(indian institute of technology|\\biit\\b).*\\bbhubaneswar\\b", "label": "IIT Bhubaneswar"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bgandhinagar\\b", "label": "IIT Gandhinagar"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bhyderabad\\b", "label": "IIT Hyderabad"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bindore\\b", "label": "IIT Indore"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bjodhpur\\b", "label": "IIT Jodhpur"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bmandi\\b", "label": "IIT Mandi"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bpatna\\b", "label": "IIT Patna"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bropar\\b", "label": "IIT Ropar"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\b(varanasi|banaras hindu university)\\b", "label": "IIT (BHU) Varanasi"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\b(dhanbad|indian school of mines)\\b", "label": "IIT (ISM) Dhanbad"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bpalakkad\\b", "label": "IIT Palakkad"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\btirupati\\b", "label": "IIT Tirupati"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bdharwad\\b", "label": "IIT Dharwad"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bbhilai\\b", "label": "IIT Bhilai"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bgoa\\b", "label": "IIT Goa"},
+        {"match": "(indian institute of technology|\\biit\\b).*\\bjammu\\b", "label": "IIT Jammu"},
+
+        {"match": "motilal nehru national institute of technology", "label": "MNNIT Allahabad"},
+        {"match": "malaviya national institute of technology", "label": "MNIT Jaipur"},
+        {"match": "visvesvaraya national institute of technology", "label": "VNIT Nagpur"},
+        {"match": "sardar vallabhbhai national institute of technology", "label": "SVNIT Surat"},
+        {"match": "maulana azad national institute of technology", "label": "MANIT Bhopal"},
+        {"match": "(dr\\s*b\\s*r\\s*ambedkar|ambedkar) national institute of technology", "label": "NIT Jalandhar"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bagartala\\b", "label": "NIT Agartala"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bandhra\\b", "label": "NIT Andhra Pradesh"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\barunachal\\b", "label": "NIT Arunachal Pradesh"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bdelhi\\b", "label": "NIT Delhi"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bdurgapur\\b", "label": "NIT Durgapur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bgoa\\b", "label": "NIT Goa"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bhamirpur\\b", "label": "NIT Hamirpur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bjalandhar\\b", "label": "NIT Jalandhar"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bjamshedpur\\b", "label": "NIT Jamshedpur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bkurukshetra\\b", "label": "NIT Kurukshetra"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bmanipur\\b", "label": "NIT Manipur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bmeghalaya\\b", "label": "NIT Meghalaya"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bmizoram\\b", "label": "NIT Mizoram"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bnagaland\\b", "label": "NIT Nagaland"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bpatna\\b", "label": "NIT Patna"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\b(puducherry|pondicherry|karaikal)\\b", "label": "NIT Puducherry"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\braipur\\b", "label": "NIT Raipur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bsikkim\\b", "label": "NIT Sikkim"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bsilchar\\b", "label": "NIT Silchar"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bsrinagar\\b", "label": "NIT Srinagar"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bsurat\\b", "label": "SVNIT Surat"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\buttarakhand\\b", "label": "NIT Uttarakhand"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\b(jaipur|rajasthan)\\b", "label": "MNIT Jaipur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\b(allahabad|prayagraj)\\b", "label": "MNNIT Allahabad"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bnagpur\\b", "label": "VNIT Nagpur"},
+        {"match": "(national institute of technology|\\bnit\\b).*\\bbhopal\\b", "label": "MANIT Bhopal"},
+
+        {"match": "indian institute of technology|\\biit\\b",
+         "label": "an IIT with no campus named",
+         "needs_review": true,
+         "review_why": "recognised as an Indian Institute of Technology, but the CV does not name a campus this configuration lists. The approved rule places any IIT outside the first-generation seven in tier 2, so that is what was applied - a first-generation campus written in an unusual way would belong in tier 1 instead. Please confirm which campus it is"},
+        {"match": "national institute of technology|\\bnit\\b",
+         "label": "an NIT with no campus named",
+         "needs_review": true,
+         "review_why": "recognised as a National Institute of Technology, but the CV does not name a campus this configuration lists. The approved rule places any NIT outside the top five in tier 2, so that is what was applied - a top-five campus written in an unusual way would belong in tier 1 instead. Please confirm which campus it is"}
+      ]
+    },
+
+    "tier_3": {
+      "label": "Other recognised degree-awarding institutions",
+      "rationale": "Central, state, deemed and private universities, and recognised universities abroad that are not named in tier 1. The qualification is unquestioned; the institution is not one of the nationally designated technical institutes in tiers 1 and 2. Listed here EXPLICITLY by a maintainer; this tier is NOT the destination for a name the configuration does not recognise, which becomes 'unknown' and is flagged instead.",
       "patterns": [
         {"match": "central university", "label": "Central University"},
         {"match": "university of delhi|delhi university", "label": "University of Delhi"},
@@ -102,17 +211,11 @@
         {"match": "deemed to be university", "label": "Deemed university"},
         {"match": "deemed university", "label": "Deemed university"}
       ]
-    },
-
-    "tier_3": {
-      "label": "Other recognised degree-awarding institutions",
-      "rationale": "Affiliated colleges and private institutions whose degrees are recognised but for which this project holds no independent standing evidence. Assigned explicitly by a maintainer; it is NOT the default for an unrecognised name.",
-      "patterns": []
     }
   },
 
   "aliases": {
-    "_README": "Expanded BEFORE tier matching. The key is matched as a whole word on the normalised string and replaced by the value. Covers abbreviations, former names and mergers.",
+    "_README": "Expanded BEFORE tier matching. The key is matched as a whole word on the normalised string and replaced by the value. Covers abbreviations, former names and mergers. An alias must expand to a string the tier patterns can match: a campus-level abbreviation therefore expands to the full name INCLUDING the campus, because the tier of an IIT or NIT now depends on which campus it is.",
     "iitb": "indian institute of technology bombay",
     "iitd": "indian institute of technology delhi",
     "iitk": "indian institute of technology kanpur",
@@ -120,15 +223,24 @@
     "iitm": "indian institute of technology madras",
     "iitr": "indian institute of technology roorkee",
     "iitg": "indian institute of technology guwahati",
+    "iitbhu": "indian institute of technology varanasi",
+    "iitism": "indian institute of technology dhanbad",
+    "ism dhanbad": "indian institute of technology dhanbad",
+    "iith": "indian institute of technology hyderabad",
     "bhu": "banaras hindu university",
     "jnu": "jawaharlal nehru university",
     "amu": "aligarh muslim university",
     "nitk": "national institute of technology karnataka",
     "nitt": "national institute of technology tiruchirappalli",
+    "nitw": "national institute of technology warangal",
+    "nitc": "national institute of technology calicut",
+    "nitrkl": "national institute of technology rourkela",
     "mnnit": "motilal nehru national institute of technology",
     "mnit": "malaviya national institute of technology",
     "vnit": "visvesvaraya national institute of technology",
     "svnit": "sardar vallabhbhai national institute of technology",
+    "manit": "maulana azad national institute of technology",
+    "nitdgp": "national institute of technology durgapur",
     "bengal engineering and science university": "indian institute of engineering science and technology",
     "university of roorkee": "indian institute of technology roorkee",
     "delhi college of engineering": "delhi technological university",
@@ -138,13 +250,13 @@
   },
 
   "never_match": {
-    "_README": "Names that LOOK like a tier-1 institute but are a different body. Checked FIRST; a hit bars the named tier for that string. This is the guard against crediting an unrelated college for a famous acronym.",
+    "_README": "Names that LOOK like a tiered institution but are a different body. Checked FIRST; a hit bars the named tier or tiers for that string. This is the guard against crediting an unrelated college for a famous acronym. Both tier_1 and tier_2 are barred for the IIT/NIT lookalikes, because tier_2 now ends in a family-wide IIT/NIT catch-all and a lookalike must not reach it.",
     "entries": [
-      {"match": "national institute of fashion technology", "not_tier": "tier_1", "why": "NIFT is not an NIT"},
-      {"match": "\\bnift\\b", "not_tier": "tier_1", "why": "NIFT is not an NIT"},
-      {"match": "birla institute of technology mesra", "not_tier": "tier_1", "why": "BIT Mesra is a distinct institution from BITS Pilani"},
-      {"match": "\\bbit mesra\\b", "not_tier": "tier_1", "why": "BIT Mesra is a distinct institution from BITS Pilani"},
-      {"match": "national institute of technical teachers training", "not_tier": "tier_1", "why": "NITTTR is a teacher-training body, not an NIT"}
+      {"match": "national institute of fashion technology", "not_tiers": ["tier_1", "tier_2"], "why": "NIFT is not an NIT"},
+      {"match": "\\bnift\\b", "not_tiers": ["tier_1", "tier_2"], "why": "NIFT is not an NIT"},
+      {"match": "birla institute of technology mesra", "not_tiers": ["tier_1", "tier_2"], "why": "BIT Mesra is a distinct institution from BITS Pilani"},
+      {"match": "\\bbit mesra\\b", "not_tiers": ["tier_1", "tier_2"], "why": "BIT Mesra is a distinct institution from BITS Pilani"},
+      {"match": "national institute of technical teachers training", "not_tiers": ["tier_1", "tier_2"], "why": "NITTTR is a teacher-training body, not an NIT"}
     ]
   }
 }

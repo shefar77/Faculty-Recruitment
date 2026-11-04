@@ -23,6 +23,20 @@ THE RULE ON NOT KNOWING
     silently scored as poor, because "we have no entry for this college"
     and "this college is weak" are different statements and only the first
     one is supported by evidence.
+
+    A SECOND kind of not-knowing sits between the two: the family is
+    certain but the campus is not. "IIT" with no campus named is
+    definitely an IIT, and the tier of an IIT now depends on which one it
+    is. Such a name takes the tier the approved rule gives it AND carries
+    needs_review, set by the matching pattern in the configuration. See
+    the tier_2 catch-alls in config/institutions.json.
+
+ONE TIER PER QUALIFICATION
+    classify() is called exactly once per qualification by scoring.py -
+    once for the doctorate, once for each of bachelors and masters - and
+    the multiplier it returns is applied once, to that category's
+    fraction. Institution standing therefore cannot stack with itself or
+    carry a qualification past its own category weight.
 """
 
 from __future__ import annotations
@@ -56,6 +70,18 @@ def normalise(name: str | None) -> str:
     text = text.lower().replace("&", " and ")
     text = re.sub(r"[^a-z0-9\s]", " ", text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _lower_first(text: str) -> str:
+    """
+    Lowercase the first character only, leaving acronyms intact.
+
+    The tier labels carry acronyms - IIT, NIT, IISc - and str.lower()
+    would flatten them into unreadable prose. These labels are dropped
+    mid-sentence into a reviewer's explanation, so the opening letter has
+    to come down and nothing else may move.
+    """
+    return text[:1].lower() + text[1:] if text else ""
 
 
 def _collapse_initialisms(text: str) -> str:
@@ -125,11 +151,19 @@ def _barred_tiers(text: str) -> dict[str, str]:
     not match anyway - but BIT Mesra against BITS Pilani is a real
     collision, and relying on a regex accident to prevent it is not a
     safeguard. This makes the exclusion explicit and reviewable.
+
+    An entry bars one tier via 'not_tier' or several via 'not_tiers'. Both
+    spellings are accepted: tier 2 now ends in a family-wide IIT/NIT
+    catch-all, so a lookalike has to be kept out of two tiers rather than
+    one, and the older single-tier entries must keep working.
     """
     barred = {}
     for entry in config().get("never_match", {}).get("entries", []):
-        if re.search(entry["match"], text):
-            barred[entry["not_tier"]] = entry["why"]
+        if not re.search(entry["match"], text):
+            continue
+        tiers = entry.get("not_tiers") or [entry["not_tier"]]
+        for tier_name in tiers:
+            barred[tier_name] = entry["why"]
     return barred
 
 
@@ -185,17 +219,35 @@ def classify(name: str | None) -> dict:
         if tier_name in barred:
             continue
         for entry in tier["patterns"]:
-            if any(re.search(entry["match"], form) for form in candidates):
-                return {
-                    "tier": tier_name,
-                    "multiplier": multipliers[tier_name],
-                    "label": entry["label"],
-                    "reason": (f"recognised as {entry['label']} - "
-                               f"{tier['label'].lower()}"),
-                    "needs_review": False,
-                    "normalised": text,
-                    "aliases_applied": applied,
-                }
+            if not any(re.search(entry["match"], form) for form in candidates):
+                continue
+            # A pattern may be confident about the FAMILY but not the
+            # campus - "an IIT" with no campus named, say. The tier then
+            # still follows the approved rule, because leaving it
+            # unrecognised would drop a statutory institute to the base
+            # rate, but the entry asks a human to confirm instead of the
+            # list deciding silently. Requirement: an institution that
+            # cannot be confidently identified is flagged, not guessed.
+            uncertain = bool(entry.get("needs_review"))
+            # Only the first letter is lowered, not the whole label:
+            # .lower() on "First-generation IITs, top NITs, IISc" produces
+            # "iits, top nits, iisc", and a professor reading that cannot
+            # tell which institutes are meant. The clause reads
+            # "... because recognised as X - <label>", so it needs a
+            # lowercase opening and nothing else changed.
+            reason = (f"recognised as {entry['label']} - "
+                      f"{_lower_first(tier['label'])}")
+            if uncertain and entry.get("review_why"):
+                reason = entry["review_why"]
+            return {
+                "tier": tier_name,
+                "multiplier": multipliers[tier_name],
+                "label": entry["label"],
+                "reason": reason,
+                "needs_review": uncertain,
+                "normalised": text,
+                "aliases_applied": applied,
+            }
 
     reason = ("not listed in the approved institution configuration, so it "
               "is scored at the base rate and flagged for you to classify. "
@@ -229,6 +281,7 @@ def visible_rubric() -> dict:
         "approved_by": live.get("approved_by"),
         "approved_on": live.get("approved_on"),
         "config_file": str(CONFIG_PATH),
+        "tier_basis": live.get("tier_basis"),
         "multipliers": live["multipliers"],
         "tiers": {
             name: {

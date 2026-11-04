@@ -761,6 +761,37 @@ def score_experience(positions: list[dict], categories: set[str],
     return criterion
 
 
+def institution_review_reason(tier: dict, institution_name: str | None) -> str:
+    """
+    What to tell the reviewer when an institution needs confirming.
+
+    There are TWO different uncertainties and they must not be worded the
+    same way, because the wrong one is a false statement about the score:
+
+      unknown / absent  the configuration has no entry for this name, so
+                        the qualification earned the BASE rate.
+      a flagged match   the family is recognised - an IIT with no campus
+                        named, say - and the approved rule gave it a real
+                        tier. Telling the professor it "is not in the
+                        approved list and was scored at the base rate"
+                        would be wrong on both counts.
+
+    Shared by the doctorate and the bachelor's/master's paths so one
+    hierarchy cannot be explained two ways (requirement 5).
+    """
+    named = institution_name or "not named on the CV"
+    reason = (tier.get("reason") or "").rstrip(". ")
+    # .capitalize() would lowercase the remainder and flatten IIT to iit.
+    reason = reason[:1].upper() + reason[1:] if reason else ""
+
+    if tier["tier"] in ("unknown", "absent"):
+        return (f"The awarding institution ({named}) is not in the approved "
+                f"list, so it was scored at the base rate. {reason}.")
+    return (f"The awarding institution ({named}) was counted as "
+            f"{tier['label']}, at {tier['multiplier']} of the institution "
+            f"marks, but the match is not certain. {reason}.")
+
+
 def score_doctorate(profile: dict, gate: dict) -> Criterion:
     """
     Scored SEPARATELY from the eligibility gate, and never reads it.
@@ -843,10 +874,7 @@ def score_doctorate(profile: dict, gate: dict) -> Criterion:
                  f"x{tier['multiplier']})")
         if tier["needs_review"]:
             review_reasons.append(
-                f"The awarding institution "
-                f"({institution_name or 'not named on the CV'}) is not in "
-                f"the approved list, so it was scored at the base rate. "
-                f"{tier['reason'].capitalize()}.")
+                institution_review_reason(tier, institution_name))
 
     return Criterion(
         name="doctorate",
@@ -1066,10 +1094,7 @@ def _score_degree(profile: dict, level: str, research_context: str,
             f"rate of {ratio}. Please confirm.")
     if tier["needs_review"]:
         review_reasons.append(
-            f"The awarding institution "
-            f"({institution_name or 'not named on the CV'}) is not in the "
-            f"approved list, so it was scored at the base rate. "
-            f"{tier['reason'].capitalize()}.")
+            institution_review_reason(tier, institution_name))
     if branch["needs_review"]:
         review_reasons.append(
             f"This degree's subject could not be read from the CV, so it "

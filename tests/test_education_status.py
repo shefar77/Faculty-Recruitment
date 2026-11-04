@@ -115,7 +115,17 @@ def test_the_supervisor_is_eligible_and_scores_the_doctorate_in_full():
     assert gate(result)["outcome"] == "met"
 
     criterion = scoring.score_doctorate(result["profile"], gate(result))
-    assert criterion.points == scoring.WEIGHTS["doctorate"]
+    # "In full" is a claim about the QUALIFICATION, which is what the
+    # status fix governs: the award is recognised and credited at 1.0.
+    # The awarding institution then scales it, and asserting the product
+    # would silently pin this test to one institution's tier.
+    qualification = next(f for f in criterion.factors
+                         if f["factor"] == "qualification")
+    assert qualification["value"] == 1.0
+    institution = next(f for f in criterion.factors
+                       if f["factor"] == "institution")
+    assert criterion.points == pytest.approx(
+        scoring.WEIGHTS["doctorate"] * institution["value"])
     assert criterion.insufficient_evidence is False
 
 
