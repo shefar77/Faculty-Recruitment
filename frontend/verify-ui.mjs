@@ -32,6 +32,19 @@ globalThis.renderList = (payload) =>
   renderToStaticMarkup(<CandidateList payload={payload} selected={null} onSelect={() => {}} />);
 globalThis.renderDetail = (candidate) =>
   renderToStaticMarkup(<CandidateDetail candidate={candidate} onOverridden={() => {}} />);
+
+import UploadPanel from "${SRC}/UploadPanel.jsx";
+import {
+  ToastViewport, toastReducer, makeToast, toastDuration, MAX_TOASTS, DURATION,
+} from "${SRC}/toast.jsx";
+import * as notices from "${SRC}/notices.js";
+import * as api from "${SRC}/api.js";
+globalThis.toastLib = { toastReducer, makeToast, toastDuration, MAX_TOASTS, DURATION };
+globalThis.renderToasts = (toasts) =>
+  renderToStaticMarkup(<ToastViewport toasts={toasts} onDismiss={() => {}} />);
+globalThis.renderUpload = () => renderToStaticMarkup(<UploadPanel />);
+globalThis.notices = notices;
+globalThis.api = api;
 `;
 
 import { writeFileSync } from "node:fs";
@@ -469,6 +482,224 @@ check("a gap in the CV is named rather than left blank",
   thinSummary.includes("no completed degree is recorded"));
 check("a candidate with no summary renders nothing rather than an empty box",
   !globalThis.renderDetail(reliable).includes("profile-summary"));
+
+// --------------------------------------------------------------------------
+// Toast notifications
+// --------------------------------------------------------------------------
+console.log("\nToasts");
+const { toastReducer, makeToast, toastDuration, MAX_TOASTS, DURATION } = globalThis.toastLib;
+const N = globalThis.notices;
+const API = globalThis.api;
+
+// --- What counts as "the server is down" -----------------------------------
+// The wording a reviewer sees depends entirely on this, so it is exercised
+// through the real request() path with fetch replaced.
+const realFetch = globalThis.fetch;
+const respond = (status, text) => async () => ({
+  ok: status < 400, status, text: async () => text,
+});
+async function failureOf(call) {
+  try { await call(); return null; } catch (exc) { return exc; }
+}
+
+globalThis.fetch = async () => { throw new TypeError("fetch failed"); };
+let failure = await failureOf(() => API.listCandidates());
+check("a refused connection is classed as unreachable",
+  failure?.kind === "unreachable");
+
+globalThis.fetch = respond(500, "");
+failure = await failureOf(() => API.listCandidates());
+check("the dev proxy's empty 500 is classed as unreachable",
+  failure?.kind === "unreachable",
+  "Vite answers 500 with no body when it cannot reach FastAPI");
+
+globalThis.fetch = respond(500, "Internal Server Error");
+failure = await failureOf(() => API.listCandidates());
+check("a real server crash is NOT classed as unreachable",
+  failure?.kind === "http" && failure?.status === 500);
+
+globalThis.fetch = respond(503, JSON.stringify(
+  { detail: "explanation generation failed: ConnectionError: ollama down" }));
+failure = await failureOf(() => API.generateExplanations("Candidate_X"));
+check("a 503 WITH a detail is the server answering, not an outage",
+  failure?.kind === "http" && failure?.status === 503,
+  "the explain endpoint answers 503 + detail when the model fails");
+check("...so it is reported as a model problem, not 'can't reach the server'",
+  N.explanationsFailed(failure).title === "Couldn't generate explanations"
+  && /Ollama/.test(N.explanationsFailed(failure).message));
+
+globalThis.fetch = respond(502, "<html>Bad Gateway</html>");
+failure = await failureOf(() => API.listCandidates());
+check("a gateway page with no JSON is classed as unreachable",
+  failure?.kind === "unreachable");
+
+globalThis.fetch = respond(422, JSON.stringify(
+  { detail: [{ msg: "field required" }, { msg: "value is not a number" }] }));
+failure = await failureOf(() => API.listCandidates());
+check("FastAPI's list-shaped validation detail is read as text",
+  failure?.detail === "field required; value is not a number");
+check("an API error still exposes .message for older callers",
+  failure?.message === "field required; value is not a number");
+globalThis.fetch = realFetch;
+
+// --- No duplicates, no pile-ups --------------------------------------------
+let stack = toastReducer([], { type: "show", toast: makeToast(N.uploadStarted("a.pdf")) });
+const firstId = stack[0].id;
+stack = toastReducer(stack, { type: "show", toast: makeToast(N.uploadCompleted({
+  candidate_id: "Candidate_X", scoring: { total_score: 70, eligibility: { outcome: "met" } },
+})) });
+check("'processing started' is REPLACED by its result, not stacked beside it",
+  stack.length === 1 && stack[0].title === "Scoring completed");
+check("a replaced toast keeps its slot and restarts its timer",
+  stack[0].id === firstId && stack[0].version === 1);
+
+stack = [makeToast(N.loadFailed({ kind: "unreachable" }, "the candidate list"))];
+for (let i = 0; i < 5; i += 1) {
+  stack = toastReducer(stack, { type: "show", toast: makeToast(
+    N.overrideFailed({ kind: "unreachable" })) });
+}
+check("five failures during one outage make ONE toast", stack.length === 1);
+stack = toastReducer(stack, { type: "show", toast: makeToast(N.serverRestored()) });
+check("'connected again' replaces the outage toast rather than joining it",
+  stack.length === 1 && stack[0].kind === "success");
+
+const plain = { kind: "info", title: "Same", message: "Same text" };
+stack = toastReducer([], { type: "show", toast: makeToast(plain) });
+stack = toastReducer(stack, { type: "show", toast: makeToast(plain) });
+check("an identical notice is not shown twice", stack.length === 1);
+stack = toastReducer(stack, { type: "show", toast: makeToast({ ...plain, message: "Other" }) });
+check("a different notice is still shown", stack.length === 2);
+
+stack = [];
+for (let i = 0; i < MAX_TOASTS + 3; i += 1) {
+  stack = toastReducer(stack, { type: "show", toast: makeToast(
+    { kind: "info", title: `n${i}`, message: "" }) });
+}
+check(`never more than ${MAX_TOASTS} on screen, oldest dropped first`,
+  stack.length === MAX_TOASTS && stack[0].title === "n3"
+  && stack.at(-1).title === `n${MAX_TOASTS + 2}`);
+check("a toast can be dismissed",
+  toastReducer(stack, { type: "dismiss", id: stack[0].id }).length === MAX_TOASTS - 1);
+
+// --- Timing ------------------------------------------------------------------
+check("errors stay longest, successes shortest",
+  DURATION.error > DURATION.warning && DURATION.warning > DURATION.info
+  && DURATION.info > DURATION.success);
+check("every toast disappears on its own (no permanent toasts)",
+  Object.values(DURATION).every((ms) => ms > 0 && ms <= 15000));
+check("a long message gets extra reading time",
+  toastDuration("success", "x".repeat(200)) > toastDuration("success", "short"));
+check("...but never more than 15 seconds",
+  toastDuration("error", "x".repeat(5000)) === 15000);
+
+// --- What is rendered --------------------------------------------------------
+const rendered = globalThis.renderToasts([
+  makeToast({ kind: "error", title: "Can't reach the server", message: "m" }),
+  makeToast({ kind: "success", title: "Scoring completed", message: "m" }),
+  makeToast({ kind: "warning", title: "Please rename the file", message: "m" }),
+]);
+check("an error toast interrupts the screen reader (role=alert)",
+  /class="toast toast-error" role="alert" aria-live="assertive"/.test(rendered));
+check("a success toast is announced politely (role=status)",
+  /class="toast toast-success" role="status" aria-live="polite"/.test(rendered));
+check("each kind has its own style class",
+  rendered.includes("toast-warning") && rendered.includes("toast-success")
+  && rendered.includes("toast-error"));
+check("the kind is spoken, not conveyed by colour alone",
+  rendered.includes('class="visually-hidden">Error: </span>')
+  && rendered.includes('class="visually-hidden">Warning: </span>'));
+check("every toast has a labelled dismiss button",
+  (rendered.match(/aria-label="Dismiss notification"/g) || []).length === 3);
+check("the notification region is labelled even when empty",
+  globalThis.renderToasts([]).includes('aria-label="Notifications"'));
+check("components render without a toast provider (no crash)",
+  globalThis.renderUpload().includes("Run the pipeline"));
+check("the upload panel no longer claims explanations are written during upload",
+  !readFileSync(join(process.cwd(), "src", "UploadPanel.jsx"), "utf8")
+    .includes("explanations are being written"));
+
+// --- Validation is a warning, a system failure is an error ------------------
+const spaced = N.checkUploadFile({ name: "John Smith CV.pdf", size: 10 });
+check("a filename with spaces is caught BEFORE upload, as a warning",
+  spaced?.kind === "warning" && /rename/i.test(spaced.title + spaced.message));
+check("a wrong file type is caught before upload, as a warning",
+  N.checkUploadFile({ name: "cv.txt", size: 10 })?.kind === "warning");
+check("an empty file is caught before upload",
+  N.checkUploadFile({ name: "cv.pdf", size: 0 })?.kind === "warning");
+check("an acceptable file raises nothing",
+  N.checkUploadFile({ name: "Candidate_08.pdf", size: 10 }) === null);
+
+const scanned = N.uploadFailed({ kind: "http", status: 422, detail:
+  "pipeline failed: RuntimeError: no usable text layer (0 characters from 2 page(s))" },
+  "cv.pdf", 30000);
+check("a scanned CV is a warning that says what to do",
+  scanned.kind === "warning" && /OCR/.test(scanned.message));
+const unopenable = N.uploadFailed({ kind: "http", status: 422, detail:
+  "pipeline failed: RuntimeError: text extraction failed: FileDataError: Failed to open file" },
+  "cv.pdf", 30000);
+check("an unopenable PDF names BOTH causes, since the two are indistinguishable",
+  unopenable.kind === "warning" && /damaged/.test(unopenable.message)
+  && /password/.test(unopenable.message));
+const modelDown = N.uploadFailed({ kind: "http", status: 422, detail:
+  "pipeline failed: RuntimeError: extraction failed, refusing to score: profile: Read timed out" },
+  "cv.pdf", 600000);
+check("a model failure is an ERROR pointing at Ollama",
+  modelDown.kind === "error" && /Ollama/.test(modelDown.message));
+const generic = N.uploadFailed({ kind: "http", status: 422, detail:
+  "pipeline failed: RuntimeError: something unexpected" }, "cv.pdf", 30000);
+check("exception class names never reach the reviewer",
+  !/RuntimeError|pipeline failed/.test(generic.message));
+check("an upload that could not even start says so",
+  /wasn't uploaded/.test(N.uploadFailed({ kind: "unreachable" }, "cv.pdf", 300).message));
+check("an upload lost midway does NOT claim the result was lost",
+  /Refresh the list/.test(N.uploadFailed({ kind: "unreachable" }, "cv.pdf", 900000).message));
+
+const shaky = N.uploadCompleted({ candidate_id: "Candidate_X",
+  scoring: { total_score: 61.27, scoring_reliable: false } });
+check("a score with unverified figures completes as a WARNING, not a success",
+  shaky.kind === "warning");
+const scored = N.uploadCompleted({ candidate_id: "Candidate_X", run_seconds: 1500,
+  scoring: { candidate_name: "Dr. A", total_score: 82.25, eligibility: { outcome: "met" } } });
+check("scoring completed names the candidate, score and eligibility",
+  scored.kind === "success" && scored.message.includes("Dr. A (Candidate_X)")
+  && scored.message.includes("82.25/100") && /eligible/.test(scored.message)
+  && /25 minutes/.test(scored.message));
+
+check("a missing override reason is a warning",
+  N.overrideReasonMissing().kind === "warning");
+const range = N.overrideFailed({ kind: "http", status: 422, detail:
+  "teaching_experience must be between 0 and its weight (20)" });
+check("an out-of-range override is a warning in plain language",
+  range.kind === "warning" && !range.message.includes("teaching_experience"));
+const recorded = N.overrideRecorded({ changed: { total: [61.27, 64.5] },
+  computed_total: 61.27 }, "publications");
+check("a recorded override shows the before and after total",
+  recorded.kind === "success" && recorded.message.includes("61.27 → 64.50"));
+
+check("explanations that all fell back to templates are not called a success",
+  N.explanationsReady({ llm_used: false }).kind === "warning");
+check("explanations that were written are a success",
+  N.explanationsReady({ llm_used: true, state: {} }).kind === "success");
+
+// --- Nothing technical leaks into any message --------------------------------
+const everyNotice = [
+  spaced, scanned, unopenable, modelDown, generic, shaky, scored, range,
+  recorded, N.uploadStarted("cv.pdf"), N.serverRestored(),
+  N.overrideReasonMissing(), N.explanationsReady({ llm_used: true }),
+  N.loadFailed({ kind: "unreachable" }, "the candidate list"),
+  N.loadFailed({ kind: "http", status: 404 }, "this candidate's record"),
+  N.loadFailed({ kind: "http", status: 500 }, "the candidate list"),
+  N.overrideFailed({ kind: "http", status: 404 }),
+  N.explanationsFailed({ kind: "http", status: 500, detail: "boom" }),
+  N.uploadFailed({ kind: "http", status: 400, detail: "unsupported file type" }, "x.doc"),
+];
+const leaks = everyNotice.filter((n) =>
+  /undefined|null|NaN|\[object|Error:|_[a-z]+_|\.\./.test(`${n.title} ${n.message}`));
+check("no message contains undefined/null/NaN, class names or doubled stops",
+  leaks.length === 0, JSON.stringify(leaks.map((n) => n.title)));
+check("every notice has a title, a message and a valid kind",
+  everyNotice.every((n) => n.title && n.message
+    && ["success", "info", "warning", "error"].includes(n.kind)));
 
 rmSync(entry, { force: true });
 rmSync(bundle, { force: true });

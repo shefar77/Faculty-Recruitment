@@ -2,6 +2,7 @@
   --fg: #1b1b1f; --muted: #5d6472; --line: #d8dce4; --bg: #f7f8fa;
   --danger: #b3261e; --danger-bg: #fdecea; --ok: #1e6b36; --ok-bg: #e9f5ec;
   --note: #7a5200; --note-bg: #fff6e0;
+  --info: #1a3f73; --info-bg: #e4ecf8;
 }
 * { box-sizing: border-box; }
 body {
@@ -94,3 +95,83 @@ button.linkish {
 }
 .profile-summary p { margin: 0; }
 .profile-summary p + p { margin-top: 6px; }
+
+/* ------------------------------------------------------------------------
+   Toast notifications (toast.jsx). Each kind uses the same colour token as
+   the matching inline alert, so a green toast and a green alert mean the
+   same thing. Newest on top.
+
+   Anchored to the TOP at every width, phones included. A bottom anchor was
+   tried and failed in a real mobile viewport: the candidate table is wider
+   than a phone, so the browser enlarges its layout viewport to fit it, and
+   "bottom: 16px" of that taller viewport lands below the visible screen.
+   The top edge is visible however the browser sizes the layout.
+   ------------------------------------------------------------------------ */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.toast-viewport {
+  position: fixed; top: 16px; right: 16px; z-index: 1000;
+  display: flex; flex-direction: column-reverse; gap: 10px;
+  width: min(380px, calc(100vw - 32px));
+  pointer-events: none;   /* the empty strip must not block the page */
+}
+.toast {
+  --toast-accent: var(--info);
+  pointer-events: auto;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px; align-items: start;
+  background: #fff; color: var(--fg);
+  border: 1px solid var(--line); border-left: 4px solid var(--toast-accent);
+  border-radius: 8px; padding: 11px 10px 11px 12px;
+  box-shadow: 0 6px 20px rgba(20, 30, 50, .14), 0 1px 3px rgba(20, 30, 50, .08);
+  animation: toast-in .18s ease-out;
+}
+.toast-success { --toast-accent: var(--ok); }
+.toast-info    { --toast-accent: var(--info); }
+.toast-warning { --toast-accent: var(--note); }
+.toast-error   { --toast-accent: var(--danger); }
+.toast-icon {
+  width: 22px; height: 22px; margin-top: 1px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--toast-accent); color: #fff;
+  font-size: 13px; font-weight: 700; line-height: 1;
+}
+.toast-body { min-width: 0; }
+.toast-title { margin: 0; font-size: 14px; font-weight: 650; line-height: 1.35; }
+.toast-message {
+  margin: 3px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted);
+  overflow-wrap: anywhere;
+}
+button.toast-close {
+  background: none; border: none; color: var(--muted);
+  padding: 0 5px; margin: -3px -3px 0 0; border-radius: 4px;
+  font-size: 20px; line-height: 1.2; cursor: pointer;
+}
+button.toast-close:hover { background: var(--bg); color: var(--fg); }
+button.toast-close:focus-visible { outline: 2px solid #2a4e86; outline-offset: 1px; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+/* On phones, sized in vw from the LEFT edge. Measured in a 390px mobile
+   viewport: 100vw tracked the visible width (390) while a fixed element's
+   left/right insets tracked the layout widened by the table (457), which
+   pushed the dismiss button off-screen. */
+@media (max-width: 480px) {
+  .toast-viewport { left: 16px; right: auto; width: calc(100vw - 32px); }
+}
+
+/* A field the user must fix, flagged in place. The toast says why; the
+   outline says where. */
+.card textarea[aria-invalid="true"], .card input[aria-invalid="true"] {
+  border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger);
+}
+
+/* The candidate list could not be loaded at all. Stays until it can be,
+   because the toast announcing the failure fades. */
+.load-failed { display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; }
+.load-failed p { margin: 0; }

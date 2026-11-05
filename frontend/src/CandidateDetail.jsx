@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { isUnreliable, reliabilityReasons } from "./reliability.js";
 import { generateExplanations } from "./api.js";
+import { useToast } from "./toast.jsx";
+import { explanationsFailed, explanationsReady } from "./notices.js";
 import {
   criterionLabel,
   categoryLabel,
@@ -296,7 +298,7 @@ function Criteria({ criteria }) {
  */
 function ExplanationControl({ candidate, onDone }) {
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(null);
+  const toast = useToast();
   const state = candidate.explanation_state;
   if (!state || state.all_llm) return null;
 
@@ -314,12 +316,12 @@ function ExplanationControl({ candidate, onDone }) {
         disabled={busy}
         onClick={async () => {
           setBusy(true);
-          setError(null);
           try {
-            await generateExplanations(candidate.candidate_id);
+            const result = await generateExplanations(candidate.candidate_id);
+            toast.show(explanationsReady(result));
             onDone?.();
           } catch (exception) {
-            setError(exception.message);
+            toast.show(explanationsFailed(exception));
           } finally {
             setBusy(false);
           }
@@ -327,7 +329,6 @@ function ExplanationControl({ candidate, onDone }) {
       >
         {busy ? "Generating…" : "Generate written explanations"}
       </button>
-      {error && <div className="alert alert-danger small">{error}</div>}
     </div>
   );
 }
@@ -398,7 +399,6 @@ function Publications({ publications }) {
 }
 
 export default function CandidateDetail({ candidate, onOverridden }) {
-  const [lastLogged, setLastLogged] = useState(null);
   if (!candidate) {
     return <p className="muted">Select a candidate to see the evidence.</p>;
   }
@@ -474,21 +474,9 @@ export default function CandidateDetail({ candidate, onOverridden }) {
       <Publications publications={candidate.publications} />
 
       <h3>Override a score</h3>
-      <OverrideForm
-        candidate={candidate}
-        onDone={(result) => {
-          setLastLogged(result);
-          onOverridden?.();
-        }}
-      />
-      {lastLogged && (
-        <div className="alert alert-ok">
-          Override #{lastLogged.override_id} logged. Effective total{" "}
-          {lastLogged.changed.total[0]?.toFixed(2)} →{" "}
-          <strong>{lastLogged.changed.total[1]?.toFixed(2)}</strong>. The
-          computed score stays {lastLogged.computed_total?.toFixed(2)}.
-        </div>
-      )}
+      {/* The outcome is a toast; the permanent record is the override
+          history below, so no confirmation box is kept here as well. */}
+      <OverrideForm candidate={candidate} onDone={() => onOverridden?.()} />
 
       {candidate.override_history?.length > 0 && (
         <>

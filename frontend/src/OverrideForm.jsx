@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { overrideScore } from "./api.js";
 import { criterionLabel } from "./labels.js";
+import { useToast } from "./toast.jsx";
+import {
+  overrideFailed, overrideReasonMissing, overrideRecorded,
+} from "./notices.js";
 
 /**
  * Records a human override. The reason is mandatory here as well as in
  * the API, so the reviewer is told before the round trip rather than
  * being handed a 422.
+ *
+ * Outcomes are toasts. A missing reason is ALSO marked on the field
+ * itself, because the toast fades and the reviewer still needs to see
+ * which box to fill in.
  */
 export default function OverrideForm({ candidate, onDone }) {
   const criteria = candidate.criteria || [];
@@ -14,17 +22,20 @@ export default function OverrideForm({ candidate, onDone }) {
   const [reason, setReason] = useState("");
   const [by, setBy] = useState("faculty");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [reasonMissing, setReasonMissing] = useState(false);
+  const reasonBox = useRef(null);
+  const toast = useToast();
 
   const isEligibility = field === "eligibility";
   const selected = criteria.find((c) => c.criterion === field);
 
   async function submit(event) {
     event.preventDefault();
-    setError("");
+    if (busy) return;
     if (!reason.trim()) {
-      setError("A reason is required. An unexplained override cannot be "
-             + "told apart from a mistake when it is read months later.");
+      setReasonMissing(true);
+      toast.show(overrideReasonMissing());
+      reasonBox.current?.focus();
       return;
     }
     setBusy(true);
@@ -37,9 +48,10 @@ export default function OverrideForm({ candidate, onDone }) {
       });
       setValue("");
       setReason("");
+      toast.show(overrideRecorded(result, field));
       onDone?.(result);
     } catch (exc) {
-      setError(String(exc.message || exc));
+      toast.show(overrideFailed(exc));
     } finally {
       setBusy(false);
     }
@@ -95,9 +107,14 @@ export default function OverrideForm({ candidate, onDone }) {
       <label>
         Reason (required)
         <textarea
+          ref={reasonBox}
           rows="2"
           value={reason}
-          onChange={(e) => setReason(e.target.value)}
+          aria-invalid={reasonMissing || undefined}
+          onChange={(e) => {
+            setReason(e.target.value);
+            if (e.target.value.trim()) setReasonMissing(false);
+          }}
           placeholder="e.g. Award letter sighted; degree conferred 2026-09."
         />
       </label>
@@ -107,7 +124,6 @@ export default function OverrideForm({ candidate, onDone }) {
         alongside it, takes effect in the ranking, and stays in the log.
       </p>
 
-      {error && <div className="alert alert-danger small">{error}</div>}
       <button type="submit" disabled={busy || !value}>
         {busy ? "Recording…" : "Record override"}
       </button>
