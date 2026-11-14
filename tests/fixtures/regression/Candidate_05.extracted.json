@@ -1,0 +1,324 @@
+{
+  "candidate_id": "Candidate_05",
+  "extracted_at": "2026-11-14T11:13:07+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Dr. Lalita Agrawal",
+      "evidence": "Dr. Lalita Agrawal                               Contact No: +91-9074522713"
+    },
+    "email": {
+      "value": "lalitaagrawalmits@gmail.com",
+      "evidence": "# lalitaagrawalmits@gmail.com"
+    },
+    "orcid": {
+      "value": "0009-0003-5776-5194",
+      "evidence": "https://orcid.org/0009-0003-5776-5194"
+    },
+    "scholar_url": {
+      "value": "https://scholar.google.com/citations?user=RRZV-L8AAAAJ",
+      "evidence": "³ https://scholar.google.com/citations?user=RRZV-L8AAAAJ"
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Ph.D. - Computer Science and Engineering"
+    },
+    "phd_status": {
+      "value": "pursuing",
+      "evidence": "Ph.D.   Computer Science and Engineering     Indian Institute of Technology       8.0    Jan 2022 – Feb 2026"
+    },
+    "phd_institution": {
+      "value": "Indian Institute of Technology Indore",
+      "evidence": "Indian Institute of Technology Indore"
+    },
+    "phd_start_year": {
+      "value": 2022,
+      "evidence": "Jan 2022 – Feb 2026"
+    },
+    "phd_year": {
+      "value": null,
+      "evidence": "Jan 2022 – Feb 2026"
+    },
+    "phd_subject": {
+      "value": "Computer Science and Engineering",
+      "evidence": "Ph.D.   Computer Science and Engineering"
+    },
+    "masters_degree": {
+      "value": "mtech",
+      "evidence": "M.Tech.  Computer Science and Engineering"
+    },
+    "masters_institution": {
+      "value": "Maulana Azad National Institute of Technology Bhopal",
+      "evidence": "Maulana Azad National Institute of Technology Bhopal, India"
+    },
+    "masters_year": {
+      "value": 2019,
+      "evidence": "2019"
+    },
+    "masters_subject": {
+      "value": "Computer Science and Engineering",
+      "evidence": "M.Tech.  Computer Science and Engineering"
+    },
+    "bachelors_degree": {
+      "value": "btech",
+      "evidence": "B.E.         Information Technology"
+    },
+    "bachelors_institution": {
+      "value": "Madhav Institute of Technology and Science Gwalior",
+      "evidence": "Madhav Institute of Technology and Science Gwalior, India"
+    },
+    "bachelors_year": {
+      "value": 2015,
+      "evidence": "2015"
+    },
+    "bachelors_subject": {
+      "value": "Information Technology",
+      "evidence": "B.E.         Information Technology"
+    },
+    "research_area": {
+      "value": "Internet of Things (IoT), Software-Defined Networks (SDNs), Edge Computing, Beyond 5G and 6G Networks, Formal Methods (Discrete Event System), Game-Theoretic Applications",
+      "evidence": "Research Interests"
+    },
+    "positions": [
+      {
+        "title": "Visiting Researcher",
+        "organisation": "Centre for Wireless Communications - Networks and Systems (CWC-NS), University of Oulu, Finland",
+        "category": "research",
+        "start_date": "2023-08",
+        "end_date": "2023-09",
+        "is_current": false,
+        "evidence": "Visiting Researcher at the Centre for Wireless Communications - Networks and Systems (CWC-NS), University of Oulu, Finland. (August - September 2023).",
+        "source_section": "Work Experience"
+      },
+      {
+        "title": "Junior Research Fellow",
+        "organisation": "IIT Guwahati, Guwahati, Assam",
+        "category": "research",
+        "start_date": "2020-01",
+        "end_date": "2021-10",
+        "is_current": false,
+        "evidence": "Junior Research Fellow in CSE Department, IIT Guwahati, Guwahati, Assam. (January 2020 - October 2021).",
+        "source_section": "Work Experience"
+      },
+      {
+        "title": "Assistant Professor",
+        "organisation": "Parul University, Vadodara, Gujarat",
+        "category": "teaching",
+        "start_date": "2019-06",
+        "end_date": "2019-12",
+        "is_current": false,
+        "evidence": "Assistant Professor in IT Department, Parul University, Vadodara, Gujarat. (June - December 2019).",
+        "source_section": "Work Experience"
+      },
+      {
+        "title": "Guest Faculty",
+        "organisation": "Govt. Polytechnic College, Sheopur, Madhya Pradesh",
+        "category": "teaching",
+        "start_date": "2015-07",
+        "end_date": "2016-05",
+        "is_current": false,
+        "evidence": "Guest Faculty in CSE Department Govt. Polytechnic College, Sheopur, Madhya Pradesh. (July 2015 - May 2016).",
+        "source_section": "Work Experience"
+      },
+      {
+        "title": "Internship",
+        "organisation": "Telephone Exchange Office of BSNL, Gwalior, Madhya Pradesh",
+        "category": "industry",
+        "start_date": "2014-05",
+        "end_date": "2014-06",
+        "is_current": false,
+        "evidence": "Internship at Telephone Exchange Office of BSNL, Gwalior, Madhya Pradesh. (May - June 2014).",
+        "source_section": "Work Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Energy-Efficient Bandwidth Orchestration for Industrial IoT in Softwarized 6G Networks",
+      "authors": [
+        "L. Agrawal",
+        "A. Mondal"
+      ],
+      "year": 2025,
+      "venue": "IEEE Internet of Things Journal",
+      "doi": null,
+      "status": "published",
+      "evidence": "L. Agrawal and A. Mondal, “Energy-Efficient Bandwidth Orchestration for Industrial IoT in Softwarized 6G Networks,” IEEE Internet of Things Journal, vol. 12, no. 19, pp. 40440-40448, October 2025."
+    },
+    {
+      "title": "TRON: Traffic Management and Resource Allocation for SDN-Enabled 5G/6G Networks",
+      "authors": [
+        "L. Agrawal",
+        "A. Mondal"
+      ],
+      "year": 2025,
+      "venue": "Proceedings of IEEE 31st International Symposium on Local and Metropolitan Area Networks (LANMAN)",
+      "doi": null,
+      "status": "published",
+      "evidence": "L. Agrawal and A. Mondal, “TRON: Traffic Management and Resource Allocation for SDN-Enabled 5G/6G Networks,” in Proceedings of IEEE 31st International Symposium on Local and Metropolitan Area Networks (LANMAN), Lille, France, July 2025."
+    },
+    {
+      "title": "Delay-Aware Dynamic Resource Orchestration for IoT-Enabled Software-Defined Edge Networks",
+      "authors": [
+        "L. Agrawal",
+        "A. Mondal",
+        "M. S. Obaidat",
+        "E. Harjula"
+      ],
+      "year": 2025,
+      "venue": "International Journal of Communication Systems",
+      "doi": null,
+      "status": "published",
+      "evidence": "L. Agrawal, A. Mondal, M. S. Obaidat, and E. Harjula, “Delay-Aware Dynamic Resource Orchestration for IoT-Enabled Software-Defined Edge Networks,” International Journal of Communication Systems, Wiley, vol. 38, no. 7, pp. e70072, March 2025."
+    },
+    {
+      "title": "T-RESIN: Throughput-Aware Dynamic Resource Orchestration for IoE-Enabled Software-Defined Edge Networks",
+      "authors": [
+        "L. Agrawal",
+        "A. Mondal",
+        "M. S. Obaidat"
+      ],
+      "year": 2024,
+      "venue": "International Journal of Communication Systems",
+      "doi": null,
+      "status": "published",
+      "evidence": "L. Agrawal, A. Mondal, and M. S. Obaidat, “T-RESIN: Throughput-Aware Dynamic Resource Orchestration for IoE-Enabled Software-Defined Edge Networks,” International Journal of Communication Systems, Wiley, vol. 37, no. 12, pp. e5802, April 2024."
+    },
+    {
+      "title": "Secure Edge Intelligence in the 6G Era",
+      "authors": [
+        "T. Kumar",
+        "J. Partala",
+        "T. Nguyen",
+        "L. Agrawal",
+        "A. Mondal",
+        "A. Kumar",
+        "I. Ahmad",
+        "E. Peltonen",
+        "S. Pirttikangas",
+        "E. Harjula"
+      ],
+      "year": null,
+      "venue": "Security and Privacy for 6G Massive IoT",
+      "doi": null,
+      "status": "published",
+      "evidence": "T. Kumar, J. Partala, T. Nguyen, L. Agrawal, A. Mondal, A. Kumar, I. Ahmad, E. Peltonen, S. Pirttikangas, and E. Harjula, “Secure Edge Intelligence in the 6G Era,” Security and Privacy for 6G Massive IoT, G. Mantas, F. Saghezchi, J. Rodriguez, and V. Sucasas (Eds.), Wiley-VCH Verlag, 2025, pp. 35-52, ISBN(Electronic): 9781119988007."
+    },
+    {
+      "title": "Optimized ECDSA algorithm for secure and efficient use in IoT network",
+      "authors": [
+        "L. Agrawal",
+        "N. Tiwari"
+      ],
+      "year": 2020,
+      "venue": "International Journal of Recent Technology and Engineering (IJRTE)",
+      "doi": null,
+      "status": "published",
+      "evidence": "L. Agrawal and N. Tiwari, “Optimized ECDSA algorithm for secure and efficient use in IoT network,” International Journal of Recent Technology and Engineering (IJRTE), Vol. 8 no. 5, pp. 980-984, January 2020."
+    },
+    {
+      "title": "A Review on IoT Security Architecture: Attacks, Protocols, Trust Management Issues and Elliptic Curve Cryptography",
+      "authors": [
+        "L. Agrawal",
+        "N. Tiwari"
+      ],
+      "year": 2019,
+      "venue": "Proceedings of International Conference on Social Networking and Computational Intelligence (SCI-2k19)",
+      "doi": null,
+      "status": "published",
+      "evidence": "L. Agrawal and N. Tiwari, “A Review on IoT Security Architecture: Attacks, Protocols, Trust Management Issues and Elliptic Curve Cryptography,” in Proceedings of International Conference on Social Networking and Computational Intelligence (SCI-2k19), March 2019."
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 4172,
+      "output_tokens": 721,
+      "seconds": 140.4,
+      "load_seconds": 0.02,
+      "prefill_seconds": 9.02,
+      "decode_seconds": 128.1,
+      "truncated": false,
+      "called_at": "2026-11-14T11:01:05+00:00",
+      "prompt_sha": "57dded3c5d1b164f"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "skipped: CV contains no NET/SET/SLET token",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T11:03:25+00:00",
+      "prompt_sha": ""
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 609,
+      "output_tokens": 540,
+      "seconds": 77.7,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T11:03:25+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3446,
+      "output_tokens": 1284,
+      "seconds": 504.0,
+      "load_seconds": 0.02,
+      "prefill_seconds": 7.6,
+      "decode_seconds": 494.21,
+      "truncated": false,
+      "called_at": "2026-11-14T11:04:43+00:00",
+      "prompt_sha": "9c964a7d0ff040a1"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T11:13:07+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "e4388adedde32c125f437a26ee0a816b33b4f5677ff02cad8cd83b0390ac0fab"
+}

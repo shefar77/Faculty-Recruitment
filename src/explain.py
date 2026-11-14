@@ -394,8 +394,9 @@ def _experience_sentences(criterion: dict) -> list[str]:
 def _research_sentences(criterion: dict) -> list[str]:
     """Describe research output, keeping papers and patents distinct."""
     rows = criterion.get("evidence", [])
-    papers = [r for r in rows if r.get("kind") != "patent"]
+    papers = [r for r in rows if r.get("kind") not in ("patent", "profile")]
     patents = [r for r in rows if r.get("kind") == "patent"]
+    profile = [r for r in rows if r.get("kind") == "profile"]
     sentences = []
 
     # Every paper is put in exactly ONE group, by the real reason it earned
@@ -445,6 +446,16 @@ def _research_sentences(criterion: dict) -> list[str]:
                          f"status the CV states")
         sentences.append(parts[0] + ": " + "; ".join(parts[1:]) + "."
                          if len(parts) > 1 else parts[0] + ".")
+
+    credited_profile = [r for r in profile if (r.get("credit") or 0) > 0]
+    if credited_profile:
+        sentences.append(
+            f"The CV presents its list as a selection, so "
+            f"{len(credited_profile)} further peer-reviewed "
+            f"work{'s' if len(credited_profile) != 1 else ''} attributed to "
+            f"the candidate's ORCID record in OpenAlex, and not printed in "
+            f"the CV, {'were' if len(credited_profile) != 1 else 'was'} also "
+            f"credited, each listed with its source.")
 
     # Say where the number sits against the threshold. Without this,
     # "9.19 out of 35 from nine papers" reads as an error rather than as
@@ -518,8 +529,15 @@ def template_explanation(criterion: dict) -> str:
     elif key in ("doctorate", "masters", "bachelors", "postdoctoral"):
         body = _education_sentences(criterion)
     elif key == "research_visibility":
-        body = [f"Corroborated publications have attracted {measured} "
-                f"citation{'s' if measured != 1 else ''} in total."]
+        profile = next((r for r in criterion.get("evidence", [])
+                        if r.get("source") == "orcid_openalex"
+                        and r.get("h_index") is not None), None)
+        body = [f"Verified sources record {measured} "
+                f"citation{'s' if measured != 1 else ''}"
+                + (f" and an h-index of {profile['h_index']} (OpenAlex, "
+                   f"through the ORCID iD in the CV)" if profile else "")
+                + ". Figures the CV reports itself are shown to the reviewer "
+                  "but not scored."]
 
     if criterion.get("unclassified_roles"):
         body.append(

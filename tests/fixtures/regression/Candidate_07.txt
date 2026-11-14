@@ -1,0 +1,230 @@
+Vikas Kumawat                                            p20210020@pilani.bits-pilani.ac.in
+Department of Computer Science & Information Systems                engg.vikas000@gmail.com
+BITS Pilani, Rajasthan, India                                      Mobile No. +91-9602356877
+
+ Profile Summary
+
+   • Computer Science researcher specializing in computer vision and ML/DL for healthcare
+      applications. Focused on marker-less gait analysis for identifying musculoskeletal and neurological
+      disorders. Experienced in pose estimation (e.g., BlazePose) and transformer-based models for
+     spatiotemporal analysis. Committed to developing non-invasive, scalable solutions for early
+      diagnosis and rehabilitation support.
+
+Education
+
+    Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026
+   •
+      Birla Institute of Technology & Science, Pilani, India
+
+        – Thesis Title: Computer Vision Based Markerless Diagnosis Techniques of Musculoskeletal & Neurological
+            Disorders for Medical Condition Classification
+        – Supervisors: Prof. Yashvardhan Sharma, Prof. Ashutosh Bhatia
+        – CGPA: 9.00
+
+    M. Tech. (Embedded Systems)                                            2014 – 2016
+   •
+    Mewar University, Chittorgarh, Rajasthan
+
+        – CGPA: 8.12/10
+
+    B. Tech. (Information Technology)                                        2009 – 2013
+   •
+     B.K. Birla Institute of Engineering & Technology, Pilani
+
+        – Percentage: 72.12
+
+Teaching Experience
+
+     Teaching Assistant                                                         2021 – 2026
+   • Computer Science & Information Systems Department, Birla Institute of
+     Technology & Science, Pilani, Rajasthan, India
+
+        – Courses Taught: IoT, Machine Learning, Data Mining, Computer Vision, Computer Programming, and
+              Artificial Intelligence.
+
+     Assistant Professor                                                        2013 – 2021
+   • Computer Science Engineering Department, B K Birla Institute of Engineer-
+      ing & Technology, Pilani, Rajasthan, India
+
+     Teaching Associate                                         Nov 2025 – Apr 2026
+     Applied Artificial Intelligence for All: Foundations to Job-Readiness, Janki
+   •
+     Devi Memorial College–Delhi University (JDMC–DU) Remote Training Pro-
+     gram by Teaching Learning Centre & Dept. of CSIS, BITS Pilani
+
+Courses Taught at B.K. Birla Institute of Engineering & Technology (BKBIET), Pilani
+
+   • Object Oriented Programming (OOP), Embedded Systems, IoT, DBMS, Machine Learning (ML)
+
+Projects
+
+   • Smart Campus Access Control System (BITS Pilani)
+
+– Design Description: Developed an automated visitor management framework to replace manual paper-based
+             logs. The system utilizes a centralized database for real-time entry/exit tracking and a wireless front-end for
+            security personnel.
+       – Improvement: Replaced traditional manual record-keeping with a digital-first approach, eliminating data
+          redundancy and loss. Integrated a wireless QR code scanning interface to facilitate rapid, contactless exit
+             validation, significantly reducing processing time and improving data integrity for security auditing.
+       – System Features: Real-time MongoDB database logging, automated time-stamping, wireless hand-held
+           scanner integration, and an administrative dashboard for security traffic analytics.
+       – Currently deployed and live at BITS Pilani, actively used for campus access control and visitor
+         management.
+
+  • Remote Home Appliance Control System using Raspberry Pi
+
+       – Design Description: Built a low-cost, open-source home automation system using a Raspberry Pi 2B as a
+          Wi-Fi web server to remotely monitor and control household electrical appliances. The system drives a 220V
+       AC load (bulb) and a 5V DC motor via relay circuits, and reads live room temperature from a DS18B20 sensor,
+               all accessible from any Wi-Fi-capable mobile device.
+       – Improvement: Replaced manual, mechanical appliance operation with remote GPIO-based control, reducing
+          power consumption and human effort while improving accessibility for elderly and differently-abled users.
+          Enabled real-time temperature readout and appliance state tracking through a browser interface reachable from
+             inside or outside the home.
+       – System Features: Apache and PHP web server on Raspberry Pi, GPIO-driven relay switching (transistor + 1
+          kΩdriver) for AC and DC loads, DS18B20 temperature monitoring over the 1-Wire interface, and a
+           Bootstrap-based mobile web UI using HTTP POST for on/off control.
+
+Research Publications
+
+  1. V. Kumawat, Y. Sharma, A. Bhatia, and K. Tiwari, “AlzNET: An Alzheimer Classification
+    Network using Action Identification,” in Proceedings of the Advances in Distributed
+    Computing and Machine Learning, Cham: Springer Nature Switzerland, 2026, pp. 294–303.
+
+  2. V. Kumawat, Y. Sharma, A. Bhatia, and K. Tiwari, “PSI-Net: Marker-less Post-Stroke
+     Identification Network,” in Proceedings of the 40th International Conference on Advanced
+    Information Networking and Applications (AINA-2026), ser. Lecture Notes in Data
+     Engineering and Communication Technologies (LNDECT), Springer, 2026, pp. 183–194. [CORE
+   Rank B].
+
+  3. V. Kumawat, Y. Sharma, A. Bhatia, and K. Tiwari, “TrPrNet: Early Parkinson Detection
+    Network using Marker-less Gait Analysis,” in Proceedings of the International Conference
+    on Advanced Information Networking and Applications (AINA-2025, Springer, 2025, pp.
+    415–427 [CORE Rank B].
+
+  4. V. Kumawat, S. Jain, V. Vashisth, N. Mittal, and B. K. Jangir, “Design of Controlling Home
+     Appliance Remotely using Raspberry Pi,” in 2017 2nd International Conference for
+    Convergence in Technology (I2CT), IEEE, 2017, pp. 841–845.
+
+  5. V. Kumawat, B. K. Jangir, H. Khatun, and A. K. Sinha, “Computationally Improved Algorithm
+     to Find Higher Roots of Integer Order Bessel Function in Gyrotron Application,” in 2017 2nd
+    International Conference for Convergence in Technology (I2CT), IEEE, 2017, pp.
+     910–914.
+
+  6. B. K. Jangir and V. Kumawat, “Cheap Parking Assist System using 8051 Family,” Annual
+    Technical Volume, Interdisciplinary Coordination Committee, The Institution of
+     Engineers (India), 2017, pp. 57–60.
+
+  7. V. Kumawat et al., “An Interpretable Transformer Framework for Video-based Multiclass Joint
+     Mobility Classification using Pose-Guided Gait Informatics,” Knowledge-Based Systems, 2026,
+    Manuscript No: KNOSYS-D-26-08056. [Under Review]
+
+8. V. Kumawat, Y. Sharma, A. Bhatia, K. Tiwari, and H. M. Pandey, “A Marker-less
+     Transformer-based Framework for Lower-limb Joint Mobility Problem Identification using Gait
+     Videos,” Engineering Applications of Artificial Intelligence, 2025, Manuscript No:
+    EAAI-25-25643. [Major revision submitted]
+
+  9. V. Kumawat, H. M. Pandey, Y. Sharma, A. Bhatia, and K. Tiwari, “Vision-Based Assessment of
+    Lower-Limb Joint Mobility Disorders: A Comprehensive Survey,” ACM Computing Surveys,
+     Association for Computing Machinery, 2026. [Communicated]
+
+Short Term Course / Workshop / FDP
+
+  • 5-Day online FDP on “Inculcating Universal Human Values in Technical Education”, organized
+    by AICTE, 18–22 January 2021.
+
+  • Short Term Course on “Machine Learning with Python”, organised by Dept. of CSE BKBIET,
+     Pilani & TechieNest, IT Services & Consulting Jaipur, 31 August 2019, November 2020.
+
+  • Three Day Workshop on “NBA Accreditation Process”, organized by RTU Kota & BKBIET
+     Pilani, 29–31 August 2020.
+
+  • TEQIP-III Sponsored Two Days Faculty Development Programme on “Research
+    Methodology & LaTeX”, organized by RTU Kota, 7–8 September 2018.
+
+  • 2-Day TEQIP-III Sponsored Workshop on “Outcome Based Education”, organized by RTU
+     Kota, 12–13 April 2018.
+
+  • Five Day Workshop on “Internet of Things”, organized by Dept. of CSE BKBIET, Pilani &
+   BPTRC, Pilani, 23–27 Dec 2016.
+
+Awards, Achievements and Certifications
+
+    International Seminar on Digital Dreamscapes: Youth, AI & Vir-                2026
+  • tual Expression (ISDD 2026)
+    BITS Pilani, in collaboration with MoYAS, Government of India
+       – Organized a three-day international seminar focused on how emerging technologies transform learning,
+          community building, and digital ecosystems. Engaged with keynote lectures and expert-led panel discussions
+           regarding the impact of AI on youth and virtual expression. Gained direct exposure to advanced research
+            infrastructure and interacted with innovators from the BITS startup ecosystem to gain insights into early-stage
+            ventures.
+
+    4th Indian Workshop on Applied Deep Learning (IWADL-2023)                 2023
+  •
+    BITS Pilani, K.K. Birla Goa Campus
+       – Participated in an intensive program covering fundamental and advanced deep learning topics, including
+           hands-on sessions on state-of-the-art architectures and their applications in real-world scenarios.
+
+  • Institute Fellowship for Ph.D., BITS Pilani, 07/09/2021–06/09/2026.                  2021
+
+  • Elite: Machine Learning for Engineering and Science Applications, NPTEL.       2019
+
+  • Elite: Introduction to Internet of Things, NPTEL.                                 2018
+
+    Organizing Committee Member, 3rd International Conference on                2017
+  • Communication Systems (ICCS-2017)
+    B.K. Birla Institute of Engineering & Technology (BKBIET), Pilani
+       – Coordinated the successful execution of the 3rd International Conference on Communication Systems held from
+          October 14–16, 2017. Facilitated technical sessions and logistical arrangements for an international forum
+            featuring original research in Microwave Engineering, Electronic Systems, and Signal Processing. Supported the
+           exchange of concepts between global investigators and scholars, contributing to the publication of proceedings in
+           the “IOP Conference Series: Materials Science and Engineering”.
+
+• Department Prize for Outstanding Teaching in C++, BKBIET, Pilani.             2014
+
+Skills
+
+  • Programming Languages: C/C++, Python.
+
+  • Tools: Jupyter Notebook, Google Colab, VS Code, Anaconda.
+
+  • Courses Taught: C++, Object Oriented Programming (OOP), Embedded Systems, IoT, DBMS,
+    Machine Learning (ML), Operating Systems, Data Structures & Algorithms (DSA).
+
+  • Hardware: Raspberry Pi, Arduino Uno, Micro-Controller 8051, Node MCU.
+
+References
+
+    Dr. Yashvardhan Sharma, Professor & HoD, Dept. of Computer Science & Information
+  •
+    Systems Engineering, BITS Pilani.
+
+       – Email: yash@pilani.bits-pilani.ac.in
+       – Area of Expertise: Advertising Campaign Optimizer, Fake News Detection, Human Action Recognition,
+         Keyword Classification, Machine Learning based Systems, Machine Translation for Low-resource Indic
+           Languages, Natural Language Processing, Question Answering Systems, Sentiment Analysis, Text
+           Summarization.
+
+    Dr. Ashutosh Bhatia, Associate Professor, Dept.  of Computer Science & Information
+  •
+    Systems Engineering, BITS Pilani.
+
+       – Email: ashutosh.bhatia@pilani.bits-pilani.ac.in
+       – Area of Expertise: Body Area Network, Internet of Things, Software Defined Networking and Network
+            Virtualization, Vehicular Adhoc Network, Wireless Sensor Networks.
+
+    Dr. Kamlesh Tiwari, Professor & HoD, Dept. of Computer Science & Engineering, Jain
+  •
+     University, Bangalore.
+
+       – Email: kamlesh.tiwari@jainuniversity.ac.in
+       – Area of Expertise: Deep Learning, Machine Learning, Artificial Intelligence, Computer Vision, Multimodal
+           Biometric (Fingerprint, Face, Palmprint, Knuckleprint), and Security.
+
+    Dr. Gopal Singh Phartiyal, Assistant Professor, Dept. of Computer Science & Infor-
+  •
+    mation Systems Engineering, BITS Pilani.
+
+       – Email: gopal.phartiyal@pilani.bits-pilani.ac.in
+       – Area of Expertise: Earth Observation Imagery and Data Processing, Geospatial Data Science,
+         PolSAR/InSAR Image Processing.

@@ -1,0 +1,275 @@
+APPLICATION FORM FOR FACULTY POSITION ( Round The Year Advertisement )
+
+ ADVT NO : FR_Adv_01_2025
+
+ REGISTRATION NO : LNMIIT/2026/01/11837
+
+APPLICATION FOR THE POST OF Assistant Professor IN LNMIIT International Centre for Artificial
+Intelligence
+
+ SPECIALISATION :Artificial Intelligence and Machine Learning
+
+NAME IN FULL :           Ankita Pandey                                       DOB :  18-Jun-1996       AGE :   30
+
+FATHER'S NAME :     GANGA DUTT PANDEY                  OCCUPATION :       SHOPKEEPER
+
+MOTHER'S NAME       JANKI PANDEY                        OCCUPATION :       HOUSE WIFE
+
+ NATIONALITY :         INDIAN                              PLACE OF BIRTH :      NAINITAL
+
+EMAIL ID :              ankitapandey0595@gmail.com               MOBILE NO. :          7300844084
+
+ GENDER /           FEMALE
+                                                   CATEGORY :        GEN
+ MARITAL STATUS :      Single
+
+ RELIGION :           HINDU                            HUSBAND NAME :
+
+ OTHER CATEGORY    NONE                               OCCUPATION :
+
+Particulars of Educational Qualification
+
+Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of
+               Degree   Specializatio    Area              Institute          University       Passing  Marks           Division   Atempt
+  1   B.Sc.               Mathematics,     Mathematics      Indira         Kumaun        2016     72.00   0.00                       I
+                           Chemistry,             , Chemistry,      Priyadarshini     University,
+                           Physics                         Govt Girls         Nainital,
+                                                Commerce      Uttarakhand,
+                                         PG College,      India
+                                                             Haldwani,
+                                                                          Nainital,
+                                                              Uttarakhand,
+                                                                    India
+  2   M.Sc                      Artificial         Mathematics     College of      G. B. Pant       2018      0.00    7.84                       I
+                           Neural            with             Basic            University of
+                         Network                         Sciences         Agriculture and
+                                                     and             Technology,
+                                                              Humanities,     Pantnagar,
+                                                            Pantnagar,      Uttarakhand,
+                                                              Uttarakhand,     India
+                                                                    India
+  3   Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I
+                        Machine          with             Basic            University of
+                             learning                         Sciences         Agriculture and
+                                                     and             Technology,
+                                                              Humanities,     Pantnagar,
+                                                            Pantnagar,      Uttarakhand,
+                                                              Uttarakhand,     India
+                                                                    India
+
+ 26-Oct-2026                   Reg. No. LNMIIT/2026/01/11837                      11:37:44                 Page 1 of 5
+
+Titles PG / Ph.D.
+
+Sl.No.   Degree                    Title of Thesis                         Guide                           University
+
+  1     PG                   Expert System for Portfolio                  Dr. Arun Kumar                 G. B. Pant University of
+                          Management based on Technical                                                 Agriculture and Technology,
+                                   Indicators using ANN                                                      Pantnagar, Uttarakhand, India
+
+  2     PHD             A Comprehensive Application of             Dr. Arun Kumar                 G. B. Pant University of
+                                           Artificial Intelligence based Hybrid                                                Agriculture and Technology,
+                         Deep Learning in Image                                                   Pantnagar, Uttarakhand, India
+                                    Classification
+
+Details of Experience
+
+Teaching Experience       Total Pre Ph. D. Experience : 0 Yr(s) 0 Month(s)        Total Post Ph. D. Experience : 3 Yr(s).2 Month(s)
+
+   Sl.   Name of the organization                                           Designation       Post Ph. D.     Date of       Date of      Post Ph.D.  Last Pay Band and
+  No.   where employed                                                      Joining       leaving         Exp.    Grade Pay
+
+   1   GLA University, U.P., Mathura,       Assistant                                                         3.02    63000
+                                                         Post        14/08/2023 12/10/2026          India                               Professor
+                                                         Ph.D.
+
+Research Experience                                                                 Total Research Experience :
+   Sl.   Name of the organization where        Designation        Post Ph.D    Date of           Date of          Last Pay Band
+  No.    employed                                                              Joining            leaving         and Grade Pay
+
+   1    NA                        NA            NA                                 NA
+
+Industrial Experience                                                                Toal Experience :
+
+   Sl.   Name of the organization                            Post Ph.D      Date of             Date of           Last Pay Band and
+                                            Designation  No.   where employed                                                      Joining              leaving          Grade Pay
+   1   NA                     NA          NA                                    NA
+
+ 26-Oct-2026                   Reg. No. LNMIIT/2026/01/11837                      11:37:44                 Page 2 of 5
+
+Total Research Publication/Presentation
+
+ Sl.   Conf. / Jou.     Pub. Type /     SCI/
+                                                              Title of Paper     Author1    Author2    Author3   Author4    Name ofNo.   N. / IN.         Year          Non-SCI
+                                                                                                                                 journal      Pub. / Acc.     ISBN No.
+       Valu. No.
+
+ 1     Journal                                              Wavelet guided                                                        Kumar,      Joshi, M.    Pandey,    Tomar,     Engineering                    2026         SCI
+       International                                    multi path                                                                A.                       A.          A.           Applications of
+      Published                                      attention based                                                                                Artificial
+                                                           relational self                                                                     Intelligence
+                                                                 distillation
+                                                       architecture for
+                                                medical image
+                                                 segmentation.
+ 2     Journal                                           Emphasize the      Upreti, H.   Pandey,    Pandey,     Bartwal,    International                    2026         SCI
+       International                                  hybrid                                                                            A.K.         A.          P.          Journal of
+      Published                          ANFIS–PSO and                                                   Hydrogen
+                                           ANFIS-GA-based                                                       Energy.
+                                                       prediction for
+                                          Casson fluid
+                                                      flow with
+                                                 Cattaneo–Christ
+                                             ov heat flux
+                                            between co-axial
+                                                         rotating disks
+ 3     Journal                                    A comparative       Upreti, H.   Pandey,    Pandey,     Bartwal,    International                    2025         SCI
+       International                                  analysis of                                                                            A.K.         A.          P.         Communication
+      Published                                  thermal and                                                           s in Heat and
+                                                 pressure                                                    Mass Transfer
+                                                           distribution in
+                                                         rotating flows of
+                                            von Karman and
+                                           Bodewadt using
+                                                        multivariate
+                                                   regression
+                                                models: A case
+                                                         of machine
+                                                      learning
+                                                 techniques
+ 4     Journal                                                      Discriminative                                                          Pandey,    Kumar, A.                             Biomedical                    2024         SCI
+       International                                  analysis of                                                                 Signal                                                                A.
+      Published                                    Diabetic                                                               Processing and
+                                                 Retinopathy                                                                    Control.
+                                                  using Cascaded
+                                             Network with
+                                           Fundus
+                                               Biomarkers and
+                                                 Atrous
+                                                      convolution.
+ 5     Journal                            An Integrated                                                            Multimedia                    2023        Non                      Pandey,
+       International                             approach for                                                            Tools and                               SCI                         A.
+      Published                                  Breast Cancer                                                                Applications
+                                                          Classification.
+
+ 6     Journal                                           Ensemble           Upreti, H.   Pandey,     Saini, M.    Uddin, Z.   Interactions                    2026        Non
+       International                                learning-based
+                               SCI                                     A.      Published                                      prediction of
+                                               energy and
+                                                exergy
+                                               performance in
+                                                      nanofluid-driven
+                                                     parabolic trough
+                                                       solar collectors.
+
+26-Oct-2026                   Reg. No. LNMIIT/2026/01/11837                      11:37:44                 Page 3 of 5
+
+7     Journal                                         DC-CNN-SE: A      Joshi, M.    Pal, A. K.   Pandey,                    International                    2025        Non
+        International                          Deep                                                                      Journal of                               SCI                                                  A.
+       Published                                   Convolutional                                                             Applied
+                                              Capsule                                                               Mathematics.
+                                              Network with
+                                              Squeeze-and-ex
+                                                             citation and
+                                                bayesian
+                                                      learning for
+                                                   multi-modal mri
+                                                      brain tumor
+                                                             classification.
+ 8     Journal                                                      Facial Emotion                                                          Pandey,    Kumar, A.                    SN Computer                    2022        Non
+        International                                      Intensity: A                                                           Science                               SCI                         A.       Published                                 Fusion Way.
+
+ 9    Conference                                                Optimized           Joshi, M.    Pal, A. K.   Pandey,               2025 Control                    2025       NONE
+        International                                 Transfer                                                                    Instrumentation                                                                                         A.
+       Published                                  Learning with                                                    System
+                                                 Xception for DR                                                      Conference
+                                                  Grading: A Data                                                 (CISCON)
+                                               Augmentation
+                                           and Balancing
+                                             Approach
+ 10    Conference                                                  Casting Fault                                                          Pandey,    Kumar, A.                         2nd Odisha                    2023       NONE
+        International                                 Detection by                                                                     International                                                                 A.
+       Published                           Deep                                                               Conference on
+                                                  Convolution                                                                         Electrical Power
+                                                 Neural                                                                    Engineering,
+                                                 Networks.                                                         Communication
+                                                                                                          and Computing
+                                                                                                                  Technology
+                                                                                                     (ODICON)
+ 11    Conference                                        Deep Features                                                          Pandey,    Kumar, A.                         2022 IEEE                    2022       NONE
+        International                           Based                                                                       Delhi Section                                                                 A.
+       Published                              Automated                                                          Conference
+                                                  Multimodel                                                  (DELCON)
+                                           System for
+                                                         Classification of
+                                              Non-Small Cell
+                                           Lung Cancer.
+
+Total Books Published
+
+Sl No.     Title Of The Book                                  Publisher Name                    Author Name
+
+  1   NA                                  NA                       NA
+
+ Research Projects
+
+ Sl. No.    Title of the Project              Amount in Rs.     Funding Agency        Period      Remarks (Completed/Ongoing)
+
+   1    NA                                            0.00  NA              NA        NA
+
+ No. of PG dissertations/ Ph.D. thesis guided   :         P.G. - NA                                 Ph. D - NA
+
+  Title of Ph. D. Thesis : NA
+
+Patents
+
+Sl No.  Name of patent                                  Year               Organisation
+
+   1    Cascade network model based system for           2023             G. B. Pant University of Agriculture and Technolog
+          binary and
+
+ 26-Oct-2026                   Reg. No. LNMIIT/2026/01/11837                      11:37:44                 Page 4 of 5
+
+Consultant
+
+ Sl. No.    Name Of The Oragnisation                                       Year                          Amount (Rs.)
+
+    1     NA                                            NA                                                      0.00
+
+ (a) Minimum Pay expected: Basic and AGP: 1814569
+
+ (b) Time required to join the institute,If Selected : 1 month
+
+  (i) Memberships/Fellowship and position of responsibility in Professional Societies :
+
+  (ii) Achievements in sports and extra-curricular activities (including N.C.C.) :
+
+ Name and addresses of two professional referees (who are not related to the applicant) who are in a position to testify from
+ their personal knowledge as to the fitness of the applicant for the post applied for :
+
+Sl.No.  Name                            Designation                     Address                            Email ID
+
+  1.     Prof. Arun Kumar                   Professor                         Department of Mathematics,                                                                                             arun_pal1969@yahoo.
+                                                                                              Statistics and Computer
+                                                                                                                      co.in
+                                                                              Science, G. B. Pant university of
+                                                                                      Agriculture and Technology,
+                                                                             Pantnagar, Uttarakhand, India.
+                                                                    87553 90000
+ 2.     Prof. S. B. Singh                    Professor                         Department of Mathematics,
+                                                                                             Statistics and Computer             drsurajbsingh@yahoo.
+                                                                              Science, G. B. Pant university of    com
+                                                                                      Agriculture and Technology,
+                                                                            Pantnagar, Uttarakhand, India.
+                                                                   94121 20731
+
+Institute Refernce
+
+ Name                                                                        Contact Number
+
+    I do hereby solemnly declare that the information given above is correct to the best of my knowledge and belief. with date of
+   final submit and signature with name.
+
+  Date : 13/10/2026
+
+ 26-Oct-2026                   Reg. No. LNMIIT/2026/01/11837                      11:37:44                 Page 5 of 5

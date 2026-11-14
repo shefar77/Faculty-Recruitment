@@ -1,0 +1,237 @@
+Rakesh Suthar
+                      Postdoctoral Researcher, School of Chemistry and Materials Science
+                      College of Science, Rochester Institute of Technology, New York, USA
+
+           Email: rakeshsuthar1996@gmail.com     |   Phone: +1 585 613 2872     |  +91 96678 67784
+                        Website: https://sites.google.com/view/rakeshiitd/home
+                             GitHub: https://github.com/SutharRakesh
+                               ORCID: 0000-0002-3921-2639
+          Semiconductor Devices, Optoelectronics, and Energy Materials
+             AI/ML-Guided Materials and Device Optimization
+
+Academic Profile
+
+Semiconductor-device and optoelectronics researcher specializing in solution-processed organic and perovskite
+materials, photovoltaic devices, and self-powered photodetectors. My research combines semiconductor-device physics,
+thin-film fabrication, optoelectronic characterization, and interpretable machine learning to understand performance-
+limiting mechanisms and guide materials and device optimization. My doctoral work developed data-driven models
+using molecular and structural descriptors and experimentally validated predictions in non-fullerene organic solar
+cells. My postdoctoral research extends this experience to photodetectors, wide-bandgap perovskite photovoltaics,
+radiovoltaic energy conversion, and lightweight photovoltaic devices. I aim to establish an interdisciplinary research
+programme in AI/ML-enabled semiconductor devices for energy, sensing, and optical communication.
+Research output: 20+ peer-reviewed journal publications; 400+ Google Scholar citations; h-index 13; recipient of
+the K. L. Chopra Best Ph.D. Thesis Award.
+
+Education
+
+Doctor of Philosophy in Energy Science and Engineering        September 2020–September 2024
+Indian Institute of Technology Delhi, New Delhi, India
+CGPA: 9.5/10
+Thesis: Unraveling Loss Mechanisms in Non-Fullerene Organic Solar Cells: Integrating Data-Driven Machine
+Learning and Experimental Approaches
+Research focus: Thin-film organic photovoltaics, semiconductor-device physics, two-dimensional materials for
+optoelectronic devices, and machine-learning-guided photovoltaic-materials optimization.
+
+• Produced six first-author publications and multiple co-authored journal articles.
+• Investigated fundamental relationships among exciton dynamics, energetic offsets, disorder, recombination, charge
+   transport, and photovoltaic energy loss.
+• Served as a Teaching Assistant for the course Fundamentals of Energy Engineering over multiple semesters.
+
+Master of Science in Physics                                             July 2016–August 2018
+Jai Narain Vyas University, Jodhpur, India
+CGPA: 8.4/10
+
+Bachelor of Science in Physics, Chemistry, and Mathematics                 July 2013–June 2016
+Lachoo Memorial College of Science & Technology, Jodhpur, India
+Percentage: 74.33%
+
+Professional Experience
+
+Postdoctoral Researcher                                                      April 2025–Present
+Rochester Institute of Technology, New York, USA
+
+• Conducting research under the DARPA-funded Rads to Watts program on perovskite radiovoltaic materials and
+   devices for watt-level power generation.
+• Investigating radiation-to-electrical energy conversion, semiconductor-device architectures, charge-generation
+   mechanisms, and performance-limiting processes in perovskite radiovoltaic systems.
+• Integrating semiconductor fabrication, optoelectronic characterization, stability analysis, radiation-source measure-
+   ments, and data-driven experimental optimization.
+• Applied Bayesian optimization to improve the performance and operational stability of wide-bandgap perovskite
+   solar cells for space-relevant applications.
+• Devloped lightweight thin-film organic photovoltaic devices for space-relevant applications.
+• Contributed to undergraduate and graduate teaching through interdisciplinary instruction, laboratory teaching,
+   student mentoring, and course-related assessment.
+
+Postdoctoral Research Fellow                                 September 2024–February 2025
+Indian Institute of Technology Delhi, New Delhi, India
+
+• Investigated self-powered organic photodetectors for broadband visible-to-near-infrared sensing, secure optical
+   communication, and low-power applications.
+• Developed large-area non-fullerene organic solar cells and solution-processed thin-film photovoltaic devices.
+• Studied semiconductor/dielectric interfaces, charge generation, transient response, responsivity, sensitivity, and
+   device-performance limitations.
+• Research output included three peer-reviewed publications and institutional media coverage of published work.
+
+Junior Research Fellow                                              February 2019–July 2020
+The LNM Institute of Information Technology, Jaipur, India
+
+• Conducted research on polymer and non-fullerene organic semiconductor materials for solution-processed thin-film
+   solar cells.
+• This work formed the foundation of my subsequent doctoral research on non-fullerene organic photovoltaic devices
+   at IIT Delhi.
+
+Research Output and Representative Publications
+
+Selected publication venues: Advanced Functional Materials, Journal of Materials Chemistry A, ACS Applied
+Materials & Interfaces, ACS Applied Nano Materials, Journal of Materials Chemistry C, and Solar Energy.
+Representative publications relevant to the LNMIIT faculty call
+
+1. R. Suthar, T. Abhijith, and S. Karak, “Machine-Learning-Guided Prediction of Photovoltaic Performance for
+   Non-Fullerene Organic Solar Cells Using Novel Molecular and Structural Descriptors,” Journal of Materials
+   Chemistry A, vol. 11, no. 41, 2023, pp. 22248–22258.
+2. S. Singh*, R. Suthar*, A. Tomimatsu, P. Rani, M. M. Matsushita, K. Awaga, and S. Karak, “Ultrafast Highly
+   Sensitive Self-Powered MSIM Photodetector Based on Organic Semiconductor/Dielectric Interfaces for Broadband
+   Visible to Near-Infrared Communication,” Advanced Functional Materials, 2025, Art. no. 2425426. (*Equal
+   contribution)
+3. R. Suthar, T. Abhijith, H. Dahiya, A. K. Singh, G. D. Sharma, and S. Karak, “Role of Exciton Lifetime, Energetic
+   Offsets, and Disorder in Voltage Loss of Bulk Heterojunction Organic Solar Cells,” ACS Applied Materials &
+   Interfaces, vol. 15, 2023, pp. 3214–3223.
+
+Additional selected publications
+
+4. T. Abhijith*, R. Suthar*, and S. Karak, “Synergistic Plasmonic Responses of Multi-Shaped Au Nanostructures
+   Hybridized with Few-Layer WS2 Nanosheets for Organic Solar Cells,” ACS Applied Nano Materials, vol. 6, 2023,
+   pp. 11737–11746. (*Equal contribution)
+5. R. Suthar, T. Abhijith, P. Sharma, and S. Karak, “Machine Learning Framework for the Analysis and Prediction
+    of Energy Loss for Non-Fullerene Organic Solar Cells,” Solar Energy, vol. 250, 2023, pp. 119–127.
+6. R. Suthar, H. Dahiya, S. Karak, and G. D. Sharma, “Indoor Organic Solar Cell for Low-Power IoT Devices:
+   Recent Progress, Challenges, and Application,” Journal of Materials Chemistry C, vol. 11, 2023, pp. 12486–12510.
+7. H. Dahiya, R. Suthar, M. K. Singh, R. Singhal, S. Karak, and G. D. Sharma, “Facile Approach for Efficient
+   Non-Fullerene-Based Binary and Ternary Organic Solar Cells Using Hydrated Vanadium Pentoxide as a Hole
+   Transport Layer,” ACS Applied Energy Materials, vol. 6, 2023, pp. 3442–3451.
+
+Complete publication details are available through my ORCID profile and website.
+
+Proposed Research Programme at LNMIIT
+
+1. AI/ML-Guided Semiconductor Materials and Device Optimization
+Development of interpretable machine-learning and Bayesian-optimization approaches for predicting device perfor-
+mance, identifying performance-limiting parameters, optimizing fabrication conditions, and improving the performance
+and stability of organic and perovskite semiconductor devices. The research will combine experimentally generated
+data, physically meaningful descriptors, model interpretation, and experimental validation.
+
+2. Self-Powered Optoelectronic and Energy Devices
+Development of organic, perovskite, and hybrid semiconductor devices for broadband sensing, optical communication,
+indoor and portable energy harvesting. The research will focus on semiconductor interfaces, charge-generation and
+transport mechanisms, spectral response, response speed, operational stability, lightweight device architectures, and
+scalable thin-film fabrication.
+
+Research Expertise and Technical Skills
+
+Semiconductor devices and fabrication
+
+• Organic and perovskite solar cells, photodetectors, sensors, and radiovoltaic devices.
+• Glovebox processing, spin coating, substrate preparation, interface engineering, thermal evaporation, and multilayer
+   thin-film fabrication.
+• Large-area and solution-processed semiconductor-device fabrication.
+
+Device and materials characterization
+
+• Current-density–voltage measurements under AM1.5 and AM0 illumination, external quantum efficiency, maximum-
+   power-point tracking, and stability testing.
+• Transient photocurrent, transient photovoltage, responsivity, detectivity, response-time, and temperature-dependent
+   measurements.
+• XRD, UV–Vis–NIR absorption, steady-state and time-resolved photoluminescence, and fluorescence spectroscopy.
+• Analysis and interpretation of SEM, TEM, AFM, XPS, and Raman data.
+
+Machine learning and scientific data analysis
+
+• Materials informatics, molecular and structural descriptors, feature engineering, regression, model validation, and
+   interpretation.
+• Bayesian optimization for materials, fabrication processes, and device-performance optimization.
+• Python-based scientific analysis using NumPy, pandas, scikit-learn, and Matplotlib.
+
+Radiovoltaic measurements
+
+• Radiation-source handling, device integration, electrical measurement, and evaluation of radiation-to-electrical
+   energy conversion.
+
+Teaching Experience
+
+Artificial Intelligence for Chemistry
+Co-Instructor, Rochester Institute of Technology, 2025
+Undergraduate and graduate level
+
+• Contributed to interdisciplinary instruction on machine-learning concepts and their applications in chemistry and
+   materials science.
+• Supported lectures, computational demonstrations, course materials, student projects, and assessment.
+• Guided students in applying data-driven methods to chemical and materials-science problems.
+
+General Chemistry Laboratory
+Laboratory Instructor, Rochester Institute of Technology, 2025
+Undergraduate level
+
+• Conducted laboratory sessions and explained experimental principles, procedures, and laboratory-safety require-
+   ments.
+• Supervised student experiments and guided students in data analysis, scientific interpretation, and report
+   preparation.
+• Evaluated student laboratory work and reports.
+
+Fundamentals of Energy Engineering Laboratory
+Teaching Assistant, Indian Institute of Technology Delhi
+Undergraduate level
+
+• Supervised experiments related to energy conversion, materials, and device characterization.
+• Guided students in experimental measurements, data analysis, and scientific interpretation.
+• Assisted with laboratory instruction and assessment.
+
+Student Mentoring
+
+• Mentored two M.Tech. and five B.Tech.  students working on machine-learning applications in organic and
+   perovskite solar cells.
+• Guided students in research-problem formulation, literature review, data organization, feature engineering,
+   machine-learning model development, interpretation, and scientific writing.
+• Supported interdisciplinary projects connecting physics, chemistry, materials science, Artificial Intelligence, and
+   energy technologies.
+
+Awards and Honours
+
+• 2026: Distinction in Doctoral Research, Indian Institute of Technology Delhi.
+• 2025: K. L. Chopra Best Ph.D. Thesis Award, Indian Institute of Technology Delhi, for outstanding doctoral
+   research in thin-film photovoltaic materials and devices.
+• 2024: IRD Early Doc Fellowship, Indian Institute of Technology Delhi.
+• 2020–2024: Junior Research Fellowship and Senior Research Fellowship, Ministry of Education, Government of
+   India.
+• 2019 and 2020: Qualified Joint CSIR–UGC NET-JRF twice, Department of Higher Education, Government of
+   India.
+• 2013–2018: INSPIRE Scholarship for undergraduate and postgraduate studies, Department of Science and
+   Technology, Government of India.
+
+Selected Invited and Conference Presentations
+
+Presented research in 10 invited, seminar, oral, and poster presentations at forums including APL Energy/AIP
+Publishing, Rochester Institute of Technology, IITs, Jawaharlal Nehru University, Tata Institute of Fundamental
+Research, and IEEE ICEE.
+
+1. “Organic Photovoltaics for Space Applications: Toward Ultra-Lightweight Solar Power,” invited talk, 1st Online
+  APL Energy Webinar on Emerging Trends in Applied Energy, May 4, 2026.
+2. “Machine Learning in Energy Materials Discovery and AI in Chemistry Education,” departmental seminar, School
+   of Chemistry and Materials Science, Rochester Institute of Technology, New York, USA, November 18, 2025.
+
+3. “Understanding Performance-Limiting Recombination in Bulk Heterojunction Organic Solar Cells,” oral presenta-
+   tion, International Conference on Materials for Energy and Sustainable Development, Jawaharlal Nehru University,
+  New Delhi, India, October 27–29, 2023.
+
+Courses I Can Teach
+
+• Semiconductor Device Physics.
+• Solid-State Physics.
+• Optoelectronic Materials and Devices.
+• Energy Materials and Devices.
+• Sensors and Photodetectors.
+• Machine Learning for Materials and Devices.
+• Materials Informatics and Data-Driven Materials Discovery.
+
+References
+
+Available upon request.

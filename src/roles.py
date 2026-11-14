@@ -96,6 +96,12 @@ RESEARCH_HEAD = re.compile(
     re.I,
 )
 
+# Research titles that belong to academic training whoever funds them.
+ACADEMIC_TRAINEE = re.compile(
+    r"\b(postdoc\w*|post[- ]doc\w*|doctoral|phd|ph\.d|jrf|srf"
+    r"|junior research fellow|senior research fellow|research scholar)\b",
+    re.I)
+
 # ---------------------------------------------------------------------------
 # 2. Employers
 # ---------------------------------------------------------------------------
@@ -329,6 +335,19 @@ def classify_position(position: dict) -> dict:
 
     if RESEARCH_HEAD.search(context):
         match = RESEARCH_HEAD.search(context)
+        # A research post at an employer that is positively commercial
+        # ("... Private Limited") and shows no academic signal is
+        # industry experience - schema.POSITION_CATEGORIES defines
+        # industry as any non-academic employer. Doctoral and postdoctoral
+        # titles are academic by nature and are never moved.
+        if employer == "commercial" and not ACADEMIC_TRAINEE.search(context):
+            return {
+                "category": "industry",
+                "confidence": "high",
+                "reason": (f"research role ({match.group(0)!r}) at a "
+                           f"commercial employer: {employer_reason}"),
+                "needs_review": False,
+            }
         return {
             "category": "research",
             "confidence": "high",

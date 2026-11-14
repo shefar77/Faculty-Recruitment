@@ -1,0 +1,196 @@
+Dr. Lalita Agrawal                               Contact No: +91-9074522713
+          PhD - Computer Science and Engineering        # lalitaagrawalmits@gmail.com
+              Indian Institute Of Technology Indore            # phd2101201003@iiti.ac.in
+                 https://orcid.org/0009-0003-5776-5194              ç Scopus ID: 57204910788
+       ³ https://scholar.google.com/citations?user=RRZV-L8AAAAJ
+
+Education
+
+ Degree            Department                     Institute/University      CGPA         Year
+  Ph.D.   Computer Science and Engineering     Indian Institute of Technology       8.0    Jan 2022 – Feb 2026
+                                                            Indore, India
+ M.Tech.  Computer Science and Engineering   Maulana Azad National Institute     8.2           2019
+                                                         of Technology Bhopal, India
+   B.E.         Information Technology       Madhav Institute of Technology     7.12          2015
+                                            and Science Gwalior, India
+
+Research Interests
+
+• Internet of Things (IoT)
+• Software-Defined Networks (SDNs)
+• Edge Computing
+• Beyond 5G and 6G Networks
+• Formal Methods (Discrete Event System)
+• Game-Theoretic Applications
+
+Publication
+
+• L. Agrawal and A. Mondal, “Energy-Efficient Bandwidth Orchestration for Industrial IoT in Softwarized 6G Networks,”
+ IEEE Internet of Things Journal, vol. 12, no. 19, pp. 40440-40448, October 2025.
+• L. Agrawal and A. Mondal, “TRON: Traffic Management and Resource Allocation for SDN-Enabled 5G/6G Networks,”
+ in Proceedings of IEEE 31st International Symposium on Local and Metropolitan Area Networks (LANMAN), Lille,
+ France, July 2025.
+• L. Agrawal, A. Mondal, M. S. Obaidat, and E. Harjula, “Delay-Aware Dynamic Resource Orchestration for IoT-Enabled
+ Software-Defined Edge Networks,” International Journal of Communication Systems, Wiley, vol. 38, no. 7, pp. e70072,
+ March 2025.
+• L. Agrawal, A. Mondal, and M. S. Obaidat, “T-RESIN: Throughput-Aware Dynamic Resource Orchestration for IoE-
+ Enabled Software-Defined Edge Networks,” International Journal of Communication Systems, Wiley, vol. 37, no. 12,
+ pp. e5802, April 2024.
+• T. Kumar, J. Partala, T. Nguyen, L. Agrawal, A. Mondal, A. Kumar, I. Ahmad, E. Peltonen, S. Pirttikangas, and E.
+ Harjula, “Secure Edge Intelligence in the 6G Era,” Security and Privacy for 6G Massive IoT, G. Mantas, F. Saghezchi,
+ J. Rodriguez, and V. Sucasas (Eds.), Wiley-VCH Verlag, 2025, pp. 35-52, ISBN(Electronic): 9781119988007.
+• L. Agrawal and N. Tiwari, “Optimized ECDSA algorithm for secure and efficient use in IoT network,” International
+ Journal of Recent Technology and Engineering (IJRTE), Vol. 8 no. 5, pp. 980-984, January 2020.
+• L. Agrawal and N. Tiwari, “A Review on IoT Security Architecture: Attacks, Protocols, Trust Management Issues
+ and Elliptic Curve Cryptography,” in Proceedings of International Conference on Social Networking and Computational
+ Intelligence (SCI-2k19), March 2019.
+
+Work Experience
+
+• Visiting Researcher at the Centre for Wireless Communications - Networks and Systems (CWC-NS), University of
+ Oulu, Finland. (August - September 2023).
+• Junior Research Fellow in CSE Department, IIT Guwahati, Guwahati, Assam. (January 2020 - October 2021).
+• Assistant Professor in IT Department, Parul University, Vadodara, Gujarat. (June - December 2019).
+• Guest Faculty in CSE Department Govt. Polytechnic College, Sheopur, Madhya Pradesh. (July 2015 - May 2016).
+• Internship at Telephone Exchange Office of BSNL, Gwalior, Madhya Pradesh. (May - June 2014).
+
+Technical Skills
+
+• Programming Languages: C, C++, Python, HTML, SQL.
+• Tools/Software:  Mininet Network Emulator, Ryu SDN Controller, NS-3 Simulator, iPerf tool, Wireshark, Cooja
+  Simulator, Cisco Packet Tracer, LaTex.
+• Computer Science Concepts: Computer Networks, Theory of Computation, Database Management System, Data
+  Structures, Design and Analysis of Algorithms.
+
+Teaching Assistant (IIT Indore)
+
+• Computer Programming (CS 103) - Autumn 2025
+• Computer Programming (CS 103) - Autumn 2024
+• Design and analysis of algorithms (CS 204) - Spring 2024
+• Design and analysis of algorithms Lab (CS 254) - Spring 2024
+• Advanced Computer Networks (CS 427/627) - Spring 2023
+• Operating Systems (CS 303)) - Autumn 2022
+• Operating Systems Lab (CS 353) - Autumn 2022
+• Computer Networks (CS 306) - Spring 2022
+• Computer Networks Lab (CS 356) - Spring 2022
+
+Ph.D. Thesis
+
+Title: Resource Orchestration in Software-Defined Edge Networks for IoT
+Supervisor: Dr. Ayan Mondal, IIT Indore.
+Description:  Investigated adaptive resource orchestration mechanisms for Software-Defined Edge Networks (SDENs)
+supporting IoT and Industrial IoT applications in softwarized 5G/6G environments. Designed throughput-aware, delay-
+aware, traffic-adaptive, and energy-efficient SDN-based orchestration frameworks to manage heterogeneous IoT traffic
+under dynamic network conditions. Developed evolutionary game-theoretic and heuristic optimization models to improve
+bandwidth utilization, reduce processing delay, and minimize energy consumption.  Implemented and evaluated the
+proposed frameworks using Mininet, Open vSwitch, and the Ryu SDN controller in scalable edge-enabled IoT scenarios.
+Simulation Tool: Mininet Network Emulator and Ryu SDN Controller
+
+Master Thesis
+
+Title: Optimized ECDSA algorithm for secure and efficient use in IoT network.
+Supervisor: Dr. Namita Tiwari, MANIT Bhopal.
+Description: Developed a lightweight ECDSA-based security mechanism for capability-constrained IoT networks, focusing
+on secure authentication under computational constraints.
+Simulation Tool: Cooja simulator supported by Contiki OS.
+
+Projects
+
+• Formal Methods for Modeling and Verification of Intrusion Detection System in Wireless Networks.
+ (January 2020 - October 2021)
+
+    Supervisor: Prof. Sukumar Nandi (IIT Guwahati), Dr. Chandan Karfa (IIT Guwahati), Prof. Santosh Biswas
+    (IIT Bhilai)
+    Description: Formally modeled the MQTT protocol using Discrete Event Systems to analyze spoofing, replay,
+    man-in-the-middle, and denial-of-service attacks.
+
+• MANIT Surveillance System (October 2017 - March 2019)
+
+    Supervisor: Prof. Nilay Khare, MANIT Bhopal.
+    Description: Developed a sustainable, cost-effective, and eco-friendly security system by integrating the existing
+    safety infrastructure at MANIT with an IoT-based solution to monitor access, detect intrusions, and support
+    prevention of property loss.
+   Hardware Used: Raspberry Pi, PIR Sensor, Pi Camera, Night Vision Camera, RFID Reader and tag, Flame
+    Sensor.
+   Tool and Software Used: Etcher, Twilio, Blynk app.
+
+Presentations/Talks
+
+• Poster Presentation on “TRON: Traffic Management and Resource Allocation for SDN-Enabled 5G/6G Networks,”
+ Research Symposium 4.0, IIT Indore, India, February 13-15, 2026.
+• Invited Talk on “Resource Orchestration in Software-Defined Edge Networks for IoT,” in the IEEE Day 2025 Event
+ organized by IEEE Student Branch IIT Indore, India, October 8, 2025.
+• Presentation on “Delay-Aware Dynamic Resource Orchestration for IoT-Enabled Software-Defined Edge Networks,” in
+ the Young Researcher Forum in the IEEE CIS Summer School on “Emerging Trends in Computational Intelligence,
+ Deep Learning, and Large Language Models,” IIT Indore, India, July 23-25, 2025. (Best Presentation Award)
+• Presentation on “Resource Orchestration in Software-Defined Edge Networks for IoT,” Research Symposium 3.0, IIT
+ Indore, India, March 21-23, 2025.
+• Invited Tutorial Session on “Mininet Network Emulator,” SERB-Funded High-End Workshop on “Internet of Things in
+ Edge Cloud Continuum: Theory and Applications,” IIT Indore, May 25-31, 2024.
+• Presentation on “Resource Orchestration for IoE-Enabled Software-Defined Edge Networks,” Research Symposium 2.0,
+ IIT Indore, India, March 15-16, 2024.
+
+Workshop/Conference participation
+
+• Participant in the 21st International Conference on Information Systems Security (ICISS), IIT Indore, December 16–20,
+ 2025.
+• Participant in a Three-day Workshop on “Internet of Things: Trends and Applications,” Indian Institute of Information
+ Technology (IIIT) Sri City, Chittoor, Andhra Pradesh, India, November 3-5, 2022.
+• Participant in the Third Edition of Webinar on “Next Generation IoT” organized by the Technical Committee on
+ Communications Software:  Special Interest Group on “NFV and SDN Technologies” of the IEEE Communications
+ Society, held on January 21, 2022.
+
+Awards/Recognitions
+
+• Received the Best Presentation Award in the Young Researcher Forum, IEEE CIS Summer School, IIT Indore, July
+ 23-25, 2025.
+• Recipient of International Travel Support (ITS) Award under ANRF-ITS Scheme for presenting the accepted paper in
+ the 31st IEEE International Symposium on Local and Metropolitan Area Networks (LANMAN), Lille, France, July 7-8,
+ 2025.
+• Recipient of Institute Doctoral Fellowship (MHRD), Government of India, for Ph.D. at Indian Institute of Technology
+ Indore, 2022-2026.
+• Secured GATE AIR 1826 with GATE SCORE of 600 in Computer Science stream, 2017.
+• Rewarded for academic excellence in Class 12th by the Chief Minister of Madhya Pradesh, 2010.
+• Secured 1st Rank in Class 11th in the Mathematics stream at School, 2009.
+• Won 1st Prize in the Vadik Math Competition at the State Level (Classes 8th and 9th), 2005-2006.
+• Won 2nd Prize in the Vadik Math Competition at the State Level (Class 5th), 2002.
+
+Extra-Curricular
+
+• Volunteer and Event Host Head, Research Symposium 3.0, IIT Indore, India, March 21-23, 2025.
+• Participated in the interactive visit to Science and Research institutions of Dehradun under the “Vigyan Manthan
+ Yatra-Mission Excellence Programme” organized by MP Council of Science and Technology, Bhopal, December 17-26,
+ 2009.
+• Won 1st Prize in Group dance at the District Level Competition, 2006.
+
+Personal Interests
+
+• Teaching, Dancing, River Rafting, Reading mythological books.
+• To take active part in cultural program.
+
+References
+
+• Dr. Ayan Mondal
+ Assistant Professor, Department of Computer Science Engineering
+ Indian Institute of Technology Indore, India.
+ Email: ayanm@iiti.ac.in
+
+• Dr. Erkki Harjula
+ Associate professor, Faculty of Information Technology and Electrical Engineering
+ University of Oulu, Finland
+ Email: erkki.harjula@oulu.fi
+
+• Prof. Santosh Biswas
+ Professor, Department of Electrical Engineering and Computer Science
+ Indian Institute of Technology Bhilai, India.
+ Email: santosh@iitbhilai.ac.in
+
+• Prof. Sukumar Nandi
+ Senior Professor, Department of Computer Science and Engineering
+ Indian Institute of Technology Guwahati, India.
+ Email: sukumar@iitg.ac.in
+
+• Dr. Namita Tiwari
+ Assistant Professor, Department of Computer Science and Engineering
+ Maulana Azad National Institute of Technology Bhopal, India.
+ Email: namitatiwari@manit.ac.in

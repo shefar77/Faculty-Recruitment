@@ -1,0 +1,342 @@
+{
+  "candidate_id": "Candidate_02",
+  "extracted_at": "2026-11-14T12:29:27+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Ankita Pandey",
+      "evidence": "NAME IN FULL :           Ankita Pandey"
+    },
+    "email": {
+      "value": "ankitapandey0595@gmail.com",
+      "evidence": "EMAIL ID :              ankitapandey0595@gmail.com"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I"
+    },
+    "phd_status": {
+      "value": "pursuing",
+      "evidence": "Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I"
+    },
+    "phd_institution": {
+      "value": "G. B. Pant University of Agriculture and Technology",
+      "evidence": "Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I"
+    },
+    "phd_start_year": {
+      "value": 2023,
+      "evidence": "Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I"
+    },
+    "phd_year": {
+      "value": null,
+      "evidence": "Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I"
+    },
+    "phd_subject": {
+      "value": "Deep learning,    Mathematics",
+      "evidence": "Ph.D.            Deep learning,    Mathematics     College of      G. B. Pant       2023      0.00    8.93                       I"
+    },
+    "masters_degree": {
+      "value": null,
+      "evidence": null
+    },
+    "masters_institution": {
+      "value": null,
+      "evidence": null
+    },
+    "masters_year": {
+      "value": null,
+      "evidence": null
+    },
+    "masters_subject": {
+      "value": null,
+      "evidence": null
+    },
+    "bachelors_degree": {
+      "value": "B.Sc.",
+      "evidence": "1   B.Sc.               Mathematics,     Mathematics      Indira         Kumaun        2016     72.00   0.00                       I"
+    },
+    "bachelors_institution": {
+      "value": "Kumaun University, Nainital",
+      "evidence": "1   B.Sc.               Mathematics,     Mathematics      Indira         Kumaun        2016     72.00   0.00                       I"
+    },
+    "bachelors_year": {
+      "value": 2016,
+      "evidence": "1   B.Sc.               Mathematics,     Mathematics      Indira         Kumaun        2016     72.00   0.00                       I"
+    },
+    "bachelors_subject": {
+      "value": "Mathematics",
+      "evidence": "1   B.Sc.               Mathematics,     Mathematics      Indira         Kumaun        2016     72.00   0.00                       I"
+    },
+    "research_area": {
+      "value": "Artificial Intelligence and Machine Learning",
+      "evidence": "SPECIALISATION :Artificial Intelligence and Machine Learning"
+    },
+    "positions": [
+      {
+        "title": "Assistant",
+        "organisation": "GLA University, U.P., Mathura, India",
+        "category": "teaching",
+        "start_date": "2023-08",
+        "end_date": "2026-10",
+        "is_current": false,
+        "evidence": "1   GLA University, U.P., Mathura,       Assistant                                                         3.02    63000\n                                                         Post        14/08/2023 12/10/2026          India                               Professor\n                                                         Ph.D.",
+        "source_section": "Details of Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Wavelet guided multi path attention based relational self distillation architecture for medical image segmentation.",
+      "authors": [
+        "Kumar, A.",
+        "Joshi, M.",
+        "Pandey, A.",
+        "Tomar, A."
+      ],
+      "year": 2026,
+      "venue": "Engineering Applications of Artificial Intelligence",
+      "doi": null,
+      "status": "published",
+      "evidence": "Wavelet guided multi path attention based relational self distillation architecture for medical image segmentation. Published in Engineering Applications of Artificial Intelligence, 2026."
+    },
+    {
+      "title": "Emphasize the hybrid ANFIS–PSO and ANFIS-GA-based prediction for Casson fluid flow with Cattaneo–Christov heat flux between co-axial rotating disks.",
+      "authors": [
+        "Upreti, H.",
+        "Pandey, A.",
+        "Pandey, A.",
+        "Bartwal, P."
+      ],
+      "year": 2026,
+      "venue": "International Journal of Hydrogen Energy",
+      "doi": null,
+      "status": "published",
+      "evidence": "Emphasize the hybrid ANFIS–PSO and ANFIS-GA-based prediction for Casson fluid flow with Cattaneo–Christov heat flux between co-axial rotating disks. Published in International Journal of Hydrogen Energy, 2026."
+    },
+    {
+      "title": "A comparative analysis of thermal and pressure distribution in rotating flows of von Karman and Bodewadt using multivariate regression models: A case of machine learning techniques.",
+      "authors": [
+        "Upreti, H.",
+        "Pandey, A.",
+        "Pandey, A.",
+        "Bartwal, P."
+      ],
+      "year": 2025,
+      "venue": "International Journal of Heat and Mass Transfer",
+      "doi": null,
+      "status": "published",
+      "evidence": "A comparative analysis of thermal and pressure distribution in rotating flows of von Karman and Bodewadt using multivariate regression models: A case of machine learning techniques. Published in International Journal of Heat and Mass Transfer, 2025."
+    },
+    {
+      "title": "Discriminative analysis of Diabetic Retinopathy using Cascaded Network with Fundus Biomarkers and Atrous convolution.",
+      "authors": [
+        "Pandey, A.",
+        "Kumar, A."
+      ],
+      "year": 2024,
+      "venue": "Biomedical Signal Processing and Control",
+      "doi": null,
+      "status": "published",
+      "evidence": "Discriminative analysis of Diabetic Retinopathy using Cascaded Network with Fundus Biomarkers and Atrous convolution. Published in Biomedical Signal Processing and Control, 2024."
+    },
+    {
+      "title": "An Integrated approach for Breast Cancer Classification.",
+      "authors": [
+        "Pandey, A."
+      ],
+      "year": 2023,
+      "venue": "Multimedia Tools and Applications",
+      "doi": null,
+      "status": "published",
+      "evidence": "An Integrated approach for Breast Cancer Classification. Published in Multimedia Tools and Applications, 2023."
+    },
+    {
+      "title": "Ensemble learning-based energy and exergy performance prediction of nanofluid-driven parabolic trough solar collectors.",
+      "authors": [
+        "Upreti, H.",
+        "Pandey, A.",
+        "Saini, M.",
+        "Uddin, Z."
+      ],
+      "year": 2026,
+      "venue": null,
+      "doi": null,
+      "status": "published",
+      "evidence": "Ensemble learning-based energy and exergy performance prediction of nanofluid-driven parabolic trough solar collectors. Published, 2026."
+    },
+    {
+      "title": "DC-CNN-SE: A Deep Convolutional Capsule Network with Squeeze-and-excitation and Bayesian learning for multi-modal MRI brain tumor classification.",
+      "authors": [
+        "Joshi, M.",
+        "Pal, A. K.",
+        "Pandey, A."
+      ],
+      "year": 2025,
+      "venue": "Journal of Applied Mathematics and Computational Intelligence",
+      "doi": null,
+      "status": "published",
+      "evidence": "DC-CNN-SE: A Deep Convolutional Capsule Network with Squeeze-and-excitation and Bayesian learning for multi-modal MRI brain tumor classification. Published in Journal of Applied Mathematics and Computational Intelligence, 2025."
+    },
+    {
+      "title": "Facial Emotion Intensity: A Fusion Way.",
+      "authors": [
+        "Pandey, A.",
+        "Kumar, A."
+      ],
+      "year": 2022,
+      "venue": "SN Computer Science",
+      "doi": null,
+      "status": "published",
+      "evidence": "Facial Emotion Intensity: A Fusion Way. Published in SN Computer Science, 2022."
+    },
+    {
+      "title": "Optimized Transfer Learning with Xception for DR Grading: A Data Augmentation and Balancing Approach.",
+      "authors": [
+        "Joshi, M.",
+        "Pal, A. K.",
+        "Pandey, A."
+      ],
+      "year": 2025,
+      "venue": null,
+      "doi": null,
+      "status": "unknown",
+      "evidence": "Optimized Transfer Learning with Xception for DR Grading: A Data Augmentation and Balancing Approach. (CISCON) Conference, 2025."
+    },
+    {
+      "title": "Casting Fault Detection by Deep Convolutional Neural Networks.",
+      "authors": [
+        "Pandey, A.",
+        "Kumar, A."
+      ],
+      "year": 2023,
+      "venue": null,
+      "doi": null,
+      "status": "unknown",
+      "evidence": "Casting Fault Detection by Deep Convolutional Neural Networks. (ODICON) International Conference on Electrical Power, Communication and Computing Technology, 2023."
+    },
+    {
+      "title": "Deep Features Based Automated Multimodel System for Classification of Non-Small Cell Lung Cancer.",
+      "authors": [
+        "Pandey, A.",
+        "Kumar, A."
+      ],
+      "year": 2022,
+      "venue": null,
+      "doi": null,
+      "status": "unknown",
+      "evidence": "Deep Features Based Automated Multimodel System for Classification of Non-Small Cell Lung Cancer. (DELCON) 2022 IEEE Delhi Section Conference, 2022."
+    }
+  ],
+  "patents": [
+    {
+      "title": "Cascade network model based system for binary and",
+      "inventors": [
+        "Ankita Pandey"
+      ],
+      "number": null,
+      "status": "unknown",
+      "year": 2023,
+      "jurisdiction": "G. B. Pant University of Agriculture and Technology, Pantnagar, Uttarakhand, India",
+      "evidence": "Sl No.  Name of patent                                  Year               Organisation\n   1    Cascade network model based system for           2023             G. B. Pant University of Agriculture and Technolog\n          binary and"
+    }
+  ],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3994,
+      "output_tokens": 818,
+      "seconds": 134.0,
+      "load_seconds": 0.01,
+      "prefill_seconds": 7.03,
+      "decode_seconds": 124.6,
+      "truncated": false,
+      "called_at": "2026-11-14T12:22:25+00:00",
+      "prompt_sha": "0c91fb9acd25d332"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "skipped: CV contains no NET/SET/SLET token",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T12:24:39+00:00",
+      "prompt_sha": ""
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 2129,
+      "output_tokens": 151,
+      "seconds": 24.8,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T12:24:39+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3268,
+      "output_tokens": 1440,
+      "seconds": 230.2,
+      "load_seconds": 0.01,
+      "prefill_seconds": 6.0,
+      "decode_seconds": 222.07,
+      "truncated": false,
+      "called_at": "2026-11-14T12:25:04+00:00",
+      "prompt_sha": "45d9226a93bac65c"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3252,
+      "output_tokens": 143,
+      "seconds": 33.0,
+      "load_seconds": 0.01,
+      "prefill_seconds": 5.99,
+      "decode_seconds": 24.72,
+      "truncated": false,
+      "called_at": "2026-11-14T12:28:54+00:00",
+      "prompt_sha": "54aebaf367062667"
+    }
+  },
+  "source_sha256": "a6527261689f1fa572463b834315f6513184333ecfdb6820fd997ad4055263d5"
+}

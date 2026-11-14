@@ -49,6 +49,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import schema  # noqa: E402  (local spec module)
 import roles   # noqa: E402  the shared role taxonomy
+import education_parse  # noqa: E402  rule-based reading of degree lines
+import research_profiles  # noqa: E402  ORCID / Scholar / Scopus links
 
 # How close a string must be to count as "present in the source".
 # 1.0 would fail on a single stray space; this tolerates whitespace and
@@ -65,6 +67,8 @@ FREE_TEXT_FIELDS = (
 NUMERIC_FIELDS = ("phd_start_year", "phd_year", "masters_year",
                   "bachelors_year")
 CLASSIFICATION_FIELDS = ("highest_degree", "phd_status")
+DEGREE_NAME_FIELDS = {"masters_degree": "masters",
+                      "bachelors_degree": "bachelors"}
 ELIGIBILITY_FLAG_FIELDS = ("net_qualified",)
 
 # A NET/SET claim is the only extracted field that can single-handedly
@@ -126,11 +130,14 @@ DOCTORATE_HINT = re.compile(
 # is already written out in cross_check_thesis_submitted below; it simply
 # was never applied here.
 
+# Matched against NORMALISED text, so a space or the string edge stands in
+# for a word boundary. Without one, "present" fired inside "presented" and
+# "representative" - ordinary words in a publication line below a degree.
 PHD_IN_PROGRESS_HINT = re.compile(
-    "(research scholar|phd scholar|ph d scholar|doctoral scholar|"
+    "(^| )(research scholar|phd scholar|ph d scholar|doctoral scholar|"
     "pursuing|perusing|ongoing|in progress|continuing|"
     "thesis submitted|under submission|under evaluation|under examination|"
-    "present|till date|to date|expected|anticipated|awaiting|not yet)"
+    "present|till date|to date|expected|anticipated|awaiting|not yet)( |$)"
 )
 
 # A doctorate awarded within two years of starting is not credible; it
@@ -340,6 +347,184 @@ def cross_check_thesis_submitted(results: list[dict]) -> list[str]:
     return notes
 
 
+# ---------------------------------------------------------------------------
+# Reconciling the model's degree fields with the CV's own degree lines
+# ---------------------------------------------------------------------------
+# The model's reading of qualifications is checked against education_parse,
+# which reads the degree lines directly. Where the model left a field
+# empty, or gave a value that failed traceability, the parser's value is
+# used - quoted from the CV, with the degree line as its evidence and the
+# reason recorded. Where the model's value is traceable it is KEPT; the
+# parser fills gaps, it does not overrule good reads.
+#
+# One correction runs in the other direction on purpose. The model
+# repeatedly called a doctorate whose own entry closes in a past year
+# "pursuing" - "September 2020 - September 2024", "Year of Passing 2023" -
+# and an unfinished doctorate scores zero. The parser concludes completion
+# from the entry itself (schema: no keyword such as "awarded" is
+# required), so a "pursuing" contradicted by a closed, past period with no
+# in-progress wording is corrected to "awarded". The reverse - an
+# "awarded" contradicted by in-progress wording in the entry - withholds
+# the claim, as cross_check_doctorate always has.
+
+EDUCATION_PREFIX = {"doctorate": "phd", "masters": "masters",
+                    "bachelors": "bachelors"}
+_USABLE = ("verified", "partial")
+
+
+def reconcile_education(results: list[dict], source_text: str,
+                        as_of=None) -> tuple[list[str], list[str]]:
+    """
+    Fill and correct degree fields from the CV's degree lines.
+
+    Returns (notes, contradictions). Contradictions are claims of an
+    award that the CV's own entry contradicts; they route to review.
+    Mutates `results` in place.
+    """
+    entries = education_parse.parse_education(source_text, as_of)
+    by_field = {r["field"]: r for r in results}
+    notes: list[str] = []
+    contradictions: list[str] = []
+
+    def usable(name: str) -> bool:
+        row = by_field.get(name) or {}
+        return row.get("status") in _USABLE and \
+            row.get("value") not in (None, "", [])
+
+    def fill(name: str, value, entry, why: str, **extra) -> None:
+        row = by_field.get(name)
+        if row is None:
+            row = {"field": name}
+            results.append(row)
+            by_field[name] = row
+        before = row.get("value")
+        row.update({"value": value, "evidence": entry.line,
+                    "status": "verified", "evidence_in_source": True,
+                    "source": "cv_rule_parser", "detail": why, **extra})
+        if before not in (None, "", value):
+            row["corrected_from"] = before
+        notes.append(f"{name}: {why}")
+
+    def entry_for(level: str):
+        """The CV entry behind the model's degree, else the best one."""
+        pool = [e for e in entries if e.level == level]
+        stated = (by_field.get(f"{EDUCATION_PREFIX[level]}_degree") or {})
+        if usable(f"{EDUCATION_PREFIX[level]}_degree"):
+            name = normalise(str(stated.get("value")))
+            same = [e for e in pool if name and name in normalise(e.line)]
+            if same:
+                return education_parse.best_entry(same, level)
+            return pool[0] if len(pool) == 1 else None
+        return education_parse.best_entry(entries, level)
+
+    # --- bachelor's and master's -----------------------------------------
+    for level in ("masters", "bachelors"):
+        entry = entry_for(level)
+        if not entry:
+            continue
+        prefix = EDUCATION_PREFIX[level]
+        source = f"the CV's education entry {entry.line[:70]!r}"
+        if not usable(f"{prefix}_degree"):
+            fill(f"{prefix}_degree", entry.name, entry,
+                 f"read from {source}; the extracted value was missing or "
+                 f"could not be traced to the CV")
+        if not usable(f"{prefix}_institution") and entry.institution:
+            fill(f"{prefix}_institution", entry.institution, entry,
+                 f"read from {source}")
+        if not usable(f"{prefix}_subject") and entry.subject:
+            fill(f"{prefix}_subject", entry.subject, entry,
+                 f"read from {source}")
+        if not usable(f"{prefix}_year") and entry.status == "completed":
+            fill(f"{prefix}_year", entry.year, entry,
+                 f"{entry.basis} ({source})")
+
+    # --- the doctorate ---------------------------------------------------
+    entry = education_parse.best_entry(entries, "doctorate")
+    if not entry:
+        return notes, contradictions
+
+    source = f"the CV's doctorate entry {entry.line[:70]!r}"
+    status_row = by_field.get("phd_status") or {}
+    stated = status_row.get("value") if usable("phd_status") else None
+
+    if entry.status == "completed":
+        corroboration = education_parse.doctorate_corroboration(source_text)
+        extra = {"completion_basis": entry.basis,
+                 "corroboration": corroboration,
+                 "needs_confirmation": (entry.needs_confirmation
+                                        or not corroboration)}
+        if stated == "thesis_submitted":
+            pass    # the stated stage wins over an inference from dates
+        elif stated == "awarded":
+            if not usable("phd_year"):
+                fill("phd_year", entry.year, entry, f"{entry.basis} ({source})")
+        else:
+            fill("phd_status", "awarded", entry,
+                 f"completed: {entry.basis} ({source})"
+                 + (f"; supported by: {'; '.join(corroboration)}"
+                    if corroboration else
+                    "; no other context in the CV corroborates the "
+                    "completion, so please confirm"), **extra)
+            fill("phd_year", entry.year, entry, f"{entry.basis} ({source})")
+
+        # A single year in a "Year of Passing" column is not a start year.
+        start_row = by_field.get("phd_start_year") or {}
+        if entry.single_year and start_row.get("value") == entry.year:
+            start_row.update({"corrected_from": entry.year, "value": None,
+                              "status": "absent",
+                              "detail": (f"cleared: {entry.year} is the year "
+                                         f"of passing in {source}, not a "
+                                         f"start year")})
+            notes.append(f"phd_start_year: {start_row['detail']}")
+        elif entry.start and not usable("phd_start_year"):
+            fill("phd_start_year", entry.start[0], entry,
+                 f"start of the period printed in {source}")
+
+        if not usable("highest_degree") or \
+                by_field["highest_degree"].get("value") != "phd":
+            fill("highest_degree", "phd", entry,
+                 f"the CV's own entry shows a completed doctorate ({source})")
+
+    elif entry.status == "thesis_submitted":
+        if stated in (None, "pursuing", "awarded"):
+            fill("phd_status", "thesis_submitted", entry,
+                 f"{entry.basis} ({source}); the award is NOT treated as "
+                 f"conferred")
+            year_row = by_field.get("phd_year") or {}
+            if year_row.get("value") is not None:
+                year_row.update({"corrected_from": year_row["value"],
+                                 "value": None, "status": "absent",
+                                 "detail": "cleared: the thesis is submitted, "
+                                           "so no award year exists yet"})
+        if not usable("highest_degree"):
+            fill("highest_degree", "phd_submitted", entry,
+                 f"{entry.basis} ({source})")
+
+    elif entry.status == "pursuing":
+        if stated == "awarded":
+            note = (f"doctorate reported as awarded, but {source} reads "
+                    f"{entry.markers[0] if entry.markers else 'as unfinished'!r}"
+                    f" ({entry.basis}). Award not confirmed - routed to human "
+                    f"review.")
+            status_row.update({"status": "unverified", "detail": note,
+                               "cross_check_failed": True})
+            contradictions.append(note)
+        elif stated is None:
+            fill("phd_status", "pursuing", entry, f"{entry.basis} ({source})")
+        if not usable("highest_degree"):
+            fill("highest_degree", "phd_pursuing", entry,
+                 f"{entry.basis} ({source})")
+
+    if entry.status in ("completed", "thesis_submitted", "pursuing"):
+        if not usable("phd_institution") and entry.institution:
+            fill("phd_institution", entry.institution, entry,
+                 f"read from {source}")
+        if not usable("phd_subject") and entry.subject:
+            fill("phd_subject", entry.subject, entry, f"read from {source}")
+
+    return notes, contradictions
+
+
 def _ends_the_entry(line_norm: str) -> bool:
     """A blank line or a section heading closes the entry above it."""
     if not line_norm.strip():
@@ -420,7 +605,7 @@ def cross_check_doctorate(results: list[dict], source_text: str) -> list[dict]:
     marker = PHD_IN_PROGRESS_HINT.search(doctorate_context(results, source_text))
     if marker:
         reasons.append(f"the doctorate's own entry in the CV reads "
-                       f"{marker.group(0)!r}, which describes a degree still "
+                       f"{marker.group(2)!r}, which describes a degree still "
                        f"in progress")
 
     start = (by_field.get("phd_start_year") or {}).get("value")
@@ -473,7 +658,93 @@ def normalise(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def appears_in(needle: str, haystack_norm: str) -> tuple[bool, float]:
+# ---------------------------------------------------------------------------
+# Text laid out in table columns
+# ---------------------------------------------------------------------------
+# Application-form CVs print publications and qualifications in grids whose
+# cells wrap. Extracted as text, one title becomes
+#
+#     Facial Emotion          Pandey,   Kumar, A.     SN Computer   2022
+#     Intensity: A            Science   SCI   Published
+#     Fusion Way.
+#
+# Every word of the title is in the CV, in order, with other columns'
+# words between them. A substring or sliding-window test can never match
+# that, and every such entry was zeroed as "title could not be found in
+# the CV" - genuine papers, several already confirmed by OpenAlex with
+# the candidate as author.
+#
+# So a second test reads the words IN ORDER, allowing other words between
+# them within a bounded span. It also repairs the one corruption PDF text
+# extraction routinely introduces inside words: a dropped ligature
+# ("Di!erences" for "Differences" reads as "di erences").
+#
+# It is a fallback, never the first test, and it is bounded so a title
+# cannot be assembled from words scattered across a page: the span is a
+# fixed multiple of the title's length, and only values with enough
+# distinctive words are eligible.
+
+_STOPWORDS = frozenset(
+    "a an the of and in on for to with by at from using its is or as via "
+    "into based towards toward".split())
+_LIGATURES = ("", "ff", "fi", "fl", "ffi", "ffl")
+SCATTER_SPAN_PER_WORD = 10
+SCATTER_SPAN_BASE = 15
+# Reported as the score of a column-scattered match, so the audit shows a
+# value was placed by the ordered-words test rather than read verbatim.
+SCATTERED_MATCH_SCORE = 0.89
+
+
+def _token_matches(word: str, tokens: list[str], i: int) -> int:
+    """How many source tokens `word` consumes at position i (0 = no match)."""
+    tok = tokens[i]
+    if tok == word:
+        return 1
+    if i + 1 < len(tokens) and len(tok) >= 2 and word.startswith(tok):
+        nxt = tokens[i + 1]
+        for lig in _LIGATURES:
+            if tok + lig + nxt == word:
+                return 2
+    if len(word) >= 6 and abs(len(word) - len(tok)) <= 2 and tok[:1] == word[:1]:
+        import difflib
+        if difflib.SequenceMatcher(None, word, tok).ratio() >= 0.85:
+            return 1
+    return 0
+
+
+def appears_scattered(needle: str, haystack_norm: str,
+                      min_content_words: int = 3) -> bool:
+    """
+    True when the needle's distinctive words occur in order within a
+    bounded span of the source, other columns' words allowed between.
+    """
+    words = normalise(needle).split()
+    content = [w for w in words if len(w) >= 3 and w not in _STOPWORDS]
+    if len(content) < min_content_words:
+        return False
+    tokens = haystack_norm.split()
+    max_span = SCATTER_SPAN_PER_WORD * len(words) + SCATTER_SPAN_BASE
+    for start in range(len(tokens)):
+        if not _token_matches(content[0], tokens, start):
+            continue
+        i, matched = start, 0
+        for word in content:
+            while i < len(tokens) and i - start <= max_span:
+                used = _token_matches(word, tokens, i)
+                i += used or 1
+                if used:
+                    matched += 1
+                    break
+            else:
+                break
+        if matched == len(content):
+            return True
+    return False
+
+
+def appears_in(needle: str, haystack_norm: str,
+               allow_scattered: bool = False,
+               min_content_words: int = 3) -> tuple[bool, float]:
     """
     Is `needle` present in the normalised source?
 
@@ -481,7 +752,21 @@ def appears_in(needle: str, haystack_norm: str) -> tuple[bool, float]:
     the needle's length over the haystack and take the best similarity - a
     model that drops one word from a long institution name should not be
     branded a fabricator.
+
+    `allow_scattered` adds the table-column test above as a last resort,
+    for values that are themselves CV text (titles, institutions) - never
+    for evidence quotations, which must be verbatim.
     """
+    found, score = _appears_contiguous(needle, haystack_norm)
+    if found or not allow_scattered:
+        return found, score
+    if appears_scattered(needle, haystack_norm, min_content_words):
+        return True, SCATTERED_MATCH_SCORE
+    return False, score
+
+
+def _appears_contiguous(needle: str, haystack_norm: str) -> tuple[bool, float]:
+    """The substring and sliding-window tests."""
     n = normalise(needle)
     if not n:
         return False, 0.0
@@ -620,12 +905,40 @@ def check_scalar(name: str, wrapper, source_norm: str,
         return result
 
     # free_text
-    val_ok, val_score = appears_in(value, source_norm)
+    # Institutions and subjects are CV text that a table may split across
+    # columns; two distinctive words in order are enough to place them.
+    scattered = name.endswith(("_institution", "_subject"))
+    val_ok, val_score = appears_in(value, source_norm,
+                                   allow_scattered=scattered,
+                                   min_content_words=2)
     result["value_in_source"] = val_ok
     result["value_score"] = val_score
+
+    # A degree NAME the extractor normalised ("btech" for a CV that prints
+    # "B.E.") or replaced with the vocabulary word ("masters") is not in
+    # the CV, but the qualification it stands for is - in the very span
+    # it quoted. Reading the name from that span recovers the real value
+    # without inventing one. This used to happen only at scoring time, by
+    # which point this function had already deleted the span it needed.
+    if not val_ok and name in DEGREE_NAME_FIELDS and ev_ok:
+        token = education_parse.find_degree_token(evidence,
+                                                  DEGREE_NAME_FIELDS[name])
+        if token:
+            result.update({
+                "value": token, "corrected_from": value,
+                "status": "verified", "value_in_source": True,
+                "detail": (f"the extractor returned {value!r}, which the CV "
+                           f"does not print; the qualification named in its "
+                           f"own quoted span is {token!r}, so that is used"),
+            })
+            return result
+
     result["status"] = "verified" if val_ok else "unverified"
     result["detail"] = ("" if val_ok
                         else f"value not found in the CV (best match {val_score})")
+    if val_ok and val_score == SCATTERED_MATCH_SCORE:
+        result["detail"] = ("placed in the CV word by word across table "
+                            "columns rather than as one run of text")
     return result
 
 
@@ -784,7 +1097,9 @@ def check_publication(index: int, pub: dict, source_norm: str,
     title = pub.get("title") or ""
     evidence = pub.get("evidence") or ""
 
-    title_ok, title_score = appears_in(title, source_norm) if title else (False, 0.0)
+    # Titles may be split across the columns of a publication table.
+    title_ok, title_score = (appears_in(title, source_norm, allow_scattered=True)
+                             if title else (False, 0.0))
     has_span = bool(evidence.strip())
     ev_ok, ev_score = (appears_in(evidence, source_norm) if has_span
                        else (False, 0.0))
@@ -1029,14 +1344,19 @@ def check_positions(positions: list, source_norm: str) -> tuple[list, list]:
         organisation = position.get("organisation")
         evidence = position.get("evidence") or ""
 
-        title_ok, title_score = appears_in(title, source_norm) if title else (False, 0.0)
+        title_ok, title_score = (appears_in(title, source_norm,
+                                            allow_scattered=True,
+                                            min_content_words=2)
+                                 if title else (False, 0.0))
         if not title_ok:
             issues.append(f"position[{index}] title {title!r} not found in CV "
                           f"(best {title_score})")
             entry["title_unverified"] = True
 
         if organisation:
-            org_ok, org_score = appears_in(organisation, source_norm)
+            org_ok, org_score = appears_in(organisation, source_norm,
+                                           allow_scattered=True,
+                                           min_content_words=2)
             if not org_ok:
                 issues.append(f"position[{index}] organisation {organisation!r} "
                               f"not found in CV (best {org_score})")
@@ -1049,6 +1369,15 @@ def check_positions(positions: list, source_norm: str) -> tuple[list, list]:
         cleaned.append(entry)
 
     return cleaned, issues
+
+
+_PLACEHOLDER = re.compile(r"^\s*(n\s*/?\s*a\.?|nil|none|not applicable|-+)?\s*$",
+                          re.I)
+
+
+def _is_placeholder(value) -> bool:
+    """Empty, or an application form's 'NA' / 'Nil' / '-' filler."""
+    return value is None or bool(_PLACEHOLDER.match(str(value)))
 
 
 def _patent_key(patent: dict) -> str:
@@ -1085,6 +1414,11 @@ def check_patents(patents: list, source_norm: str) -> list[dict]:
             continue
         title = patent.get("title") or ""
         evidence = patent.get("evidence") or ""
+        # An application form's empty row ("1   NA   NA   NA") is the CV
+        # saying there is NO patent. Listing it as an excluded patent told
+        # the reviewer a claim had been made and rejected.
+        if _is_placeholder(title) and _is_placeholder(patent.get("number")):
+            continue
         status = (patent.get("status") or "unknown").lower()
         if status not in schema.PATENT_STATUSES:
             status = "unknown"
@@ -1092,7 +1426,8 @@ def check_patents(patents: list, source_norm: str) -> list[dict]:
         exclusions: list[str] = []
         issues: list[str] = []
 
-        title_ok, title_score = (appears_in(title, source_norm) if title
+        title_ok, title_score = (appears_in(title, source_norm,
+                                            allow_scattered=True) if title
                                  else (False, 0.0))
         if not title_ok:
             issues.append(f"title not found in CV (best {title_score})")
@@ -1142,7 +1477,11 @@ def check_patents(patents: list, source_norm: str) -> list[dict]:
     return results
 
 
-def validate_record(record: dict, source_text: str) -> dict:
+def validate_record(record: dict, source_text: str, as_of=None) -> dict:
+    """
+    Stage 4 for one candidate. `as_of` resolves whether a degree period
+    has ended; it defaults to today and run.py passes its pinned date.
+    """
     source_norm = normalise(source_text)
     profile = record.get("profile", {})
 
@@ -1164,10 +1503,17 @@ def validate_record(record: dict, source_text: str) -> dict:
     # doctorate_cross_check_failed - and recognising a stated stage is not
     # a failed check.
     thesis_notes = cross_check_thesis_submitted(scalar_results)
+    # AFTER the model's own spans have been read, BEFORE the award check:
+    # the CV's degree lines fill what the model missed and correct a
+    # finished doctorate read as "pursuing", and the award check below
+    # then tests the result against the entry's own lines.
+    education_notes, education_contradictions = reconcile_education(
+        scalar_results, source_text, as_of)
     # The RAW text, not source_norm: this check reasons about which lines
     # belong to the doctorate's own entry, and normalising the document
     # collapses the line breaks that mark where that entry ends.
-    doctorate_notes = cross_check_doctorate(scalar_results, source_text)
+    doctorate_notes = (education_contradictions
+                       + cross_check_doctorate(scalar_results, source_text))
 
     # Build the cleaned profile: unverified values are REMOVED, not kept.
     clean: dict = {}
@@ -1183,6 +1529,14 @@ def validate_record(record: dict, source_text: str) -> dict:
                 # Kept, but the audit trail must show the span was imperfect.
                 clean[r["field"]]["evidence_not_verbatim"] = True
                 clean[r["field"]]["note"] = r.get("detail", "")
+            if r.get("source") == "cv_rule_parser":
+                # Read from the CV's degree line, not the model: say so.
+                clean[r["field"]]["source"] = "cv_rule_parser"
+                clean[r["field"]]["note"] = r.get("detail", "")
+                for key in ("completion_basis", "corroboration",
+                            "needs_confirmation"):
+                    if key in r:
+                        clean[r["field"]][key] = r[key]
         else:
             clean[r["field"]] = {
                 "value": None,
@@ -1245,11 +1599,16 @@ def validate_record(record: dict, source_text: str) -> dict:
             "publications_with_issues": sum(1 for r in pub_results if r["issues"]),
             "publication_statuses_downgraded": downgraded,
             "flags": ([f for r in pub_results for f in r["flags"]]
-                  + doctorate_notes + year_notes + thesis_notes),
+                  + doctorate_notes + year_notes + thesis_notes
+                  + education_notes),
+        "education_from_cv_lines": education_notes,
         "doctorate_cross_check_failed": bool(doctorate_notes),
         },
         "scalar_detail": scalar_results,
         "publication_detail": pub_results,
+        # Profile identifiers and self-reported metrics, read by Python from
+        # the CV text; Stage 5 decides what can be verified.
+        "research_links": research_profiles.detect_links(source_text),
     }
 
 

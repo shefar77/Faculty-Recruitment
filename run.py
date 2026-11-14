@@ -125,12 +125,13 @@ def run_candidate(cv_path: Path, *, as_of: date, use_llm: bool = True,
         json.dumps(extracted, indent=2, ensure_ascii=False), encoding="utf-8")
 
     # --- Stage 4: validation ---------------------------------------------
-    validated = validate.validate_record(extracted, cv_text)
+    validated = validate.validate_record(extracted, cv_text, as_of=as_of)
     (OUTPUT_DIR / f"{stem}.validated.json").write_text(
         json.dumps(validated, indent=2, ensure_ascii=False), encoding="utf-8")
 
     # --- Stage 5: publication verification -------------------------------
-    verified = verify_pubs.verify_candidate(validated, use_cache=use_cache)
+    verified = verify_pubs.verify_candidate(validated, use_cache=use_cache,
+                                           as_of_year=as_of.year)
     (OUTPUT_DIR / f"{stem}.verified.json").write_text(
         json.dumps(verified, indent=2, ensure_ascii=False), encoding="utf-8")
 

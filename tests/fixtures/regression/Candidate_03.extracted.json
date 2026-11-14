@@ -1,0 +1,506 @@
+{
+  "candidate_id": "Candidate_03",
+  "extracted_at": "2026-11-14T12:17:43+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Jayraj Singh",
+      "evidence": "Jayraj Singh (Postdoc|Ph.D.)"
+    },
+    "email": {
+      "value": "jayrajsinghit@gmail.com",
+      "evidence": "jayrajsinghit@gmail.com | jayrajsinghcse@yahoo.com"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Ph.D., Computer Science & Engineering (Feb. 2015 - Dec. 2020)"
+    },
+    "phd_status": {
+      "value": "awarded",
+      "evidence": "Ph.D., Computer Science & Engineering (Feb. 2015 - Dec. 2020)"
+    },
+    "phd_institution": {
+      "value": "Indian Institute of Technolog (ISM) Dhanbad",
+      "evidence": "Ph.D., Computer Science & Engineering (Feb. 2015 - Dec. 2020)"
+    },
+    "phd_start_year": {
+      "value": 2015,
+      "evidence": "Ph.D., Computer Science & Engineering (Feb. 2015 - Dec. 2020)"
+    },
+    "phd_year": {
+      "value": 2020,
+      "evidence": "Ph.D., Computer Science & Engineering (Feb. 2015 - Dec. 2020)"
+    },
+    "phd_subject": {
+      "value": "Computer Science & Engineering",
+      "evidence": "Ph.D., Computer Science & Engineering (Feb. 2015 - Dec. 2020)"
+    },
+    "masters_degree": {
+      "value": "mtech",
+      "evidence": "M. Tech., Computer Science & Engineering (2012- 2014)"
+    },
+    "masters_institution": {
+      "value": "Pondicherry Central University",
+      "evidence": "M. Tech., Computer Science & Engineering (2012- 2014)"
+    },
+    "masters_year": {
+      "value": 2014,
+      "evidence": "M. Tech., Computer Science & Engineering (2012- 2014)"
+    },
+    "masters_subject": {
+      "value": "Computer Science & Engineering",
+      "evidence": "M. Tech., Computer Science & Engineering (2012- 2014)"
+    },
+    "bachelors_degree": {
+      "value": "bsc",
+      "evidence": "B. Sc., (2005- 2009) in Physics (Hons.), Chem & Math."
+    },
+    "bachelors_institution": {
+      "value": "Vinoba Bhave University",
+      "evidence": "B. Sc., (2005- 2009) in Physics (Hons.), Chem & Math."
+    },
+    "bachelors_year": {
+      "value": 2009,
+      "evidence": "B. Sc., (2005- 2009) in Physics (Hons.), Chem & Math."
+    },
+    "bachelors_subject": {
+      "value": "Physics",
+      "evidence": "B. Sc., (2005- 2009) in Physics (Hons.), Chem & Math."
+    },
+    "research_area": {
+      "value": "Artificial intelligence, Machine learning, Evolutionary Computation, Meta-heuristic techniques, and other emerging soft Computing methods.",
+      "evidence": "Research Interests: Artificial intelligence, Machine learning, Evolutionary Computation, Meta-heuristic techniques, and other emerging soft Computing methods."
+    },
+    "positions": [
+      {
+        "title": "Assistant Professor",
+        "organisation": "NIIT University, Neemrana",
+        "category": "teaching",
+        "start_date": "2022-06",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Assistant Professor in NIIT University, Neemrana, Rajasthan (June 2022 to Till date)."
+      },
+      {
+        "title": "Teaching Assistant",
+        "organisation": null,
+        "category": "teaching",
+        "start_date": "2015-02",
+        "end_date": "2019-12",
+        "is_current": false,
+        "evidence": "Teaching Assistant in IIT(ISM) Dhanbad (Feb 2015 to Dec 2019)"
+      },
+      {
+        "title": "PostDoc Researcher",
+        "organisation": "Universiti Teknologi Malaysia (UTM)",
+        "category": "research",
+        "start_date": "2024-01",
+        "end_date": "2025-01",
+        "is_current": false,
+        "evidence": "PostDoc Researcher, Center for Artificial Intelligence and Robotics, (January 2024 to January 2025)"
+      },
+      {
+        "title": "PostDoc Researcher (Research Associate)",
+        "organisation": "Indian Institute of Technology Delhi",
+        "category": "research",
+        "start_date": "2021-03",
+        "end_date": "2022-06",
+        "is_current": false,
+        "evidence": "PostDoc Researcher (Research Associate), Interdisciplinary research in Department of Civil Engineering, (March 2021 to June 2022)"
+      },
+      {
+        "title": "JRF & SRF",
+        "organisation": "Indian Institute of Technolog (ISM) Dhanbad",
+        "category": "research",
+        "start_date": "2015-02",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Worked as JRF & SRF, from 20/02/2015 onward ( 4.5 yrs +)"
+      }
+    ],
+    "net_qualified": {
+      "value": true,
+      "evidence": "National Examination: UGC NET, June 2012, December 2012"
+    }
+  },
+  "publications": [
+    {
+      "title": "Optics-based metaheuristic approach to assess critical failure surfaces in both circular and non-circular failure modes for slope stability analysis.",
+      "authors": [
+        "Singh, Jayraj",
+        "Verma, A. K.",
+        "Banka, Haider",
+        "Kumar, Ravishankar",
+        "Jaiswal, Amit kumar"
+      ],
+      "year": 2024,
+      "venue": "Rock Mechanics Bulletin (Elsevier)",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "A QoS Metric Approach for Web Service Pertinence for the Cloud.",
+      "authors": [
+        "Singh, J.",
+        "Chandramohan, D."
+      ],
+      "year": 2021,
+      "venue": "Recent Advances in Computer Science & Communications",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "Locating critical failure surface using meta-heuristic approaches: A comparative assessment.",
+      "authors": [
+        "Singh, J.",
+        "Banka H.",
+        "Verma, A.K."
+      ],
+      "year": 2019,
+      "venue": "Arabian Journal of Geosciences",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "A BBO-based algorithm for slope stability analysis by locating critical failure surface.",
+      "authors": [
+        "Singh, J.",
+        "Banka H.",
+        "Verma, A.K."
+      ],
+      "year": 2018,
+      "venue": "Neural Computing and Applications",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "A study of soft computing models for prediction of longitudinal wave velocity.",
+      "authors": [
+        "Singh, Jayraj",
+        "Verma, A. K.",
+        "Banka, Haider",
+        "Singh, T. N.",
+        "Maheshwar, Sachin"
+      ],
+      "year": 2016,
+      "venue": "Arabian Journal of Geosciences",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "A comparative analysis using firefly algorithm to locate critical failure surface in slope stability analysis.",
+      "authors": [
+        "Singh, J.",
+        "Banka H.",
+        "Verma, A.K."
+      ],
+      "year": 2018,
+      "venue": "Indian Landslides",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "Suitable QoS parameters survey for standard web services & web applications to understand their cloud deploy-ability.",
+      "authors": [
+        "Jayakumar, S. K. V.",
+        "Singh, Jayraj",
+        "Joseph, K. Suresh"
+      ],
+      "year": 2014,
+      "venue": "Int J Comput. Intell. Inf.",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "An assessment of frequently adopted unsecure patterns in mobile ad hoc network: Requirement and security management perspective.",
+      "authors": [
+        "Singh, Jayraj",
+        "Singh, Arunesh",
+        "Shree, Raj"
+      ],
+      "year": 2011,
+      "venue": "International Journal of Computer Applications (0975-8887)",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Journal Publications"
+    },
+    {
+      "title": "Enhancing UAV decision landing through intelligent identification of vulnerable earth surfaces in disaster management scenarios: A mitigation approach in unreliable landing.",
+      "authors": [
+        "Singh, J.",
+        "Zool, H.",
+        "Hing, T.H."
+      ],
+      "year": null,
+      "venue": null,
+      "doi": null,
+      "status": "under_revision",
+      "evidence": "Paper Under Process"
+    },
+    {
+      "title": "An improved random forest classifier for slope stability prediction in circular mode failure.",
+      "authors": [
+        "Singh, J.",
+        "Pathak, Shashank",
+        "Ramana, G.V."
+      ],
+      "year": null,
+      "venue": "Expert Systems with Applications",
+      "doi": null,
+      "status": "under_revision",
+      "evidence": "Paper Under Process"
+    },
+    {
+      "title": "An intelligent multilayer neural network for nuclear-blast parameter prediction.",
+      "authors": [
+        "Pathak, Shashank",
+        "Singh, Jayraj",
+        "Ramana, G.V."
+      ],
+      "year": null,
+      "venue": "Engineering Structures",
+      "doi": null,
+      "status": "under_revision",
+      "evidence": "Paper Under Process"
+    },
+    {
+      "title": "Optimizing Open-Pit Iron ore Mine Dump Stability with an increased height: A Geotechnical Perspective.",
+      "authors": [
+        "Katariya, N. K.",
+        "Choudhary, B. S.",
+        "Sabri, M. M.",
+        "Mohamad, E. T.",
+        "Singh, Jayraj",
+        "Bhatawdekar, R. M.",
+        "Kwon, S.",
+        "Singh, Lalit"
+      ],
+      "year": null,
+      "venue": "Scientific Reports (Springer)",
+      "doi": null,
+      "status": "under_revision",
+      "evidence": "Paper Under Process"
+    },
+    {
+      "title": "Enhancing UAV decision landing through intelligent identification of vulnerable earth surfaces: Disaster Management Mitigation, 2024 IEEE 10th International Conference on Underwater System Technology: Theory and Applications (USYS), Xi’an, China, pp. 1-6, 2025.",
+      "authors": [
+        "Singh, J.",
+        "Ismail, Zool",
+        "Hing, Tang Howe"
+      ],
+      "year": 2025,
+      "venue": "2024 IEEE 10th International Conference on Underwater System Technology: Theory and Applications (USYS)",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Conference Papers"
+    },
+    {
+      "title": "Application of Biogeography based optimization to locate critical slip surface in slope stability evaluation.",
+      "authors": [
+        "Singh, Jayraj",
+        "Verma, A. K.",
+        "Banka, Haider"
+      ],
+      "year": 2018,
+      "venue": "4th International Conference on Recent Advances in Information Technology (RAIT)",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Conference Papers"
+    },
+    {
+      "title": "Analysis of slope stability and detection of critical failure surface using gravitational search algorithm.",
+      "authors": [
+        "Singh, Jayraj",
+        "Banka, Haider",
+        "Verma, A. K."
+      ],
+      "year": 2018,
+      "venue": "4th International Conference on Recent Advances in Information Technology (RAIT)",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Conference Papers"
+    },
+    {
+      "title": "Suitable QoS parameters survey for standard web services & web applications to understand their cloud deployability.",
+      "authors": [
+        "Singh, Jayraj",
+        "Jayakumar, S. K. V.",
+        "Joseph, K. Suresh"
+      ],
+      "year": 2014,
+      "venue": "National Conference on Issues and Trends in Advanced Computing (NITAC-2014)",
+      "doi": null,
+      "status": "published",
+      "evidence": "Selected Conference Papers"
+    },
+    {
+      "title": "An emerging machine learning approach for predicting risk and stability on susceptible terrain.",
+      "authors": [
+        "Singh, Sanjay",
+        "Verma, A. K.",
+        "Singh, Jayraj"
+      ],
+      "year": 2025,
+      "venue": "Landslides: Analysis, modeling and mitigation",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "Book Chapters"
+    },
+    {
+      "title": "Landslide hazard assessment using Machine Learning and GIS.",
+      "authors": [
+        "Singh, Amit Jaiswal",
+        "Verma, A.K.",
+        "Singh, T.N.",
+        "Singh, Jayraj"
+      ],
+      "year": 2023,
+      "venue": "Landslide: Detection, Monitoring & Prediction- Technological Developments",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "Book Chapters"
+    },
+    {
+      "title": "A Meta-heuristic Based Approach for Slope Stability Analysis to Design an Optimal Soil Slope.",
+      "authors": [
+        "Singh, Jayraj",
+        "Banka, Haider",
+        "Verma, A. K."
+      ],
+      "year": 2021,
+      "venue": "Machine Learning Algorithms for Industrial Applications. Studies in Computational Intelligence, vol 907",
+      "doi": null,
+      "status": "published",
+      "evidence": "Book Chapters"
+    },
+    {
+      "title": "Application of Flower Pollination Algorithm to Locate Critical Failure Surface for Slope Stability Analysis.",
+      "authors": [
+        "Singh, Jayraj",
+        "Kumar, Ravishankar",
+        "Banka, Haider"
+      ],
+      "year": 2021,
+      "venue": "Machine Learning Algorithms for Industrial Applications. Studies in Computational Intelligence, vol 907",
+      "doi": null,
+      "status": "published",
+      "evidence": "Book Chapters"
+    },
+    {
+      "title": "A Comparative Study for Locating Critical Failure Surface in Slope Stability Analysis via Meta-Heuristic Approach.",
+      "authors": [
+        "Singh, Jayraj",
+        "Verma, A. K.",
+        "Banka, Haider"
+      ],
+      "year": 2018,
+      "venue": "Handbook of Research on Predictive Modeling and Optimization Methods in Science and Engineering",
+      "doi": null,
+      "status": "published",
+      "evidence": "Book Chapters"
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 5902,
+      "output_tokens": 797,
+      "seconds": 172.5,
+      "load_seconds": 8.79,
+      "prefill_seconds": 10.62,
+      "decode_seconds": 151.0,
+      "truncated": false,
+      "called_at": "2026-11-14T12:05:30+00:00",
+      "prompt_sha": "fac116085a3257a6"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 5011,
+      "output_tokens": 40,
+      "seconds": 16.5,
+      "load_seconds": 0.01,
+      "prefill_seconds": 9.01,
+      "decode_seconds": 5.22,
+      "truncated": false,
+      "called_at": "2026-11-14T12:08:22+00:00",
+      "prompt_sha": "01095b38761a3156"
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 5155,
+      "output_tokens": 513,
+      "seconds": 96.6,
+      "load_seconds": 0.01,
+      "prefill_seconds": 9.59,
+      "decode_seconds": 84.75,
+      "truncated": false,
+      "called_at": "2026-11-14T12:08:39+00:00",
+      "prompt_sha": "130bc2e3ca6645c3"
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 5176,
+      "output_tokens": 2255,
+      "seconds": 447.3,
+      "load_seconds": 0.01,
+      "prefill_seconds": 10.27,
+      "decode_seconds": 434.8,
+      "truncated": false,
+      "called_at": "2026-11-14T12:10:15+00:00",
+      "prompt_sha": "af73959243219ca5"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T12:17:43+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "828b37ca77ca594bc670035ee31a38986bcd951352ab504b75c0ae63c8a0b602"
+}

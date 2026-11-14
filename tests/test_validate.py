@@ -196,7 +196,10 @@ def test_negative_claim_rejected_when_contradicted():
     }
     result = validate.validate_record(record, cv_with_phd)
     by_field = {r["field"]: r for r in result["scalar_detail"]}
-    assert by_field["phd_status"]["status"] == "unverified"
+    # The "none" claim is not kept: the CV's own doctorate line replaces it.
+    assert by_field["phd_status"]["value"] != "none"
+    assert by_field["phd_status"]["corrected_from"] == "none"
+    assert by_field["phd_status"]["source"] == "cv_rule_parser"
 
 
 # ---------------------------------------------------------------------------
@@ -268,6 +271,31 @@ def test_cross_check_leaves_a_genuine_doctorate_alone():
 
 def test_cross_check_catches_implausibly_short_doctorate():
     """Award year within two years of the start is almost always a misread."""
+    cv = ("Ravi Kumar\n\nEducation\n"
+          "Ph.D. in Physics                              Aug 2020 - May 2021\n")
+    span = "Ph.D. in Physics                              Aug 2020 - May 2021"
+    record = {
+        "candidate_id": "X",
+        "profile": {
+            "phd_status": _wrap("awarded", span),
+            "phd_start_year": _wrap(2020, span),
+            "phd_year": _wrap(2021, span),
+        },
+        "publications": [],
+    }
+    # No "in progress" wording in this CV, so the year gap is the only signal.
+    result = validate.validate_record(record, cv)
+    by_field = {r["field"]: r for r in result["scalar_detail"]}
+    assert by_field["phd_status"]["status"] == "unverified"
+    assert "implausibly close" in by_field["phd_status"]["detail"]
+
+
+def test_a_misread_start_year_is_corrected_from_the_cv_row():
+    """
+    The model put 2020 as the start of a PhD the CV dates Aug 2015 - May
+    2021. 2020 is not in its own quotation, so it fails traceability, and
+    the start printed in the row is used - the award then stands.
+    """
     record = {
         "candidate_id": "X",
         "profile": {
@@ -277,11 +305,11 @@ def test_cross_check_catches_implausibly_short_doctorate():
         },
         "publications": [],
     }
-    # No "in progress" wording in this CV, so the year gap is the only signal.
     result = validate.validate_record(record, CV_PHD_AWARDED)
     by_field = {r["field"]: r for r in result["scalar_detail"]}
-    assert by_field["phd_status"]["status"] == "unverified"
-    assert "implausibly close" in by_field["phd_status"]["detail"]
+    assert by_field["phd_start_year"]["value"] == 2015
+    assert by_field["phd_status"]["status"] == "verified"
+    assert result["validation_summary"]["doctorate_cross_check_failed"] is False
 
 
 def test_cross_check_never_invents_an_award():

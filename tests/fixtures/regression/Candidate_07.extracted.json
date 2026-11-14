@@ -1,0 +1,333 @@
+{
+  "candidate_id": "Candidate_07",
+  "extracted_at": "2026-11-14T09:52:40+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Vikas Kumawat",
+      "evidence": "Vikas Kumawat                                            p20210020@pilani.bits-pilani.ac.in"
+    },
+    "email": {
+      "value": "p20210020@pilani.bits-pilani.ac.in",
+      "evidence": "p20210020@pilani.bits-pilani.ac.in"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026"
+    },
+    "phd_status": {
+      "value": "thesis_submitted",
+      "evidence": "Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026"
+    },
+    "phd_institution": {
+      "value": "Birla Institute of Technology & Science, Pilani, India",
+      "evidence": "Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026"
+    },
+    "phd_start_year": {
+      "value": 2021,
+      "evidence": "Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026"
+    },
+    "phd_year": {
+      "value": null,
+      "evidence": "Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026"
+    },
+    "phd_subject": {
+      "value": "Computer Vision Based Markerless Diagnosis Techniques of Musculoskeletal & Neurological Disorders for Medical Condition Classification",
+      "evidence": "Ph.D. (Thesis Submitted), CSIS Department                              2021 – 2026"
+    },
+    "masters_degree": {
+      "value": "mtech",
+      "evidence": "M. Tech. (Embedded Systems)                                            2014 – 2016"
+    },
+    "masters_institution": {
+      "value": "Mewar University, Chittorgarh, Rajasthan",
+      "evidence": "M. Tech. (Embedded Systems)                                            2014 – 2016"
+    },
+    "masters_year": {
+      "value": 2016,
+      "evidence": "M. Tech. (Embedded Systems)                                            2014 – 2016"
+    },
+    "masters_subject": {
+      "value": "Embedded Systems",
+      "evidence": "M. Tech. (Embedded Systems)                                            2014 – 2016"
+    },
+    "bachelors_degree": {
+      "value": "btech",
+      "evidence": "B. Tech. (Information Technology)                                        2009 – 2013"
+    },
+    "bachelors_institution": {
+      "value": "B.K. Birla Institute of Engineering & Technology, Pilani",
+      "evidence": "B. Tech. (Information Technology)                                        2009 – 2013"
+    },
+    "bachelors_year": {
+      "value": 2013,
+      "evidence": "B. Tech. (Information Technology)                                        2009 – 2013"
+    },
+    "bachelors_subject": {
+      "value": "Information Technology",
+      "evidence": "B. Tech. (Information Technology)                                        2009 – 2013"
+    },
+    "research_area": {
+      "value": "Computer vision and ML/DL for healthcare applications, marker-less gait analysis, musculoskeletal and neurological disorders",
+      "evidence": "Computer Science researcher specializing in computer vision and ML/DL for healthcare\n      applications. Focused on marker-less gait analysis for identifying musculoskeletal and neurological\n      disorders. Experienced in pose estimation (e.g., BlazePose) and transformer-based models for\n     spatiotemporal analysis. Committed to developing non-invasive, scalable solutions for early\n      diagnosis and rehabilitation support."
+    },
+    "positions": [
+      {
+        "title": "Teaching Assistant",
+        "organisation": "Computer Science & Information Systems Department, Birla Institute of Technology & Science, Pilani, Rajasthan, India",
+        "category": "teaching",
+        "start_date": "2021-01",
+        "end_date": "2026-01",
+        "is_current": false,
+        "evidence": "Teaching Assistant                                                         2021 – 2026\n   • Computer Science & Information Systems Department, Birla Institute of Technology & Science, Pilani, Rajasthan, India\n\n        – Courses Taught: IoT, Machine Learning, Data Mining, Computer Vision, Computer Programming, and Artificial Intelligence.",
+        "source_section": "Teaching Experience"
+      },
+      {
+        "title": "Assistant Professor",
+        "organisation": "Computer Science Engineering Department, B K Birla Institute of Engineering & Technology, Pilani, Rajasthan, India",
+        "category": "teaching",
+        "start_date": "2013-01",
+        "end_date": "2021-01",
+        "is_current": false,
+        "evidence": "Assistant Professor                                                        2013 – 2021\n   • Computer Science Engineering Department, B K Birla Institute of Engineering & Technology, Pilani, Rajasthan, India",
+        "source_section": "Teaching Experience"
+      },
+      {
+        "title": "Teaching Associate",
+        "organisation": "Applied Artificial Intelligence for All: Foundations to Job-Readiness, Janki Devi Memorial College–Delhi University (JDMC–DU) Remote Training Program by Teaching Learning Centre & Dept. of CSIS, BITS Pilani",
+        "category": "teaching",
+        "start_date": "2025-11",
+        "end_date": "2026-04",
+        "is_current": false,
+        "evidence": "Teaching Associate                                         Nov 2025 – Apr 2026\n     Applied Artificial Intelligence for All: Foundations to Job-Readiness, Janki Devi Memorial College–Delhi University (JDMC–DU) Remote Training Program by Teaching Learning Centre & Dept. of CSIS, BITS Pilani",
+        "source_section": "Teaching Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "AlzNET: An Alzheimer Classification Network using Action Identification",
+      "authors": [
+        "V. Kumawat",
+        "Y. Sharma",
+        "A. Bhatia",
+        "K. Tiwari"
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the Advances in Distributed Computing and Machine Learning",
+      "doi": null,
+      "status": "unknown",
+      "evidence": "V. Kumawat, Y. Sharma, A. Bhatia, and K. Tiwari, “AlzNET: An Alzheimer Classification Network using Action Identification,” in Proceedings of the Advances in Distributed Computing and Machine Learning, Cham: Springer Nature Switzerland, 2026, pp. 294–303."
+    },
+    {
+      "title": "PSI-Net: Marker-less Post-Stroke Identification Network",
+      "authors": [
+        "V. Kumawat",
+        "Y. Sharma",
+        "A. Bhatia",
+        "K. Tiwari"
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the 40th International Conference on Advanced Information Networking and Applications (AINA-2026)",
+      "doi": null,
+      "status": "unknown",
+      "evidence": "V. Kumawat, Y. Sharma, A. Bhatia, and K. Tiwari, “PSI-Net: Marker-less Post-Stroke Identification Network,” in Proceedings of the 40th International Conference on Advanced Information Networking and Applications (AINA-2026), ser. Lecture Notes in Data Engineering and Communication Technologies (LNDECT), Springer, 2026, pp. 183–194. [CORE Rank B]."
+    },
+    {
+      "title": "TrPrNet: Early Parkinson Detection Network using Marker-less Gait Analysis",
+      "authors": [
+        "V. Kumawat",
+        "Y. Sharma",
+        "A. Bhatia",
+        "K. Tiwari"
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Advanced Information Networking and Applications (AINA-2025)",
+      "doi": null,
+      "status": "unknown",
+      "evidence": "V. Kumawat, Y. Sharma, A. Bhatia, and K. Tiwari, “TrPrNet: Early Parkinson Detection Network using Marker-less Gait Analysis,” in Proceedings of the International Conference on Advanced Information Networking and Applications (AINA-2025, Springer, 2025, pp. 415–427 [CORE Rank B]."
+    },
+    {
+      "title": "Design of Controlling Home Appliance Remotely using Raspberry Pi",
+      "authors": [
+        "V. Kumawat",
+        "S. Jain",
+        "V. Vashisth",
+        "N. Mittal",
+        "B. K. Jangir"
+      ],
+      "year": 2017,
+      "venue": "2017 2nd International Conference for Convergence in Technology (I2CT)",
+      "doi": null,
+      "status": "unknown",
+      "evidence": "V. Kumawat, S. Jain, V. Vashisth, N. Mittal, and B. K. Jangir, “Design of Controlling Home Appliance Remotely using Raspberry Pi,” in 2017 2nd International Conference for Convergence in Technology (I2CT), IEEE, 2017, pp. 841–845."
+    },
+    {
+      "title": "Computationally Improved Algorithm to Find Higher Roots of Integer Order Bessel Function in Gyrotron Application",
+      "authors": [
+        "V. Kumawat",
+        "B. K. Jangir",
+        "H. Khatun",
+        "A. K. Sinha"
+      ],
+      "year": 2017,
+      "venue": "2017 2nd International Conference for Convergence in Technology (I2CT)",
+      "doi": null,
+      "status": "unknown",
+      "evidence": "B. K. Jangir and V. Kumawat, “Cheap Parking Assist System using 8051 Family,” Annual Technical Volume, Interdisciplinary Coordination Committee, The Institution of Engineers (India), 2017, pp. 57–60."
+    },
+    {
+      "title": "Cheap Parking Assist System using 8051 Family",
+      "authors": [
+        "B. K. Jangir",
+        "V. Kumawat"
+      ],
+      "year": 2017,
+      "venue": "Annual Technical Volume, Interdisciplinary Coordination Committee, The Institution of Engineers (India)",
+      "doi": null,
+      "status": "unknown",
+      "evidence": "B. K. Jangir and V. Kumawat, “Cheap Parking Assist System using 8051 Family,” Annual Technical Volume, Interdisciplinary Coordination Committee, The Institution of Engineers (India), 2017, pp. 57–60."
+    },
+    {
+      "title": "An Interpretable Transformer Framework for Video-based Multiclass Joint Mobility Classification using Pose-Guided Gait Informatics",
+      "authors": [
+        "V. Kumawat"
+      ],
+      "year": 2026,
+      "venue": null,
+      "doi": null,
+      "status": "under_revision",
+      "evidence": "V. Kumawat et al., “An Interpretable Transformer Framework for Video-based Multiclass Joint Mobility Classification using Pose-Guided Gait Informatics,” Knowledge-Based Systems, 2026, Manuscript No: KNOSYS-D-26-08056. [Under Review]"
+    },
+    {
+      "title": "A Marker-less Transformer-based Framework for Lower-limb Joint Mobility Problem Identification using Gait Videos",
+      "authors": [
+        "V. Kumawat",
+        "Y. Sharma",
+        "A. Bhatia",
+        "K. Tiwari",
+        "H. M. Pandey"
+      ],
+      "year": 2025,
+      "venue": "Engineering Applications of Artificial Intelligence",
+      "doi": null,
+      "status": "submitted",
+      "evidence": "V. Kumawat, Y. Sharma, A. Bhatia, K. Tiwari, and H. M. Pandey, “A Marker-less Transformer-based Framework for Lower-limb Joint Mobility Problem Identification using Gait Videos,” Engineering Applications of Artificial Intelligence, 2025, Manuscript No: EAAI-25-25643. [Major revision submitted]"
+    },
+    {
+      "title": "Vision-Based Assessment of Lower-Limb Joint Mobility Disorders: A Comprehensive Survey",
+      "authors": [
+        "V. Kumawat",
+        "H. M. Pandey",
+        "Y. Sharma",
+        "A. Bhatia",
+        "K. Tiwari"
+      ],
+      "year": 2026,
+      "venue": "ACM Computing Surveys",
+      "doi": null,
+      "status": "communicated",
+      "evidence": "V. Kumawat, H. M. Pandey, Y. Sharma, A. Bhatia, and K. Tiwari, “Vision-Based Assessment of Lower-Limb Joint Mobility Disorders: A Comprehensive Survey,” ACM Computing Surveys, Association for Computing Machinery, 2026. [Communicated]"
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 4198,
+      "output_tokens": 894,
+      "seconds": 232.5,
+      "load_seconds": 49.2,
+      "prefill_seconds": 31.16,
+      "decode_seconds": 149.94,
+      "truncated": false,
+      "called_at": "2026-11-14T09:43:22+00:00",
+      "prompt_sha": "b791533254dfe6ef"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3307,
+      "output_tokens": 19,
+      "seconds": 10.1,
+      "load_seconds": 0.01,
+      "prefill_seconds": 5.97,
+      "decode_seconds": 1.97,
+      "truncated": false,
+      "called_at": "2026-11-14T09:47:14+00:00",
+      "prompt_sha": "34896fde6b280026"
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 671,
+      "output_tokens": 479,
+      "seconds": 59.2,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T09:47:24+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3472,
+      "output_tokens": 1618,
+      "seconds": 257.0,
+      "load_seconds": 0.01,
+      "prefill_seconds": 6.24,
+      "decode_seconds": 248.65,
+      "truncated": false,
+      "called_at": "2026-11-14T09:48:23+00:00",
+      "prompt_sha": "4520bd8d37e5ec92"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T09:52:40+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "3cc3d95aa600519f0bb4f670a48dc905cefe4a223fbf232a75c984a34db6b30e"
+}

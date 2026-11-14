@@ -1,0 +1,117 @@
+Curriculum Vitae
+
+Prachi Venkat
+DOB: 13/06/1991
+
+Email: prachivenkat11@gmail.com
+Contact no.: +91-96490-92467
+
+Experience
+
+    •  Post-doctoral research fellow at Kansai Institute for Photon Science (QST) in
+     Japan from January 2021 to December 2023.
+    •  National Post-doctoral Fellow (NPDF) at Department of Physics, IIT Bombay from
+       April 2024 to April 2026.
+    •  Visiting Scientist at MPI-PKS Dresden from April 2026 to June 2026.
+
+Research summary
+
+  Ph.D:
+   Study of laser-cluster interaction using molecular dynamics modeling, specifically the
+    effect of intense femtosecond pulses on noble gas clusters using classical molecular
+    dynamics.
+  Post-Doctoral work:
+   Study of the onset and nature of damage in silicon films using Three-Temperature
+   Model and the effect of different interaction parameters on the damage threshold as
+   a part of the ultrafast electronic dynamics project at Kansai Institute for Photon
+   Science (QST) in Kyoto, Japan.
+  ANRF-NPDF Project:
+    Simulating laser-driven electron dynamics by solving the equations of motion within
+    the density matrix formalism, to study non-linear response from 2D materials and
+    topological quantum materials at the Attosecond Physics Lab, IIT Bombay.
+
+Collaborations
+
+   •  Dynamics and Interactions in the Condensed Phase (DICO), Université Paris-
+      Saclay, CEA, LIDYL, Paris, France.
+   •  Laser Advanced  Materials  Processing (LAMP)  Laboratory, Department  of
+      Mechanical Engineering, IIT Bombay.
+
+Academic details
+
+   Degree         Year of                      Institute/University
+                  graduation
+     Ph.D.            2020              Birla Institute of Technology and Science (BITS-
+                                                                         Pilani)
+ MSc. Physics         2014            Malviya National Institute of Technology (MNIT)
+    BSc. (H)           2012                 Hindu College, University of Delhi
+    Physics
+
+Publications
+
+   •  Attosecond pulse generation from Weyl semimetals, Prachi Venkat, Amar Bharti
+     and Gopal Dixit, Physical Review B 113, 125144 (2026).
+   •  Chiral-sensitive   frequency   mixing    in    valley-excited   two-dimensional
+      semiconductors, Prachi Venkat, Leon Schlemmer, Amar Bharti, David Gauthier,
+      Willem Boutu and Gopal Dixit, Applied Physics Letters, 128, 021102 (2026).
+   •  Harnessing Light for Valley Control in 2d Semiconductors, Gopika N. Gopalan,
+     Amar Bharti, Prachi Venkat and Gopal Dixit, Advanced Optical Materials 4(3),
+     e01593 (2026).
+   •  Three-Temperature Model  for Silicon Damage Process, Prachi Venkat and
+      Tomohito Otobe, Journal of Japan Laser Processing Society, 31(1) (2024).
+   •  Thickness Dependence of Laser Damage in Silicon Thin Films, Prachi Venkat and
+      Tomohito Otobe, JLMN-Journal of Laser Micro/Nanoengineering 18(3) (2023).
+   •  Wavelength dependence of laser-induced excitation dynamics in silicon, Prachi
+     Venkat and Tomohito  Otobe,  Applied  Physics  A:  Materials Science and
+      Processing 128(9), 810 (2022).
+   •  Three-temperature modeling of laser-induced damage process in silicon, Prachi
+     Venkat and Tomohito Otobe, Applied Physics Express 15(4), 041008 (2022).
+   •  Electron Excitation Rate in Dielectrics Under an Intense Elliptically Polarized Laser
+       Field, Prachi Venkat and Tomohito Otobe, Journal of the Physical Society of
+      Japan, 91(4), 044401 (2022).
+   •  Study of radiation spectra produced during laser induced Thomson scattering in
+     Xenon clusters, Prachi Venkat, AIP Conference Proceedings 2179, 020027
+       (2019).
+   •  Higher harmonics and attosecond pulse generation by laser induced Thomson
+       scattering in atomic clusters, Prachi Venkat, Amol R. Holkundkar, Phys. Rev.
+       Accel. Beams 22, 084401 (2019).
+   •  Energetic electron bunch generation by laser interaction with Xenon clusters,
+      Prachi Venkat and Amol R. Holkundkar, Phys. Plasmas 25, 103112 (2018).
+
+•  Interaction of Xenon clusters with intense sub-cycle laser pulses, Prachi Venkat
+     and Amol R. Holkundkar, Phys. Plasmas 23, 123106 (2016).
+
+Other Achievements
+
+   •  Awarded the National Post-Doctoral Fellowship by Science and Engineering
+      Research Board (ANRF) in March, 2024.
+
+Non-academic skills
+
+   •  Interpersonal  Skills:  Scientific communication  • Mentorship  • Interdisciplinary
+       collaboration • Team leadership • Constructive feedback • Cross-cultural teamwork
+   •  Languages: English (Fluent) • Hindi (Fluent) • Spanish (Basic)
+
+References
+
+    Prof. Amol R. Holkundkar (Thesis Supervisor)
+    Professor
+   Department of Physics,
+    FD-3, BITS-Pilani
+    Pilani-333031 (India)
+    Email ID: amol.holkundkar@pilani.bits-pilani.ac.in
+
+    Prof. Gopal Dixit
+    Associate Professor
+   Department of Physics
+     IIT Bombay
+    Powai, Mumbai-400076
+    Email ID: gdixit@phy.iitb.ac.in
+
+    Dr. Tomohito Otobe
+    Senior Principal Researcher
+    Ultrafast Electronic Dynamics Project
+   Kansai Institute for Photon Science
+    National Institutes for Quantum Science and Technology (QST)
+   Kizugawa, Kyoto 619-0215 (Japan)
+    Email ID: otobe.tomohito@qst.go.jp

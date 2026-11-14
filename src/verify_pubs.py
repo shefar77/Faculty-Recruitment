@@ -184,22 +184,51 @@ def openalex_search(title: str, *, use_cache: bool = True) -> tuple[dict, str, s
         "mailto": MAILTO,
     })
     url = f"{OPENALEX_WORKS}?{query}"
+    payload, error = cached_get_json(url, use_cache=use_cache)
+    return payload, url, error
+
+
+# Transient failures - a timeout, a dropped connection, a 429 or a 5xx -
+# are retried before anything is concluded. A single blip used to turn an
+# entry into "lookup_failed", which withheld its credit until a re-run.
+RETRIES = 2
+RETRY_STATUS = {429, 500, 502, 503, 504}
+
+
+def cached_get_json(url: str, *, use_cache: bool = True,
+                    missing_ok: bool = False) -> tuple[dict, str]:
+    """
+    GET a JSON document through the on-disk cache. Returns (payload, error).
+
+    Only successful responses are cached, so a failure is retried on the
+    next run rather than remembered. With `missing_ok`, a 404 is an answer
+    ("not in the index"), returned as an empty payload and that error text.
+    """
     cached = _cache_path(url)
-
     if use_cache and cached.is_file():
-        return json.loads(cached.read_text(encoding="utf-8")), url, ""
+        return json.loads(cached.read_text(encoding="utf-8")), ""
 
-    try:
-        time.sleep(RATE_LIMIT_SECONDS)
-        response = requests.get(url, timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        payload = response.json()
-    except Exception as exc:
-        return {}, url, f"{type(exc).__name__}: {exc}"
+    error = ""
+    for attempt in range(RETRIES + 1):
+        try:
+            time.sleep(RATE_LIMIT_SECONDS * (1 + 2 * attempt))
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
+            if missing_ok and response.status_code == 404:
+                return {}, "not in OpenAlex"
+            if response.status_code in RETRY_STATUS and attempt < RETRIES:
+                error = f"HTTP {response.status_code}"
+                continue
+            response.raise_for_status()
+            payload = response.json()
+            break
+        except Exception as exc:
+            error = f"{type(exc).__name__}: {exc}"
+    else:
+        return {}, error
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cached.write_text(json.dumps(payload), encoding="utf-8")
-    return payload, url, ""
+    return payload, ""
 
 
 # A DOI as CVs print it: bare, as a URL, with or without a scheme, and
@@ -262,27 +291,11 @@ def openalex_by_doi(doi: str, *, use_cache: bool = True) -> tuple[dict, str, str
     a neighbouring entry, or simply belong to somebody else's paper.
     """
     url = f"{OPENALEX_WORKS}/doi:{doi}?mailto={MAILTO}"
-    cached = _cache_path(url)
-
-    if use_cache and cached.is_file():
-        return json.loads(cached.read_text(encoding="utf-8")), url, ""
-
-    try:
-        time.sleep(RATE_LIMIT_SECONDS)
-        response = requests.get(url, timeout=REQUEST_TIMEOUT)
-        # A DOI that resolves to nothing is an answer, not an outage: the
-        # caller falls back to the title search either way, but only a
-        # genuine failure should be reported as one.
-        if response.status_code == 404:
-            return {}, url, "not in OpenAlex"
-        response.raise_for_status()
-        payload = response.json()
-    except Exception as exc:
-        return {}, url, f"{type(exc).__name__}: {exc}"
-
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cached.write_text(json.dumps(payload), encoding="utf-8")
-    return payload, url, ""
+    # A DOI that resolves to nothing is an answer, not an outage: the
+    # caller falls back to the title search either way, but only a genuine
+    # failure should be reported as one.
+    payload, error = cached_get_json(url, use_cache=use_cache, missing_ok=True)
+    return payload, url, error
 
 
 # ---------------------------------------------------------------------------
@@ -431,6 +444,19 @@ def split_author_blob(name: str) -> list[str]:
     return parts
 
 
+def venue_of(work: dict) -> dict:
+    """
+    Where the indexed work appeared, for the reviewer to judge.
+
+    Shown, not scored: pricing journal quality needs an approved venue
+    list, the same rule the institution tiers follow (DESIGN_DECISIONS.md).
+    """
+    source = (work.get("primary_location") or {}).get("source") or {}
+    return {"venue": source.get("display_name"),
+            "venue_type": source.get("type"),
+            "work_type": work.get("type")}
+
+
 def _authors_of(work: dict) -> list[str]:
     names = []
     for authorship in work.get("authorships", []) or []:
@@ -501,6 +527,7 @@ def verify_publication(pub: dict, candidate_name: str, *,
                     "author_match": match,
                     "cited_by_count": work.get("cited_by_count"),
                     "doi": work.get("doi"),
+                    **venue_of(work),
                     "resolved_by": "doi",
                     "outcome": outcome,
                     "checked_at": datetime.now(timezone.utc).isoformat(
@@ -583,6 +610,7 @@ def verify_publication(pub: dict, candidate_name: str, *,
                     (a for a in authors if names_match(candidate_name, a)), None),
                 "cited_by_count": work.get("cited_by_count"),
                 "doi": work.get("doi"),
+                **venue_of(work),
                 "outcome": "matched_by_biblio",
                 "fallback_query_url": fb_url,
                 "matched_volume": biblio.get("volume"),
@@ -625,6 +653,7 @@ def verify_publication(pub: dict, candidate_name: str, *,
         "author_match": matched_author,
         "cited_by_count": best.get("cited_by_count"),
         "doi": best.get("doi"),
+        **venue_of(best),
     })
 
     outcome, exact, _ = rule_outcome(best_sim, matched_author, cv_year, oa_year)
@@ -658,7 +687,8 @@ def verify_publication(pub: dict, candidate_name: str, *,
 # Candidate-level driver
 # ---------------------------------------------------------------------------
 
-def verify_candidate(validated: dict, *, use_cache: bool = True) -> dict:
+def verify_candidate(validated: dict, *, use_cache: bool = True,
+                     as_of_year: int | None = None) -> dict:
     """Verify every publication in a Stage 4 validated record."""
     profile = validated.get("profile", {})
     name_field = profile.get("full_name") or {}
@@ -679,6 +709,11 @@ def verify_candidate(validated: dict, *, use_cache: bool = True) -> dict:
         # wrong; that is carried forward for a human to look at, not used
         # to delete the entry's credit. Silently excluding an uncertain
         # record hides the uncertainty instead of resolving it.
+        # A title that cannot be placed in the CV - now tested word by word
+        # across table columns too (validate.appears_scattered) - is not
+        # credited even when the index knows the paper: the CV is the
+        # candidate's own account of their work, and a title absent from it
+        # is the extractor's, not theirs.
         if validation.get("verdict") == "unverified":
             exclusions.append("failed_validation")
 
@@ -697,12 +732,29 @@ def verify_candidate(validated: dict, *, use_cache: bool = True) -> dict:
 
     mark_duplicates(results, validated.get("publications", []))
 
+    # Research profiles the CV links to. Only ORCID can be retrieved; see
+    # research_profiles.py for why Scholar and Scopus are shown, not read.
+    import research_profiles
+    links = validated.get("research_links") or {}
+    profiles = [research_profiles.fetch_orcid_profile(
+                    orcid, candidate_name or "", use_cache=use_cache)
+                for orcid in links.get("orcid", [])[:1]]
+    extra = []
+    for profile in profiles:
+        extra = research_profiles.profile_works(
+            profile, results, links, as_of_year=as_of_year)
+        profile.pop("works", None)   # kept once, as profile_works below
+
     return {
         "candidate_id": validated.get("candidate_id"),
         "candidate_name": candidate_name,
         "verified_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "publications": results,
+        "research_links": links,
+        "research_profiles": profiles,
+        "profile_works": extra,
     }
+
 
 
 # Which copy of a duplicated entry earns the credit: the one the index

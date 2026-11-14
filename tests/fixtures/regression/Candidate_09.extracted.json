@@ -1,0 +1,505 @@
+{
+  "candidate_id": "Candidate_09",
+  "extracted_at": "2026-11-05T07:47:24+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Dr. Apala Banerjee",
+      "evidence": "Dr. Apala Banerjee                                                apala.banerjee26@gmail.com"
+    },
+    "email": {
+      "value": "apala.banerjee26@gmail.com",
+      "evidence": "apala.banerjee26@gmail.com"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": "LinkedIn, Google Scholar",
+      "evidence": "Indian Institute of Science, Bangalore,                                                LinkedIn, Google Scholar"
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "2018 - 2024                 PhD,                  Indian Institute of Technology Kanpur, India     7.5"
+    },
+    "phd_status": {
+      "value": "awarded",
+      "evidence": "2018 - 2024                 PhD,                  Indian Institute of Technology Kanpur, India     7.5"
+    },
+    "phd_institution": {
+      "value": "Indian Institute of Technology Kanpur",
+      "evidence": "2018 - 2024                 PhD,                  Indian Institute of Technology Kanpur, India     7.5"
+    },
+    "phd_start_year": {
+      "value": 2018,
+      "evidence": "2018 - 2024"
+    },
+    "phd_year": {
+      "value": 2024,
+      "evidence": "2018 - 2024"
+    },
+    "phd_subject": {
+      "value": "RF and Microwaves",
+      "evidence": "2018 - 2024                 PhD,                  Indian Institute of Technology Kanpur, India     7.5 RF and Microwaves"
+    },
+    "masters_degree": {
+      "value": "Master Of Technology",
+      "evidence": "2016-2018            Master Of Technology,             The University Of Burdwan, India           9.37 Microwaves"
+    },
+    "masters_institution": {
+      "value": "The University Of Burdwan",
+      "evidence": "2016-2018            Master Of Technology,             The University Of Burdwan, India           9.37"
+    },
+    "masters_year": {
+      "value": 2018,
+      "evidence": "2016-2018"
+    },
+    "masters_subject": {
+      "value": "Microwaves",
+      "evidence": "2016-2018            Master Of Technology,             The University Of Burdwan, India           9.37 Microwaves"
+    },
+    "bachelors_degree": {
+      "value": "Bachelor Of Technology",
+      "evidence": "2012-2016            Bachelor Of Technology,        West Bengal University Of Technology, India     9.14 Electronics and Communications"
+    },
+    "bachelors_institution": {
+      "value": "West Bengal University Of Technology",
+      "evidence": "2012-2016            Bachelor Of Technology,        West Bengal University Of Technology, India     9.14"
+    },
+    "bachelors_year": {
+      "value": 2016,
+      "evidence": "2012-2016"
+    },
+    "bachelors_subject": {
+      "value": "Electronics and Communications",
+      "evidence": "2012-2016            Bachelor Of Technology,        West Bengal University Of Technology, India     9.14 Electronics and Communications"
+    },
+    "research_area": {
+      "value": "RF and Microwaves, MMIC, EM Theory, EMI/EMC, RF Sensors, Resonators, Electromagnetics, resonant devices, receiver architecture, RFIC, eddy current sensing analysis, Active RF Sensors, Material Characterization",
+      "evidence": "Research interest areas: RF sensors, resonators, Electromagnetics, resonant devices, receiver architecture, RFIC, eddy current sensing analysis, Active RF Sensors, Material Characterization"
+    },
+    "positions": [
+      {
+        "title": "RF Quantum Engineer",
+        "organisation": "IISC, Bangalore",
+        "category": "industry",
+        "start_date": "2026-05",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "RF Quantum Engineer at IISC, Bangalore (May 2026- Present)",
+        "source_section": "POST PHD/THESIS SUBMISSION EXPERIENCE"
+      },
+      {
+        "title": "Post Doctoral Researcher",
+        "organisation": "CEMSE, KAUST Saudi Arabia",
+        "category": "research",
+        "start_date": "2025-03",
+        "end_date": "2026-03",
+        "is_current": false,
+        "evidence": "Post Doctoral Researcher at CEMSE, KAUST Saudi Arabia (March 2025-March 2026)",
+        "source_section": "POST PHD/THESIS SUBMISSION EXPERIENCE"
+      },
+      {
+        "title": "Research Consultant Electromagnetics",
+        "organisation": "CEMSE, KAUST Saudi Arabia",
+        "category": "research",
+        "start_date": "2024-05",
+        "end_date": "2024-09",
+        "is_current": false,
+        "evidence": "Research Consultant Electromagnetics at CEMSE, KAUST Saudi Arabia: EM Simulation, Design, Development, Analysis and Validation of RF biosensors. (May 2024-Sept 2024)",
+        "source_section": "POST PHD/THESIS SUBMISSION EXPERIENCE"
+      },
+      {
+        "title": "Project Scientist",
+        "organisation": "Department of Electrical Engineering, Indian Institute of Technology Kanpur",
+        "category": "research",
+        "start_date": "2024-11",
+        "end_date": "2025-02",
+        "is_current": false,
+        "evidence": "Project Scientist at Department of Electrical Engineering, Indian Institute of Technology Kanpur: Dielectric and Material Characterization of planetary analogous rocks sponsored by ISRO. (Nov 2024-Feb 2025)",
+        "source_section": "POST PHD/THESIS SUBMISSION EXPERIENCE"
+      },
+      {
+        "title": "Post Doctoral Research Fellow",
+        "organisation": "KAUST, Saudi Arabia",
+        "category": "research",
+        "start_date": "2024-07",
+        "end_date": "2026-06",
+        "is_current": false,
+        "evidence": "Post Doctoral Research Fellow, KAUST, Saudi Arabia: RF and Microwave Planar sensor for Biomedical Applications, Microwave testing of adhesive lap joints in oil pipelines in collaboration with Saudi ARAMCO. (2025-2026)",
+        "source_section": "Research Experience"
+      },
+      {
+        "title": "Research Consultant",
+        "organisation": "KAUST, Saudi Arabia",
+        "category": "research",
+        "start_date": "2023-07",
+        "end_date": "2024-06",
+        "is_current": false,
+        "evidence": "Research Consultant, KAUST, Saudi Arabia: Development of RF and Microwave Planar sensor for Biomedical Applications. (2024)",
+        "source_section": "Research Experience"
+      },
+      {
+        "title": "Doctor of Philosophy",
+        "organisation": "Indian Institute of Technology Kanpur",
+        "category": "research",
+        "start_date": "2018-01",
+        "end_date": "2024-06",
+        "is_current": false,
+        "evidence": "Doctor of Philosophy, Indian Institute of Technology Kanpur : High Sensitivity Planar RF Sensors for Industrial, Biomedical and Humanitarian Applications. A number of RF sensors with their full modelling, analysis and fabricated prototype with measured results are developed for several real-world applications. To overcome the limitation of resolution, active sensing is also explored using passive meta-material inspired sensors for dielectric characterization of plastic samples. A further prototype development for wireless sensing systems in the near-field ISM band is also proposed. (2018-2024)",
+        "source_section": "Research Experience"
+      },
+      {
+        "title": "Research Experience",
+        "organisation": "GE Bangalore, India (GE Research)",
+        "category": "research",
+        "start_date": "2022-01",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Research Experience, GE Bangalore, India(GE Research): Project 1: Non-Destructive evaluation of Eddy Current sensing system for F-Class Blade Turbine: Modelling and Study of coil geometry, crack-recess-sample analyses, voltage variation, field study and experimental exposure. Project 2: Motion Observation for cracks in moving blade turbines: experimental validation of cracks in lp/mm to determine the optimum resolution of cracks in turbine blades Project 3: Preliminary/Basics of THz sensing of bio-chemical particles in human breath. (2022)",
+        "source_section": "Research Experience"
+      },
+      {
+        "title": "Masters Research Experience",
+        "organisation": "Space Applications Center, ISRO, Ahmedabad, India",
+        "category": "research",
+        "start_date": "2017-01",
+        "end_date": "2018-06",
+        "is_current": false,
+        "evidence": "Masters Research Experience, Space Applications Center, ISRO, Ahmedabad, India: Design of 102 GHz MMIC Multiplier for Sub-MM Wave Receiver Development. Multiplier and Power Amplifier Design in full layout after LVS DRC check, modeling verification of MIM capacitors and Spiral inductors from foundry specified models. (2017-18)",
+        "source_section": "Research Experience"
+      },
+      {
+        "title": "Bachelors Research Experience",
+        "organisation": "Variable Energy Cyclotron Centre, Department of Atomic Energy, India",
+        "category": "research",
+        "start_date": "2015-01",
+        "end_date": "2015-12",
+        "is_current": false,
+        "evidence": "Bachelors Research Experience, Variable Energy Cyclotron Centre, Department of Atomic Energy, India: Design Of Cryogenic Temperature Monitor/Controller and Data Acquisition. (2015)",
+        "source_section": "Research Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Beyond the 2D Plane: Interfacing Microwave Resonators with Bioreceptor-Functionalized Hydrogel Micropillars for Label-free Enhanced Sensitivity Biosensing",
+      "authors": [
+        "G. Abuhaimed",
+        "H. Lu",
+        "A. Banerjee",
+        "J. R. Dominguez",
+        "E. Hasan",
+        "A. Shamim",
+        "D. Alsulaiman"
+      ],
+      "year": null,
+      "venue": "ACS Applied Materials and Interfaces",
+      "doi": null,
+      "status": "under_revision",
+      "evidence": "Beyond the 2D Plane: Interfacing Microwave Resonators with Bioreceptor-Functionalized Hydrogel Micropillars for Label-free Enhanced Sensitivity Biosensing, ACS Applied Materials and Interfaces (Revision Submitted)"
+    },
+    {
+      "title": "Microwave Measurement Techniques Using High Sensitivity Planar RF Sensors for Biomedical Applications",
+      "authors": [
+        "A. Banerjee",
+        "N. K. Tiwari",
+        "M. J. Akhtar"
+      ],
+      "year": 2025,
+      "venue": "IEEE Instrumentation and Measurement Magazine",
+      "doi": null,
+      "status": "published",
+      "evidence": "Microwave Measurement Techniques Using High Sensitivity Planar RF Sensors for Biomedical Applications, IEEE Instrumentation and Measurement Magazine, vol. 28, no. 8, pp. 20-30, November 2025"
+    },
+    {
+      "title": "Highly Selective IL-6 Detection Through a Microwave Sensor for Sepsis Severity Evaluation",
+      "authors": [
+        "A. O. Gonzalez",
+        "S. Rauf",
+        "A. Banerjee",
+        "A. Shamim"
+      ],
+      "year": 2025,
+      "venue": "IEEE Sensors Journal",
+      "doi": null,
+      "status": "published",
+      "evidence": "Highly Selective IL-6 Detection Through a Microwave Sensor for Sepsis Severity Evaluation, IEEE Sensors Journal, vol. 25, no. 22, pp. 41096-41104, 15 Nov.15, 2025"
+    },
+    {
+      "title": "Breaking the Specificity Barrier in Microwave Sensing: Highly Specific Lactate Microwave Biosensor for Fitness and Exercise Optimization",
+      "authors": [
+        "Firas Fatani",
+        "Sakandar Rauf",
+        "Apala Banerjee",
+        "Atif Shamim"
+      ],
+      "year": null,
+      "venue": "ACS Sensors",
+      "doi": "10.1021/acssensors.5c00470",
+      "status": "published",
+      "evidence": "Breaking the Specificity Barrier in Microwave Sensing: Highly Specific Lactate Microwave Biosensor for Fitness and Exercise Optimization, ACS Sensors Article ASAP DOI: 10.1021/acssensors.5c00470"
+    },
+    {
+      "title": "An Improved Microwave Sensor for Qualitative Assessment of Recycled Cooking Oils",
+      "authors": [
+        "A. Banerjee",
+        "N. K. Tiwari",
+        "F. Fatima",
+        "M. J. Akhtar"
+      ],
+      "year": 2023,
+      "venue": "IEEE Transactions on Instrumentation and Measurement",
+      "doi": null,
+      "status": "published",
+      "evidence": "An Improved Microwave Sensor for Qualitative Assessment of Recycled Cooking Oils, IEEE Transactions on Instrumentation and Measurement, vol. 72, pp. 1-14, 2023, Art no. 8005714"
+    },
+    {
+      "title": "Flexible printed electrically small microwave resonator for automated displacement tracking",
+      "authors": [
+        "A. Banerjee",
+        "F. Fatima",
+        "N. K. Tiwari",
+        "M. J. Akhtar"
+      ],
+      "year": 2023,
+      "venue": "Journal of Electromagnetic Waves and Applications",
+      "doi": null,
+      "status": "published",
+      "evidence": "Flexible printed electrically small microwave resonator for automated displacement tracking, Journal of Electromagnetic Waves and Applications, 37:17, 1409-1424"
+    },
+    {
+      "title": "Design of slot radiating RF planar sensor for homogeneity check of dielectric discontinuity",
+      "authors": [
+        "A. Banerjee",
+        "M. J. Akhtar"
+      ],
+      "year": 2023,
+      "venue": "Microw Opt Technol Lett",
+      "doi": null,
+      "status": "published",
+      "evidence": "Design of slot radiating RF planar sensor for homogeneity check of dielectric discontinuity. Microw Opt Technol Lett. 2023; 65: 2238-2245"
+    },
+    {
+      "title": "Detection of Sodium Ion Imbalance in Human Body Fluids Using an Improved RF Sensor",
+      "authors": [
+        "A. Banerjee",
+        "P. Azad",
+        "M. J. Akhtar"
+      ],
+      "year": 2023,
+      "venue": "IEEE Journal of Electromagnetics, RF and Microwaves in Medicine and Biology",
+      "doi": null,
+      "status": "published",
+      "evidence": "Detection of Sodium Ion Imbalance in Human Body Fluids Using an Improved RF Sensor, in IEEE Journal of Electromagnetics, RF and Microwaves in Medicine and Biology, vol. 7, no. 1, pp. 73-81, March 2023"
+    },
+    {
+      "title": "Frequency controlled intelligent standalone RF sensor system for dispersive material testing",
+      "authors": [
+        "S. Seth",
+        "A. Banerjee",
+        "N. K. Tiwari",
+        "M. Jaleel Akhtar"
+      ],
+      "year": 2021,
+      "venue": "Journal of Electromagnetic Waves and Applications",
+      "doi": null,
+      "status": "published",
+      "evidence": "Frequency controlled intelligent standalone RF sensor system for dispersive material testing, Journal of Electromagnetic Waves and Applications, 35:12, 1619-1636"
+    },
+    {
+      "title": "Design of Bridge Type C-Band Planar RF Sensor for Detection of Solute Concentration Level in Water",
+      "authors": [
+        "A. Banerjee",
+        "A. Kumar",
+        "N. K. Tiwari",
+        "M. J. Akhtar"
+      ],
+      "year": 2021,
+      "venue": "IEEE Sensors Journal",
+      "doi": null,
+      "status": "published",
+      "evidence": "Design of Bridge Type C-Band Planar RF Sensor for Detection of Solute Concentration Level in Water, in IEEE Sensors Journal, vol. 21, no. 20, pp. 22670-22678, 15 Oct.15, 2021"
+    },
+    {
+      "title": "Artificial neural network-based standalone tunable RF sensor system",
+      "authors": [
+        "A. Banerjee",
+        "S. Chatterjee",
+        "A. Das",
+        "S. Chakraborty",
+        "A. Acharyya"
+      ],
+      "year": 2021,
+      "venue": "Rev. Sci. Instrum.",
+      "doi": null,
+      "status": "published",
+      "evidence": "Artificial neural network-based standalone tunable RF sensor system. Rev. Sci. Instrum. 1 July 2021; 92 (7): 075003"
+    },
+    {
+      "title": "Impact Ionization Rate of Electrons in Monolayer Graphene Nanoribbons",
+      "authors": [
+        "A. Banerjee Bhowmick",
+        "A. Banerjee",
+        "A. R. Pandey",
+        "A. Yadav",
+        "P. Pallye",
+        "A. Acharyya"
+      ],
+      "year": 2016,
+      "venue": "IETE Journal of Research",
+      "doi": null,
+      "status": "published",
+      "evidence": "Impact Ionization Rate of Electrons in Monolayer Graphene Nanoribbons, IETE Journal of Research, 62:5, 645-653"
+    },
+    {
+      "title": "Additional confirmation of a generalized analytical model based on multistage scattering phenomena to evaluate the ionization rates of charge carriers in semiconductors",
+      "authors": [
+        "A. Acharyya",
+        "A. Chatterjee",
+        "A. Das",
+        "S. Chakraborty",
+        "A. Banerjee"
+      ],
+      "year": 2016,
+      "venue": "J Comput Electron",
+      "doi": null,
+      "status": "published",
+      "evidence": "Additional confirmation of a generalized analytical model based on multistage scattering phenomena to evaluate the ionization rates of charge carriers in semiconductors. J Comput Electron 15, 34–39 (2016)"
+    },
+    {
+      "title": "Evaluation of ionization rates of charge carriers in a semiconductor via a generalized analytical model based on multistage scattering phenomena—part II: Type-IIb diamond and 6H-SiC",
+      "authors": [
+        "A. Banerjee",
+        "A. Das",
+        "S. Chatterjee",
+        "S. Chakraborty",
+        "A. Acharyya"
+      ],
+      "year": 2016,
+      "venue": "Foundations and Frontiers in Computer, Communication and Electrical Engineering",
+      "doi": null,
+      "status": "published",
+      "evidence": "Evaluation of ionization rates of charge carriers in a semiconductor via a generalized analytical model based on multistage scattering phenomena—part II: Type-IIb diamond and 6H-SiC, in Foundations and Frontiers in Computer, Communication and Electrical Engineering, 1st ed. CRC Press, 2016, p. 4. eBook ISBN: 9780429225802"
+    },
+    {
+      "title": "Evaluation of ionization rates of charge carriers in a semiconductor via a generalized analytical model based on multistage scattering phenomena—part I: Wurtzite-GaN",
+      "authors": [
+        "A. Banerjee",
+        "S. Chatterjee",
+        "A. Das",
+        "S. Chakraborty",
+        "A. Acharyya"
+      ],
+      "year": 2016,
+      "venue": "Foundations and Frontiers in Computer, Communication and Electrical Engineering",
+      "doi": null,
+      "status": "published",
+      "evidence": "Evaluation of ionization rates of charge carriers in a semiconductor via a generalized analytical model based on multistage scattering phenomena—part I: Wurtzite-GaN, in Foundations and Frontiers in Computer, Communication and Electrical Engineering, 1st ed. CRC Press, 2016, p. 4. eBook ISBN: 9780429225802"
+    },
+    {
+      "title": "Development of an Active MMIC Frequency Tripler System in a Sub-millimeter to Terahertz Region Receiver for Planetary Observation",
+      "authors": [
+        "A. Banerjee"
+      ],
+      "year": 2021,
+      "venue": "Advanced Materials for Future Terahertz Devices, Circuits and Systems",
+      "doi": null,
+      "status": "published",
+      "evidence": "Development of an Active MMIC Frequency Tripler System in a Sub-millimeter to Terahertz Region Receiver for Planetary Observation. In: Acharyya, A., Das, P. (eds) Advanced Materials for Future Terahertz Devices, Circuits and Systems. Lecture Notes in Electrical Engineering, vol 727. Springer, Singapore."
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 5837,
+      "output_tokens": 898,
+      "seconds": 215.7,
+      "load_seconds": 15.62,
+      "prefill_seconds": 13.12,
+      "decode_seconds": 184.8,
+      "truncated": false,
+      "called_at": "2026-11-05T07:24:54+00:00",
+      "prompt_sha": "b6d84af404d115ed"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "skipped: CV contains no NET/SET/SLET token",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-05T07:28:30+00:00",
+      "prompt_sha": ""
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 1530,
+      "output_tokens": 1314,
+      "seconds": 270.2,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-05T07:28:30+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 5111,
+      "output_tokens": 2634,
+      "seconds": 863.3,
+      "load_seconds": 0.02,
+      "prefill_seconds": 10.94,
+      "decode_seconds": 850.1,
+      "truncated": false,
+      "called_at": "2026-11-05T07:33:00+00:00",
+      "prompt_sha": "91bca546a8a68aa5"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-05T07:47:24+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "4b9f395846fbdaa1dc5fcf070b75f6a4313fabad753bc5014034514cefc39073"
+}

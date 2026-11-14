@@ -1,0 +1,352 @@
+{
+  "candidate_id": "Candidate_06",
+  "extracted_at": "2026-11-14T10:58:08+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Rakesh Suthar",
+      "evidence": "Rakesh Suthar"
+    },
+    "email": {
+      "value": "rakeshsuthar1996@gmail.com",
+      "evidence": "Email: rakeshsuthar1996@gmail.com"
+    },
+    "orcid": {
+      "value": "0000-0002-3921-2639",
+      "evidence": "ORCID: 0000-0002-3921-2639"
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Doctor of Philosophy in Energy Science and Engineering        September 2020–September 2024"
+    },
+    "phd_status": {
+      "value": "pursuing",
+      "evidence": "Doctor of Philosophy in Energy Science and Engineering        September 2020–September 2024"
+    },
+    "phd_institution": {
+      "value": "Indian Institute of Technology Delhi",
+      "evidence": "Indian Institute of Technology Delhi, New Delhi, India"
+    },
+    "phd_start_year": {
+      "value": 2020,
+      "evidence": "Doctor of Philosophy in Energy Science and Engineering        September 2020–September 2024"
+    },
+    "phd_year": {
+      "value": null,
+      "evidence": "Doctor of Philosophy in Energy Science and Engineering        September 2020–September 2024"
+    },
+    "phd_subject": {
+      "value": "Unraveling Loss Mechanisms in Non-Fullerene Organic Solar Cells: Integrating Data-Driven Machine Learning and Experimental Approaches",
+      "evidence": "Thesis: Unraveling Loss Mechanisms in Non-Fullerene Organic Solar Cells: Integrating Data-Driven Machine Learning and Experimental Approaches"
+    },
+    "masters_degree": {
+      "value": "masters",
+      "evidence": "Master of Science in Physics"
+    },
+    "masters_institution": {
+      "value": "Jai Narain Vyas University",
+      "evidence": "Jai Narain Vyas University, Jodhpur, India"
+    },
+    "masters_year": {
+      "value": 2018,
+      "evidence": "Master of Science in Physics                                             July 2016–August 2018"
+    },
+    "masters_subject": {
+      "value": "Physics",
+      "evidence": "Master of Science in Physics"
+    },
+    "bachelors_degree": {
+      "value": "bachelors",
+      "evidence": "Bachelor of Science in Physics, Chemistry, and Mathematics"
+    },
+    "bachelors_institution": {
+      "value": "Lachoo Memorial College of Science & Technology",
+      "evidence": "Lachoo Memorial College of Science & Technology, Jodhpur, India"
+    },
+    "bachelors_year": {
+      "value": 2016,
+      "evidence": "Bachelor of Science in Physics, Chemistry, and Mathematics                 July 2013–June 2016"
+    },
+    "bachelors_subject": {
+      "value": "Physics, Chemistry, and Mathematics",
+      "evidence": "Bachelor of Science in Physics, Chemistry, and Mathematics                 July 2013–June 2016"
+    },
+    "research_area": {
+      "value": "Semiconductor Devices, Optoelectronics, and Energy Materials",
+      "evidence": "Research focus: Thin-film organic photovoltaics, semiconductor-device physics, two-dimensional materials for optoelectronic devices, and machine-learning-guided photovoltaic-materials optimization."
+    },
+    "positions": [
+      {
+        "title": "Postdoctoral Researcher",
+        "organisation": "Rochester Institute of Technology, New York, USA",
+        "category": "research",
+        "start_date": "2025-04",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Postdoctoral Researcher                                                      April 2025–Present\nRochester Institute of Technology, New York, USA",
+        "source_section": "Professional Experience"
+      },
+      {
+        "title": "Postdoctoral Research Fellow",
+        "organisation": "Indian Institute of Technology Delhi, New Delhi, India",
+        "category": "research",
+        "start_date": "2024-09",
+        "end_date": "2025-02",
+        "is_current": false,
+        "evidence": "Postdoctoral Research Fellow                                 September 2024–February 2025\nIndian Institute of Technology Delhi, New Delhi, India",
+        "source_section": "Professional Experience"
+      },
+      {
+        "title": "Junior Research Fellow",
+        "organisation": "The LNM Institute of Information Technology, Jaipur, India",
+        "category": "research",
+        "start_date": "2019-02",
+        "end_date": "2020-07",
+        "is_current": false,
+        "evidence": "Junior Research Fellow                                              February 2019–July 2020\nThe LNM Institute of Information Technology, Jaipur, India",
+        "source_section": "Professional Experience"
+      },
+      {
+        "title": "Co-Instructor",
+        "organisation": "Rochester Institute of Technology",
+        "category": "teaching",
+        "start_date": "2025",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Co-Instructor, Rochester Institute of Technology, 2025\nUndergraduate and graduate level\n\n• Contributed to interdisciplinary instruction on machine-learning concepts and their applications in chemistry and materials science.\n• Supported lectures, computational demonstrations, course materials, student projects, and assessment.\n• Guided students in applying data-driven methods to chemical and materials-science problems.",
+        "source_section": "Teaching Experience"
+      },
+      {
+        "title": "Laboratory Instructor",
+        "organisation": "Rochester Institute of Technology",
+        "category": "teaching",
+        "start_date": "2025",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Laboratory Instructor, Rochester Institute of Technology, 2025\nUndergraduate level\n\n• Conducted laboratory sessions and explained experimental principles, procedures, and laboratory-safety requirements.\n• Supervised student experiments and guided students in data analysis, scientific interpretation, and report preparation.\n• Evaluated student laboratory work and reports.",
+        "source_section": "Teaching Experience"
+      },
+      {
+        "title": "Teaching Assistant",
+        "organisation": "Indian Institute of Technology Delhi",
+        "category": "teaching",
+        "start_date": "2025",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Teaching Assistant, Indian Institute of Technology Delhi\nUndergraduate level\n\n• Supervised experiments related to energy conversion, materials, and device characterization.\n• Guided students in experimental measurements, data analysis, and scientific interpretation.\n• Assisted with laboratory instruction and assessment.",
+        "source_section": "Teaching Experience"
+      },
+      {
+        "title": "Student Mentoring",
+        "organisation": null,
+        "category": "other",
+        "start_date": "2025",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "Student Mentoring\n\n• Mentored two M.Tech. and five B.Tech. students working on machine-learning applications in organic and perovskite solar cells.\n• Guided students in research-problem formulation, literature review, data organization, feature engineering, machine-learning model development, interpretation, and scientific writing.\n• Supported interdisciplinary projects connecting physics, chemistry, materials science, Artificial Intelligence, and energy technologies.",
+        "source_section": "Teaching Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Machine-Learning-Guided Prediction of Photovoltaic Performance for Non-Fullerene Organic Solar Cells Using Novel Molecular and Structural Descriptors",
+      "authors": [
+        "R. Suthar",
+        "T. Abhijith",
+        "S. Karak"
+      ],
+      "year": 2023,
+      "venue": "Journal of Materials Chemistry A",
+      "doi": null,
+      "status": "published",
+      "evidence": "R. Suthar, T. Abhijith, and S. Karak, “Machine-Learning-Guided Prediction of Photovoltaic Performance for Non-Fullerene Organic Solar Cells Using Novel Molecular and Structural Descriptors,” Journal of Materials Chemistry A, vol. 11, no. 41, 2023, pp. 22248–22258."
+    },
+    {
+      "title": "Ultrafast Highly Sensitive Self-Powered MSIM Photodetector Based on Organic Semiconductor/Dielectric Interfaces for Broadband Visible to Near-Infrared Communication",
+      "authors": [
+        "S. Singh*",
+        "R. Suthar*",
+        "A. Tomimatsu",
+        "P. Rani",
+        "M. M. Matsushita",
+        "K. Awaga",
+        "S. Karak"
+      ],
+      "year": 2025,
+      "venue": "Advanced Functional Materials",
+      "doi": "2025, Art. no. 2425426",
+      "status": "in press",
+      "evidence": "S. Singh*, R. Suthar*, A. Tomimatsu, P. Rani, M. M. Matsushita, K. Awaga, and S. Karak, “Ultrafast Highly Sensitive Self-Powered MSIM Photodetector Based on Organic Semiconductor/Dielectric Interfaces for Broadband Visible to Near-Infrared Communication,” Advanced Functional Materials, 2025, Art. no. 2425426. (*Equal contribution)"
+    },
+    {
+      "title": "Role of Exciton Lifetime, Energetic Offsets, and Disorder in Voltage Loss of Bulk Heterojunction Organic Solar Cells",
+      "authors": [
+        "R. Suthar",
+        "T. Abhijith",
+        "H. Dahiya",
+        "A. K. Singh",
+        "G. D. Sharma",
+        "S. Karak"
+      ],
+      "year": 2023,
+      "venue": "ACS Applied Materials & Interfaces",
+      "doi": null,
+      "status": "published",
+      "evidence": "R. Suthar, T. Abhijith, H. Dahiya, A. K. Singh, G. D. Sharma, and S. Karak, “Role of Exciton Lifetime, Energetic Offsets, and Disorder in Voltage Loss of Bulk Heterojunction Organic Solar Cells,” ACS Applied Materials & Interfaces, vol. 15, 2023, pp. 3214–3223."
+    },
+    {
+      "title": "Synergistic Plasmonic Responses of Multi-Shaped Au Nanostructures Hybridized with Few-Layer WS2 Nanosheets for Organic Solar Cells",
+      "authors": [
+        "T. Abhijith*",
+        "R. Suthar*",
+        "S. Karak"
+      ],
+      "year": 2023,
+      "venue": "ACS Applied Nano Materials",
+      "doi": null,
+      "status": "published",
+      "evidence": "T. Abhijith*, R. Suthar*, and S. Karak, “Synergistic Plasmonic Responses of Multi-Shaped Au Nanostructures Hybridized with Few-Layer WS2 Nanosheets for Organic Solar Cells,” ACS Applied Nano Materials, vol. 6, 2023, pp. 11737–11746. (*Equal contribution)"
+    },
+    {
+      "title": "Machine Learning Framework for the Analysis and Prediction of Energy Loss for Non-Fullerene Organic Solar Cells",
+      "authors": [
+        "R. Suthar",
+        "T. Abhijith",
+        "P. Sharma",
+        "S. Karak"
+      ],
+      "year": 2023,
+      "venue": "Solar Energy",
+      "doi": null,
+      "status": "published",
+      "evidence": "R. Suthar, T. Abhijith, P. Sharma, and S. Karak, “Machine Learning Framework for the Analysis and Prediction of Energy Loss for Non-Fullerene Organic Solar Cells,” Solar Energy, vol. 250, 2023, pp. 119–127."
+    },
+    {
+      "title": "Indoor Organic Solar Cell for Low-Power IoT Devices: Recent Progress, Challenges, and Application",
+      "authors": [
+        "R. Suthar",
+        "H. Dahiya",
+        "S. Karak",
+        "G. D. Sharma"
+      ],
+      "year": 2023,
+      "venue": "Journal of Materials Chemistry C",
+      "doi": null,
+      "status": "published",
+      "evidence": "R. Suthar, H. Dahiya, S. Karak, and G. D. Sharma, “Indoor Organic Solar Cell for Low-Power IoT Devices: Recent Progress, Challenges, and Application,” Journal of Materials Chemistry C, vol. 11, 2023, pp. 12486–12510."
+    },
+    {
+      "title": "Facile Approach for Efficient Non-Fullerene-Based Binary and Ternary Organic Solar Cells Using Hydrated Vanadium Pentoxide as a Hole Transport Layer",
+      "authors": [
+        "H. Dahiya",
+        "R. Suthar",
+        "M. K. Singh",
+        "R. Singhal",
+        "S. Karak",
+        "G. D. Sharma"
+      ],
+      "year": 2023,
+      "venue": "ACS Applied Energy Materials",
+      "doi": null,
+      "status": "published",
+      "evidence": "H. Dahiya, R. Suthar, M. K. Singh, R. Singhal, S. Karak, and G. D. Sharma, “Facile Approach for Efficient Non-Fullerene-Based Binary and Ternary Organic Solar Cells Using Hydrated Vanadium Pentoxide as a Hole Transport Layer,” ACS Applied Energy Materials, vol. 6, 2023, pp. 3442–3451."
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 4225,
+      "output_tokens": 791,
+      "seconds": 180.0,
+      "load_seconds": 15.25,
+      "prefill_seconds": 9.29,
+      "decode_seconds": 153.29,
+      "truncated": false,
+      "called_at": "2026-11-14T10:43:11+00:00",
+      "prompt_sha": "5edf02b155658dab"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3334,
+      "output_tokens": 19,
+      "seconds": 12.1,
+      "load_seconds": 0.02,
+      "prefill_seconds": 7.41,
+      "decode_seconds": 2.28,
+      "truncated": false,
+      "called_at": "2026-11-14T10:46:11+00:00",
+      "prompt_sha": "f9289268f736e16b"
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 1945,
+      "output_tokens": 874,
+      "seconds": 160.8,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T10:46:23+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 3499,
+      "output_tokens": 1425,
+      "seconds": 544.2,
+      "load_seconds": 0.01,
+      "prefill_seconds": 7.43,
+      "decode_seconds": 534.51,
+      "truncated": false,
+      "called_at": "2026-11-14T10:49:04+00:00",
+      "prompt_sha": "f34b1511cbb350dd"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T10:58:08+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "7de2bd38a57bf57fc89aa2897a7af6492789906231d6c50924aaf8903f1435b9"
+}

@@ -318,13 +318,32 @@ Ongoing   Mr. Shailesh Kumar, IIT ISM Dhanbad
 
 
 def test_a_doctorate_under_education_still_contradicts_a_none_claim():
-    """The safety net the scoping must not remove."""
+    """
+    The safety net the scoping must not remove: a "none" claim never
+    survives a doctorate printed under Education. The CV's own row is read
+    instead - here a closed, past period with no in-progress wording, so a
+    completed doctorate, flagged because nothing else corroborates it.
+    """
     result = run("""Anita Rao
 
 Education
 Ph.D. Physics, IISc Bangalore    2015 - 2021
 """, phd_status=wrap("none", ""))
-    assert result["profile"]["phd_status"]["value"] is None
+    status = result["profile"]["phd_status"]
+    assert status["value"] == "awarded"
+    assert status["source"] == "cv_rule_parser"
+    assert status["corrected_from"] == "none"
+    assert status["needs_confirmation"] is True
+    assert gate(result)["outcome"] == "met"
+
+
+def test_an_unfinished_doctorate_under_education_contradicts_a_none_claim():
+    result = run("""Anita Rao
+
+Education
+Ph.D. Physics, IISc Bangalore    2021 - Present
+""", phd_status=wrap("none", ""))
+    assert result["profile"]["phd_status"]["value"] == "pursuing"
     assert gate(result)["outcome"] == "indeterminate"
 
 

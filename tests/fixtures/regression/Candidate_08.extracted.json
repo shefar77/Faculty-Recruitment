@@ -1,0 +1,791 @@
+{
+  "candidate_id": "Candidate_08",
+  "extracted_at": "2026-11-06T10:03:18+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Prabhat Dansena",
+      "evidence": "Prabhat Dansena"
+    },
+    "email": {
+      "value": "p.dansena23@gmail.com",
+      "evidence": "# p.dansena23@gmail.com"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Ph.D. Computer Science and Engineering"
+    },
+    "phd_status": {
+      "value": "awarded",
+      "evidence": "Ph.D. Computer Science and Engineering"
+    },
+    "phd_institution": {
+      "value": "Indian Institute of Technology (Indian School of Mines) Dhanbad, Jharkhand, India.",
+      "evidence": "Indian Institute of Technology (Indian School of Mines) Dhanbad, Jharkhand, India."
+    },
+    "phd_start_year": {
+      "value": 2015,
+      "evidence": "2015 – 2022"
+    },
+    "phd_year": {
+      "value": 2022,
+      "evidence": "2015 – 2022"
+    },
+    "phd_subject": {
+      "value": "Computer Science and Engineering",
+      "evidence": "Computer Science and Engineering"
+    },
+    "masters_degree": {
+      "value": "mtech",
+      "evidence": "M.Tech. Information Technology"
+    },
+    "masters_institution": {
+      "value": "University of Hyderabad, Telangana, India.",
+      "evidence": "University of Hyderabad, Telangana, India."
+    },
+    "masters_year": {
+      "value": 2013,
+      "evidence": "2013 – 2015"
+    },
+    "masters_subject": {
+      "value": "Information Technology",
+      "evidence": "Information Technology"
+    },
+    "bachelors_degree": {
+      "value": "btech",
+      "evidence": "B.Tech. Computer Science and Engineering"
+    },
+    "bachelors_institution": {
+      "value": "Chhattisgarh Swami Vivekanand Technical University, Chhattisgarh, India.",
+      "evidence": "Chhattisgarh Swami Vivekanand Technical University, Chhattisgarh, India."
+    },
+    "bachelors_year": {
+      "value": 2008,
+      "evidence": "2008 – 2012"
+    },
+    "bachelors_subject": {
+      "value": "Computer Science and Engineering",
+      "evidence": "Computer Science and Engineering"
+    },
+    "research_area": {
+      "value": "Artificial Intelligence, Computer Vision, Deep Learning, Document Intelligence, Document Image Analysis and Forensics, Image Enhancement and Restoration, Pattern Recognition, Machine Learning, Digital Image Processing, FinTech Applications of AI",
+      "evidence": "Research Interests"
+    },
+    "positions": [
+      {
+        "title": "Assistant Professor",
+        "organisation": "C. V. Raman Global University, Bhubaneswar",
+        "category": "teaching",
+        "start_date": "2023-01",
+        "end_date": null,
+        "is_current": true,
+        "evidence": "2023 – Till Date   ]  Assistant Professor C. V. Raman Global University, Bhubaneswar.",
+        "source_section": "Academic Appointments"
+      },
+      {
+        "title": "Assistant Professor",
+        "organisation": "ITER, SOA Bhubaneswar",
+        "category": "teaching",
+        "start_date": "2022-01",
+        "end_date": "2023-12",
+        "is_current": false,
+        "evidence": "2022 – 2023   ]  Assistant Professor ITER, SOA Bhubaneswar.",
+        "source_section": "Academic Appointments"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Multilingual Signature Verification System Using Handcrafted Features Infused VGG-16 Model",
+      "authors": [
+        "Gupta, R.",
+        "Wagh, M. P.",
+        "Dansena, P.",
+        "Saikia, M. J."
+      ],
+      "year": 2026,
+      "venue": "Signal, Image and Video Processing",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "An Efficient Low-Complexity Deep Learning Model for Low-Light Human Action Recognition using IoT Devices",
+      "authors": [
+        "Mishra, M. R.",
+        "Dansena, P.",
+        "Meher, P. K."
+      ],
+      "year": 2026,
+      "venue": "Internet Technology Letters",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "A Systematic Multi-Criteria Framework for Selecting Hydrogen Production Methods",
+      "authors": [
+        "Yadav, D.",
+        "Dwivedi, A.",
+        "Lu, X.",
+        "Vishwakarma, C. B.",
+        "Jing, D.",
+        "Dansena, P.",
+        "Kumar, R. R."
+      ],
+      "year": 2026,
+      "venue": "International Journal of Green Energy",
+      "doi": "https://doi.org/10.1080/15435075.2026.2626404",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Afast(CNN+MCWS-transformer) based Architecture for Protein Function Prediction",
+      "authors": [
+        "Mahala, A.",
+        "Ranjan, A.",
+        "Priyadarshini, R.",
+        "Vikram, R.",
+        "Dansena, P."
+      ],
+      "year": 2025,
+      "venue": "Statistical Applications in Genetics and Molecular Biology",
+      "doi": "https://doi.org/10.1515/sagmb-2024-0027",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "An Efficient Camouflaged Image Segmentation with Modified U-Net and Attention Techniques",
+      "authors": [
+        "Padhy, I.",
+        "Dansena, P.",
+        "Sahoo, S.",
+        "Priyadarshi, R."
+      ],
+      "year": 2025,
+      "venue": "Scientific Reports",
+      "doi": "https://doi.org/10.1038/s41598-025-07571-9",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Numerical Analysis of a Helical Spiral Microevaporator-Microreformer System for Enhanced Methanol Conversion and Hydrogen Production",
+      "authors": [
+        "Yadav, D.",
+        "Lu, X.",
+        "Dansena, P.",
+        "Jing, D."
+      ],
+      "year": 2025,
+      "venue": "Chemical Engineering and Processing-Process Intensification",
+      "doi": "https://doi.org/10.1016/j.cep.2024.110149",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Evolutionary Optimization-Based Descendent Adaptive Filter for Noise Confiscation in Electrocardiogram Signals",
+      "authors": [
+        "Yadav, S.",
+        "Saha, S. K.",
+        "Kar, R.",
+        "Dansena, P."
+      ],
+      "year": 2025,
+      "venue": "Physical and Engineering Sciences in Medicine",
+      "doi": "https://doi.org/10.1007/s13246-025-01631-0",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Pen Ink Discrimination in Handwritten Documents using Statistical and Motif Texture Analysis: A Classification based Approach",
+      "authors": [
+        "Dansena, P.",
+        "Bag, S.",
+        "Pal, R."
+      ],
+      "year": 2022,
+      "venue": "Multimedia Tools and Applications",
+      "doi": "https://doi.org/10.1007/s11042-022-12843-x",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Application of Machine Learning and Well Log Attributes in Geothermal Drilling",
+      "authors": [
+        "Kiran, R.",
+        "Dansena, P.",
+        "Salehi, S.",
+        "Rajak, V. K."
+      ],
+      "year": 2022,
+      "venue": "Geothermics",
+      "doi": "https://doi.org/10.1016/j.geothermics.2022.102355",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Generation of Synthetic Data for Handwritten Word Alteration Detection",
+      "authors": [
+        "Dansena, P.",
+        "Bag, S.",
+        "Pal, R."
+      ],
+      "year": 2021,
+      "venue": "IEEE Access",
+      "doi": "https://doi.org/10.1109/ACCESS.2021.3059342",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Fusion of Region based Extracted Features for Instance-and Class-based CBIR Applications",
+      "authors": [
+        "Pradhan, J.",
+        "Pal, A. K.",
+        "Banka, H.",
+        "Dansena, P."
+      ],
+      "year": 2021,
+      "venue": "Applied Soft Computing",
+      "doi": "https://doi.org/10.1016/j.asoc.2020.107063",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Quantitative Assessment of Capabilities of Colour Models for Pen Ink Discrimination in Handwritten Documents",
+      "authors": [
+        "Dansena, P.",
+        "Pal, R.",
+        "Bag, S."
+      ],
+      "year": 2020,
+      "venue": "IET Image Processing",
+      "doi": "https://doi.org/10.1049/iet-ipr.2018.6616",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "A Unique Multilayer Perceptron Model (ANN) for Different Oxide/EG Nanofluid’s Viscosity from the Experimental Study",
+      "authors": [
+        "Yadav, D.",
+        "Dansena, P.",
+        "Ghosh, S. K.",
+        "Singh, P. K."
+      ],
+      "year": 2020,
+      "venue": "Physica A: Statistical Mechanics and Its Applications",
+      "doi": "https://doi.org/10.1016/j.physa.2019.124030",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Folded Artifact Removal in Document Images via Lightness Channel Simulation and Conditional GAN Restoration",
+      "authors": [
+        "Jha, B.",
+        "Dansena, P.",
+        "Ranjan, A.",
+        "Bag, S."
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the International Conference on Intelligent Computing, Cognitive Networks, and Smart Systems (IC2NS2)",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "GL-3DViT: A Global-Local Feature Fusion based Hybrid Network for Hyperspectral Land Cover Classification",
+      "authors": [
+        "Khonde, S. P.",
+        "Mishra, G.",
+        "Dansena, P.",
+        "Ranjan, A.",
+        "Kumari, R."
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge Management",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "Superpixel-Enhanced SC-U-Net for Skin Lesion Segmentation",
+      "authors": [
+        "Kumar, N.",
+        "Mishra, G.",
+        "Dansena, P."
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the International Conference on Intelligent Computing, Cognitive Networks, and Smart Systems (IC2NS2)",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "Channel Attention-Infused DenseNet for Multi-Class Brain MRI Analysis",
+      "authors": [
+        "Panigrahi, S.",
+        "Das Adhikary, D. R.",
+        "Jena, P. P.",
+        "Dash, A.",
+        "Dansena, P."
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the International Conference on Intelligent Computing, Cognitive Networks, and Smart Systems (IC2NS2)",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "Physics-Informed Attention Networks for Flow in Digital Porous Media",
+      "authors": [
+        "Paul, R.",
+        "Bangrawa, S.",
+        "Dansena, P.",
+        "Kiran, R."
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the International Conference on Intelligent Computing, Cognitive Networks, and Smart Systems (IC2NS2)",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "γ-Correction + ZeroDCE-PCE: A Text Aware Zero-Reference Approach for Low-Light Cheque Image Enhancement",
+      "authors": [
+        "Ranjan, A.",
+        "Dansena, P.",
+        "Bag, S.",
+        "Tripathi, P. C."
+      ],
+      "year": 2026,
+      "venue": "Proceedings of the International Conference on Pattern Recognition Applications and Methods (ICPRAM)",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted, Springer]"
+    },
+    {
+      "title": "A Zero-Reference Approach Employing γ-Correction + Dilated-ZeroDCE++ for Handwritten Cheque Image Enhancement",
+      "authors": [
+        "Dansena, P.",
+        "Ranjan, A.",
+        "Bag, S.",
+        "Tripathi, P. C."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Pattern Recognition Applications and Methods (ICPRAM)",
+      "doi": "https://doi.org/10.5220/0014489900004067",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Writer Authentication using Different Structural and Geometrical Features: An Application Towards Handwritten Document Forensics",
+      "authors": [
+        "Dansena, P.",
+        "Sinha, A.",
+        "Bag, S.",
+        "Sarkar, K."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the Indian Conference on Computer Vision, Graphics and Image Processing ICVGIP 2025 Workshop HDF",
+      "doi": null,
+      "status": "accepted",
+      "evidence": "[Accepted]"
+    },
+    {
+      "title": "A Zero-Reference-Based He + Deep Enhancement Approach for Low-Light Images",
+      "authors": [
+        "Mahala, A.",
+        "Ranjan, A.",
+        "Dansena, P.",
+        "Kumar, G."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Microwave, Optical, and Communication Engineering (ICMOCE-2025)",
+      "doi": null,
+      "status": "accepted and presented",
+      "evidence": null
+    },
+    {
+      "title": "LiteSeqCNN + Multi-attention-Based Framework for Protein Function Prediction",
+      "authors": [
+        "Mahala, A.",
+        "Ranjan, A.",
+        "Priyadarshini, R.",
+        "Dansena, P.",
+        "Bharadwaj, K."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Power Engineering and Intelligent Systems (PEIS)",
+      "doi": "https://doi.org/10.1007/978-981-96-9716-8_48",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Hybrid Residual 3D CNN with Focal Loss for Hyperspectral Image Classification",
+      "authors": [
+        "Moolchandani, S.",
+        "Mishra, G.",
+        "Dansena, P."
+      ],
+      "year": 2025,
+      "venue": "International Conference on Pattern Recognition and Machine Intelligence",
+      "doi": "https://doi.org/10.1007/978-3-032-18477-1_43",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "ConvFormer: A Hybrid CNN-Transformer Architecture for Efficient Brain Tumor Recognition in MRI Scans",
+      "authors": [
+        "Panigrahi, S.",
+        "Adhikary, D. R. D.",
+        "Mishra, G.",
+        "Dansena, P.",
+        "Vikram, R."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Cognitive, Green and Ubiquitous Computing (IC-CGU) (pp. 1–6)",
+      "doi": "https://doi.org/10.1109/IC-CGU67042.2025.11337989",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "An Adaptive (γ-Correction + Deep Learning)-Based Zero-Reference Approach for Low-Light Images",
+      "authors": [
+        "Rath, S.",
+        "Ranjan, A.",
+        "Panda, G.",
+        "Dansena, P.",
+        "Mahala, A."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the IC-CGU Conference",
+      "doi": "https://doi.org/10.1109/IC-CGU67042.2025.11338095",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Summarizing News Articles Using Artificial Intelligence and Machine Learning",
+      "authors": [
+        "Reddy, V. M.",
+        "Wali, S.",
+        "Vurubindi, P.",
+        "Dansena, P.",
+        "Uyyala, R."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Cognitive, Green and Ubiquitous Computing (IC-CGU) (pp. 1–5)",
+      "doi": "https://doi.org/10.1109/IC-CGU67042.2025.11338128",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Kidney Stone Detection Using Deep Learning Techniques",
+      "authors": [
+        "Uyyala, R.",
+        "Baig, M. I.",
+        "Reddy, R. R.",
+        "Dansena, P."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Cognitive, Green and Ubiquitous Computing (IC-CGU) (pp. 1–6)",
+      "doi": "https://doi.org/10.1109/IC-CGU67042.2025.11338047",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "AI-Based Terminal Assistant: Code Generator, Summarizer & Smart-Debugger using RAG, FAISS Vector Retrieval, and Large Language Models",
+      "authors": [
+        "Uyyala, R.",
+        "Sajid, M.",
+        "Madhav, V.",
+        "Dansena, P."
+      ],
+      "year": 2025,
+      "venue": "Proceedings of the International Conference on Cognitive, Green and Ubiquitous Computing (IC-CGU) (pp. 1–5)",
+      "doi": "https://doi.org/10.1109/ic-cgu67042.2025.11338012",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "A Weighted Deep Learning Approach to Identify Nucleic Acid-Binding Proteins",
+      "authors": [
+        "Mahala, A.",
+        "Ranjan, A.",
+        "Priyadarshini, R.",
+        "Dansena, P.",
+        "Tripathi, P. C."
+      ],
+      "year": 2024,
+      "venue": "Proceedings of the International Conference on Computational Intelligence (pp. 219–230)",
+      "doi": "https://doi.org/10.1007/978-981-96-4539-8_15",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Rhombus Context Based Gradient Estimation for Information Retrieval Using Digital Media",
+      "authors": [
+        "Uyyala, R.",
+        "Ramu, S. C.",
+        "Reddy, R. R.",
+        "Dansena, P."
+      ],
+      "year": 2024,
+      "venue": "Proceedings of the International Conference on Leveraging Emerging Technologies and Analytics for Development (pp. 83–101)",
+      "doi": "https://doi.org/10.1007/978-981-96-2548-2_4",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Ink Analysis using CNN-based Transfer Learning to Detect Alteration in Handwritten Words",
+      "authors": [
+        "Dansena, P.",
+        "Pramanik, R.",
+        "Bag, S.",
+        "Pal, R."
+      ],
+      "year": 2019,
+      "venue": "Proceedings of the International Conference on Computer Vision and Image Processing (CVIP-2019) (pp. 223–232)",
+      "doi": "https://doi.org/10.1007/978-981-15-4018-9_21",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Thermal Conductivity of CuO Nano Fluid Using Artificial Neural Network",
+      "authors": [
+        "Naruka, D. S.",
+        "Singh, P. K.",
+        "Dansena, P.",
+        "Patel, H."
+      ],
+      "year": 2018,
+      "venue": "Proceedings of International Conference on Mechanical Engineering (INCOM-2018)",
+      "doi": null,
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "A Study on the Effect of CNN-based Transfer Learning on Handwritten Indic and Mixed Numeral Recognition",
+      "authors": [
+        "Pramanik, R.",
+        "Dansena, P.",
+        "Bag, S."
+      ],
+      "year": 2018,
+      "venue": "Proceedings of the Workshop on Document Analysis and Recognition (pp. 41–51)",
+      "doi": "https://doi.org/10.1007/978-981-13-9361-7_4",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Geometrical and Structural Features for Forensics in Handwritten Bank Cheques",
+      "authors": [
+        "Wadhwa, A.",
+        "Maheshwari, M.",
+        "Dansena, P.",
+        "Bag, S."
+      ],
+      "year": 2018,
+      "venue": "Proceedings of the IEEE India Council International Conference (INDICON) (pp. 1–6)",
+      "doi": "https://doi.org/10.1109/INDICON45594.2018.8987116",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Differentiating Pen Inks in Handwritten Bank Cheques using Multi-layer Perceptron",
+      "authors": [
+        "Dansena, P.",
+        "Bag, S.",
+        "Pal, R."
+      ],
+      "year": 2017,
+      "venue": "Proceedings of the International Conference on Pattern Recognition and Machine Intelligence (PReMI-2017) (pp. 655–663)",
+      "doi": "https://doi.org/10.1007/978-3-319-69900-4_83",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Experimental Evaluation and ANN Modeling of Thermal Conductivity of Al2O3 Nanoparticles Dispersed in Different Base Fluids",
+      "authors": [
+        "Naruka, D. S.",
+        "Singh, P. K.",
+        "Dansena, P.",
+        "Patel, H."
+      ],
+      "year": 2017,
+      "venue": "Proceedings of the International ISHMT-ASTFE Heat and Mass Transfer Conference (IHMTC-2017)",
+      "doi": "https://doi.org/10.1615/IHMTC-2017.2230",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Line Based Extraction of Important Regions from a Cheque Image",
+      "authors": [
+        "Dansena, P.",
+        "Kumar, K. P.",
+        "Pal, R."
+      ],
+      "year": 2015,
+      "venue": "Proceedings of the International Conference on Contemporary Computing (IC3-2015) (pp. 183–189)",
+      "doi": "https://doi.org/10.1109/IC3.2015.7346676",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Implementation of a New Framework for Automated Network Security Checking and Alert System",
+      "authors": [
+        "Pandey, S. K.",
+        "Yadav, V. K.",
+        "Kumar, S.",
+        "Verma, S.",
+        "Dansena, P."
+      ],
+      "year": 2014,
+      "venue": "Proceedings of the International Conference on Wireless and Optical Communications Networks (WOCN) (pp. 1–7)",
+      "doi": "https://doi.org/10.1109/WOCN.2014.6923089",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Role of Digital Agriculture in Shaping the Future of Farming: A Social Network Analytics Approach",
+      "authors": [
+        "Adhikary, D. R. D.",
+        "Dansena, P.",
+        "Yadav, D.",
+        "Kumar, A.",
+        "Tripathy, L."
+      ],
+      "year": 2026,
+      "venue": "Social Network Analytics: Empowering Data Engineering with Deep Learning and Large Language Models",
+      "doi": "https://www.routledge.com/Social-Network-Analytics-Empowering-Data-Engineering-with-Deep-Learning-and-Large-Language-Models/Roy-Tripathy-Kumar-Wu/p/book/9781041006909",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Pen Ink Analysis in Handwritten Document Forensics: Classification and Current Trends",
+      "authors": [
+        "Dash, R.",
+        "Dansena, P.",
+        "Tripathi, P. C.",
+        "Ranjan, A."
+      ],
+      "year": 2025,
+      "venue": "Advanced Techniques for Anomaly Detection",
+      "doi": "https://doi.org/10.1201/9781003463559-6",
+      "status": null,
+      "evidence": null
+    },
+    {
+      "title": "Anomaly Detection in Carbon Sequestration: Advancements, Challenges, and Future Directions",
+      "authors": [
+        "Saif, M.",
+        "Kiran, R.",
+        "Dansena, P.",
+        "Tripathi, P. C."
+      ],
+      "year": 2025,
+      "venue": "Advanced Techniques for Anomaly Detection",
+      "doi": "https://doi.org/10.1201/9781003463559-1",
+      "status": null,
+      "evidence": null
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 7191,
+      "output_tokens": 621,
+      "seconds": 190.5,
+      "load_seconds": 16.36,
+      "prefill_seconds": 21.39,
+      "decode_seconds": 150.51,
+      "truncated": false,
+      "called_at": "2026-11-06T09:36:41+00:00",
+      "prompt_sha": "419119f22b809141"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 6300,
+      "output_tokens": 19,
+      "seconds": 23.3,
+      "load_seconds": 0.02,
+      "prefill_seconds": 16.75,
+      "decode_seconds": 3.94,
+      "truncated": false,
+      "called_at": "2026-11-06T09:39:52+00:00",
+      "prompt_sha": "f54a038f6cb32122"
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 488,
+      "output_tokens": 208,
+      "seconds": 36.4,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-06T09:40:15+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 6465,
+      "output_tokens": 5661,
+      "seconds": 1346.7,
+      "load_seconds": 0.02,
+      "prefill_seconds": 17.21,
+      "decode_seconds": 1327.28,
+      "truncated": false,
+      "called_at": "2026-11-06T09:40:52+00:00",
+      "prompt_sha": "7684fc7b3e19142a"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-06T10:03:18+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "fadc74b1cd02e400c09c2b7ce1d1d8a0dfcfdae5791d48dd50f902cc255bf66e"
+}

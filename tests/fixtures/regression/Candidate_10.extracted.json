@@ -1,0 +1,360 @@
+{
+  "candidate_id": "Candidate_10",
+  "extracted_at": "2026-11-07T18:31:19+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Prachi Venkat",
+      "evidence": "Curriculum Vitae\nPrachi Venkat"
+    },
+    "email": {
+      "value": "prachivenkat11@gmail.com",
+      "evidence": "Email: prachivenkat11@gmail.com"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Ph.D.            2020              Birla Institute of Technology and Science (BITS-\nPilani)"
+    },
+    "phd_status": {
+      "value": "awarded",
+      "evidence": "Ph.D.            2020              Birla Institute of Technology and Science (BITS-\nPilani)"
+    },
+    "phd_institution": {
+      "value": "Birla Institute of Technology and Science (BITS-Pilani)",
+      "evidence": "Ph.D.            2020              Birla Institute of Technology and Science (BITS-\nPilani)"
+    },
+    "phd_start_year": {
+      "value": 2016,
+      "evidence": "Ph.D.            2020              Birla Institute of Technology and Science (BITS-\nPilani)"
+    },
+    "phd_year": {
+      "value": 2020,
+      "evidence": "Ph.D.            2020              Birla Institute of Technology and Science (BITS-\nPilani)"
+    },
+    "phd_subject": {
+      "value": "Study of laser-cluster interaction using molecular dynamics modeling, specifically the effect of intense femtosecond pulses on noble gas clusters using classical molecular dynamics.",
+      "evidence": "Ph.D: \nStudy of laser-cluster interaction using molecular dynamics modeling, specifically the effect of intense femtosecond pulses on noble gas clusters using classical molecular dynamics."
+    },
+    "masters_degree": {
+      "value": null,
+      "evidence": null
+    },
+    "masters_institution": {
+      "value": null,
+      "evidence": null
+    },
+    "masters_year": {
+      "value": null,
+      "evidence": null
+    },
+    "masters_subject": {
+      "value": null,
+      "evidence": null
+    },
+    "bachelors_degree": {
+      "value": "BSc. (H)",
+      "evidence": "BSc. (H)           2012                 Hindu College, University of Delhi"
+    },
+    "bachelors_institution": {
+      "value": "Hindu College, University of Delhi",
+      "evidence": "BSc. (H)           2012                 Hindu College, University of Delhi"
+    },
+    "bachelors_year": {
+      "value": 2012,
+      "evidence": "BSc. (H)           2012                 Hindu College, University of Delhi"
+    },
+    "bachelors_subject": {
+      "value": "Physics",
+      "evidence": "BSc. (H)           2012                 Hindu College, University of Delhi"
+    },
+    "research_area": {
+      "value": "laser-cluster interaction, laser-induced damage in silicon, electron dynamics, molecular dynamics modeling",
+      "evidence": "Ph.D: \nStudy of laser-cluster interaction using molecular dynamics modeling, specifically the effect of intense femtosecond pulses on noble gas clusters using classical molecular dynamics.\nPost-Doctoral work:\nStudy of the onset and nature of damage in silicon films using Three-Temperature Model and the effect of different interaction parameters on the damage threshold as a part of the ultrafast electronic dynamics project at Kansai Institute for Photon Science (QST) in Kyoto, Japan.\nANRF-NPDF Project:\nSimulating laser-driven electron dynamics by solving the equations of motion within the density matrix formalism, to study non-linear response from 2D materials and topological quantum materials at the Attosecond Physics Lab, IIT Bombay."
+    },
+    "positions": [
+      {
+        "title": "Post-doctoral research fellow",
+        "organisation": "Kansai Institute for Photon Science (QST) in Japan",
+        "category": "research",
+        "start_date": "2021-01",
+        "end_date": "2023-12",
+        "is_current": false,
+        "evidence": "Post-doctoral research fellow at Kansai Institute for Photon Science (QST) in Japan from January 2021 to December 2023.",
+        "source_section": "Experience"
+      },
+      {
+        "title": "National Post-doctoral Fellow",
+        "organisation": "Department of Physics, IIT Bombay",
+        "category": "research",
+        "start_date": "2024-04",
+        "end_date": "2026-04",
+        "is_current": false,
+        "evidence": "National Post-doctoral Fellow (NPDF) at Department of Physics, IIT Bombay from April 2024 to April 2026.",
+        "source_section": "Experience"
+      },
+      {
+        "title": "Visiting Scientist",
+        "organisation": "MPI-PKS Dresden",
+        "category": "research",
+        "start_date": "2026-04",
+        "end_date": "2026-06",
+        "is_current": false,
+        "evidence": "Visiting Scientist at MPI-PKS Dresden from April 2026 to June 2026.",
+        "source_section": "Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Attosecond pulse generation from Weyl semimetals",
+      "authors": [
+        "Prachi Venkat",
+        "Amar Bharti",
+        "Gopal Dixit"
+      ],
+      "year": 2026,
+      "venue": "Physical Review B",
+      "doi": "113, 125144",
+      "status": "published",
+      "evidence": "Attosecond pulse generation from Weyl semimetals, Prachi Venkat, Amar Bharti and Gopal Dixit, Physical Review B 113, 125144 (2026)."
+    },
+    {
+      "title": "Chiral-sensitive frequency mixing in valley-excited two-dimensional semiconductors",
+      "authors": [
+        "Prachi Venkat",
+        "Leon Schlemmer",
+        "Amar Bharti",
+        "David Gauthier",
+        "Willem Boutu",
+        "Gopal Dixit"
+      ],
+      "year": 2026,
+      "venue": "Applied Physics Letters",
+      "doi": "128, 021102",
+      "status": "published",
+      "evidence": "Chiral-sensitive frequency mixing in valley-excited two-dimensional semiconductors, Prachi Venkat, Leon Schlemmer, Amar Bharti, David Gauthier, Willem Boutu and Gopal Dixit, Applied Physics Letters, 128, 021102 (2026)."
+    },
+    {
+      "title": "Harnessing Light for Valley Control in 2d Semiconductors",
+      "authors": [
+        "Gopika N. Gopalan",
+        "Amar Bharti",
+        "Prachi Venkat",
+        "Gopal Dixit"
+      ],
+      "year": 2026,
+      "venue": "Advanced Optical Materials",
+      "doi": "4(3), e01593",
+      "status": "published",
+      "evidence": "Harnessing Light for Valley Control in 2d Semiconductors, Gopika N. Gopalan, Amar Bharti, Prachi Venkat and Gopal Dixit, Advanced Optical Materials 4(3), e01593 (2026)."
+    },
+    {
+      "title": "Three-Temperature Model for Silicon Damage Process",
+      "authors": [
+        "Prachi Venkat",
+        "Tomohito Otobe"
+      ],
+      "year": 2024,
+      "venue": "Journal of Japan Laser Processing Society",
+      "doi": "31(1)",
+      "status": "published",
+      "evidence": "Three-Temperature Model for Silicon Damage Process, Prachi Venkat and Tomohito Otobe, Journal of Japan Laser Processing Society, 31(1) (2024)."
+    },
+    {
+      "title": "Thickness Dependence of Laser Damage in Silicon Thin Films",
+      "authors": [
+        "Prachi Venkat",
+        "Tomohito Otobe"
+      ],
+      "year": 2023,
+      "venue": "JLMN-Journal of Laser Micro/Nanoengineering",
+      "doi": "18(3)",
+      "status": "published",
+      "evidence": "Thickness Dependence of Laser Damage in Silicon Thin Films, Prachi Venkat and Tomohito Otobe, JLMN-Journal of Laser Micro/Nanoengineering 18(3) (2023)."
+    },
+    {
+      "title": "Wavelength dependence of laser-induced excitation dynamics in silicon",
+      "authors": [
+        "Prachi Venkat",
+        "Tomohito Otobe"
+      ],
+      "year": 2022,
+      "venue": "Applied Physics A: Materials Science and Processing",
+      "doi": "128(9), 810",
+      "status": "published",
+      "evidence": "Wavelength dependence of laser-induced excitation dynamics in silicon, Prachi Venkat and Tomohito Otobe, Applied Physics A: Materials Science and Processing 128(9), 810 (2022)."
+    },
+    {
+      "title": "Three-temperature modeling of laser-induced damage process in silicon",
+      "authors": [
+        "Prachi Venkat",
+        "Tomohito Otobe"
+      ],
+      "year": 2022,
+      "venue": "Applied Physics Express",
+      "doi": "15(4), 041008",
+      "status": "published",
+      "evidence": "Three-temperature modeling of laser-induced damage process in silicon, Prachi Venkat and Tomohito Otobe, Applied Physics Express 15(4), 041008 (2022)."
+    },
+    {
+      "title": "Electron Excitation Rate in Dielectrics Under an Intense Elliptically Polarized Laser Field",
+      "authors": [
+        "Prachi Venkat",
+        "Tomohito Otobe"
+      ],
+      "year": 2022,
+      "venue": "Journal of the Physical Society of Japan",
+      "doi": "91(4), 044401",
+      "status": "published",
+      "evidence": "Electron Excitation Rate in Dielectrics Under an Intense Elliptically Polarized Laser Field, Prachi Venkat and Tomohito Otobe, Journal of the Physical Society of Japan, 91(4), 044401 (2022)."
+    },
+    {
+      "title": "Study of radiation spectra produced during laser induced Thomson scattering in Xenon clusters",
+      "authors": [
+        "Prachi Venkat",
+        "AIP Conference Proceedings 2179, 020027"
+      ],
+      "year": 2019,
+      "venue": "AIP Conference Proceedings",
+      "doi": "2179, 020027",
+      "status": "published",
+      "evidence": "Study of radiation spectra produced during laser induced Thomson scattering in Xenon clusters, Prachi Venkat, AIP Conference Proceedings 2179, 020027 (2019)."
+    },
+    {
+      "title": "Higher harmonics and attosecond pulse generation by laser induced Thomson scattering in atomic clusters",
+      "authors": [
+        "Prachi Venkat",
+        "Amol R. Holkundkar"
+      ],
+      "year": 2019,
+      "venue": "Phys. Rev. Accel. Beams",
+      "doi": "22, 084401",
+      "status": "published",
+      "evidence": "Higher harmonics and attosecond pulse generation by laser induced Thomson scattering in atomic clusters, Prachi Venkat, Amol R. Holkundkar, Phys. Rev. Accel. Beams 22, 084401 (2019)."
+    },
+    {
+      "title": "Energetic electron bunch generation by laser interaction with Xenon clusters",
+      "authors": [
+        "Prachi Venkat",
+        "Amol R. Holkundkar"
+      ],
+      "year": 2018,
+      "venue": "Phys. Plasmas",
+      "doi": "25, 103112",
+      "status": "published",
+      "evidence": "Energetic electron bunch generation by laser interaction with Xenon clusters, Prachi Venkat and Amol R. Holkundkar, Phys. Plasmas 25, 103112 (2018)."
+    },
+    {
+      "title": "Interaction of Xenon clusters with intense sub-cycle laser pulses",
+      "authors": [
+        "Prachi Venkat",
+        "Amol R. Holkundkar"
+      ],
+      "year": 2016,
+      "venue": "Phys. Plasmas",
+      "doi": "23, 123106",
+      "status": "published",
+      "evidence": "Interaction of Xenon clusters with intense sub-cycle laser pulses, Prachi Venkat and Amol R. Holkundkar, Phys. Plasmas 23, 123106 (2016)."
+    }
+  ],
+  "patents": [],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 2648,
+      "output_tokens": 839,
+      "seconds": 149.9,
+      "load_seconds": 15.33,
+      "prefill_seconds": 6.45,
+      "decode_seconds": 126.07,
+      "truncated": false,
+      "called_at": "2026-11-07T18:21:38+00:00",
+      "prompt_sha": "c830f5204a3b750e"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "skipped: CV contains no NET/SET/SLET token",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-07T18:24:08+00:00",
+      "prompt_sha": ""
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 648,
+      "output_tokens": 332,
+      "seconds": 57.5,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-07T18:24:08+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 1922,
+      "output_tokens": 1778,
+      "seconds": 373.1,
+      "load_seconds": 0.03,
+      "prefill_seconds": 4.3,
+      "decode_seconds": 366.6,
+      "truncated": false,
+      "called_at": "2026-11-07T18:25:06+00:00",
+      "prompt_sha": "1f44833e32b782b6"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "skipped: CV contains no occurrence of 'patent'",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 0.0,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-07T18:31:19+00:00",
+      "prompt_sha": ""
+    }
+  },
+  "source_sha256": "ad86e421e98370ecfc183893f667287e6e28bba1b9db39c614b3079ba99570b0"
+}

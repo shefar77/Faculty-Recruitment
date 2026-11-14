@@ -102,6 +102,9 @@ FULL_MARKS_PUBLICATION_CREDIT = 20.0   # credited publications (see schema)
 FULL_MARKS_TEACHING_YEARS = 5.0
 FULL_MARKS_INDUSTRY_YEARS = 3.0
 FULL_MARKS_CITATIONS = 100
+# The h-index at which visibility earns full marks, as an alternative to
+# the citation total (whichever is reached first). DEMO/RESEARCH value.
+FULL_MARKS_H_INDEX = 10
 
 # Postdoctoral experience, measured the same way as every other duration:
 # overlapping appointments merged, ongoing posts resolved against as_of.
@@ -339,6 +342,7 @@ class Criterion:
     # Research-output breakdown, so the two kinds of contribution stay
     # legible instead of collapsing into one number.
     publication_credit: float = 0.0
+    profile_credit: float = 0.0
     patent_credit: float = 0.0
     patent_credit_counted: float = 0.0
     # True when the pipeline could not reach a verdict - distinct from
@@ -380,6 +384,7 @@ class Criterion:
             "unclassified_roles": self.unclassified_roles,
             "unscored_positions": self.unscored_positions,
             "publication_credit": self.publication_credit,
+            "profile_credit": self.profile_credit,
             "patent_credit": self.patent_credit,
             "patent_credit_counted": self.patent_credit_counted,
             "indeterminate": self.indeterminate,
@@ -433,7 +438,8 @@ def patent_credit(patents: list[dict]) -> tuple[float, list[dict]]:
 
 
 def score_publications(verified: list[dict],
-                       patents: list[dict] | None = None) -> Criterion:
+                       patents: list[dict] | None = None,
+                       profile_works: list[dict] | None = None) -> Criterion:
     """
     Research output: peer-reviewed publications PLUS patents.
 
@@ -471,7 +477,17 @@ def score_publications(verified: list[dict],
         else:
             matrix = schema.CREDIT_MATRIX[(status_class, outcome)]
             if matrix is schema.INDETERMINATE:
-                credit, reason = 0.0, "lookup failed - INDETERMINATE, needs review"
+                # The index could not be asked. An outage is not evidence
+                # against a paper, so the entry keeps the credit the CV's
+                # own claim earns without corroboration - the not_found
+                # cell - and the criterion is marked indeterminate so the
+                # candidate is re-verified. It is never zeroed for our
+                # failure to look.
+                credit = schema.CREDIT_MATRIX.get(
+                    (status_class, "not_found")) or 0.0
+                reason = (f"lookup failed - INDETERMINATE; provisional "
+                          f"credit {credit} on the CV's own claim, pending "
+                          f"re-verification")
                 indeterminate += 1
             else:
                 credit, reason = matrix, f"{status_class} + {outcome}"
@@ -514,7 +530,13 @@ def score_publications(verified: list[dict],
     patent_counted = min(patent_total, patent_ceiling)
     patent_capped = patent_total > patent_ceiling
 
-    combined = total + patent_counted
+    # --- works from the candidate's verified ORCID record ----------------
+    # Only those research_profiles.profile_works() credited: absent from
+    # the CV, peer-reviewed, and the CV says its own list is a selection.
+    profile_rows = list(profile_works or [])
+    profile_total = sum(row.get("credit") or 0.0 for row in profile_rows)
+
+    combined = total + profile_total + patent_counted
     fraction = _capped(combined, FULL_MARKS_PUBLICATION_CREDIT)
 
     criterion = Criterion(
@@ -526,8 +548,10 @@ def score_publications(verified: list[dict],
         points=weight * fraction,
         sources=["publications[].status", "verification.outcome",
                  "patents[].status"],
-        evidence=rows + [dict(row, kind="patent") for row in patent_rows],
-        insufficient_evidence=(not verified and not patent_rows),
+        evidence=(rows + [dict(row, kind="patent") for row in patent_rows]
+                  + [dict(row, kind="profile") for row in profile_rows]),
+        insufficient_evidence=(not verified and not patent_rows
+                               and not profile_total),
         note=(f"full marks at {FULL_MARKS_PUBLICATION_CREDIT} "
               f"publication-equivalents"),
     )
@@ -535,6 +559,13 @@ def score_publications(verified: list[dict],
     criterion.patent_credit = round(patent_total, 2)
     criterion.patent_credit_counted = round(patent_counted, 2)
     criterion.publication_credit = round(total, 2)
+    criterion.profile_credit = round(profile_total, 2)
+    if profile_total:
+        criterion.note += (
+            f"; of which {round(profile_total, 2)} from "
+            f"{sum(1 for r in profile_rows if r.get('credit'))} work(s) in "
+            f"the candidate's verified ORCID record that the CV's selected "
+            f"list does not print")
 
     if patent_rows:
         criterion.note += (
@@ -548,7 +579,7 @@ def score_publications(verified: list[dict],
         criterion.note += (
             "; patent records were NOT checked against any patent register")
 
-    if not verified and not patent_rows:
+    if not verified and not patent_rows and not profile_total:
         criterion.note = ("no publications or patents listed - "
                           "insufficient evidence")
     elif indeterminate:
@@ -561,9 +592,10 @@ def score_publications(verified: list[dict],
         criterion.indeterminate_entries = indeterminate
         criterion.note += (
             f"; {indeterminate} of {len(verified)} entr(ies) could NOT BE "
-            f"LOOKED UP (service unreachable). This score is not reliable "
-            f"and must not be read as a judgement on the candidate's "
-            f"publication record - re-run when the index is reachable")
+            f"LOOKED UP (service unreachable) and carry only the provisional "
+            f"credit the CV's own claim earns. This score is not reliable and "
+            f"must not be read as a judgement on the candidate's publication "
+            f"record - re-run when the index is reachable")
     return criterion
 
 
@@ -811,8 +843,39 @@ def score_doctorate(profile: dict, gate: dict) -> Criterion:
     # insufficient_evidence.
     withheld = _rejected(profile, "phd_status")
 
+    status_entry = profile.get("phd_status") or {}
+    review_reasons = []
+
     if status == "awarded" and year:
         fraction, note, thin = 1.0, f"doctorate awarded {year}", False
+        if status_entry.get("source") == "cv_rule_parser":
+            # Completion read from the doctorate's own entry, not from the
+            # word "awarded". Say what it rests on, and ask for a check
+            # when nothing beyond the dates supports it.
+            basis = status_entry.get("completion_basis") or ""
+            support = status_entry.get("corroboration") or []
+            note = (f"doctorate completed {year} - {basis}"
+                    + (f"; supported by: {'; '.join(support)}" if support
+                       else ""))
+            if status_entry.get("needs_confirmation"):
+                review_reasons.append(
+                    f"The doctorate is counted as completed in {year} because "
+                    f"{basis}. "
+                    + ("Nothing else in the CV (a thesis, a postdoctoral "
+                       "post, post-PhD experience) corroborates it. "
+                       if not support else "")
+                    + "Please confirm the degree has been conferred.")
+    elif status == "awarded":
+        # Awarded is stated and traceable, the year is not. A missing year
+        # is a gap in the CV's dates, not evidence against the degree, so
+        # it is credited - and flagged, because the eligibility gate cannot
+        # be met without a year.
+        fraction, thin = 1.0, False
+        note = "doctorate awarded (award year not stated in the CV)"
+        review_reasons.append(
+            "The CV shows the doctorate as awarded but gives no award year. "
+            "It has been credited; please confirm the year so eligibility "
+            "can be settled.")
     elif status == "thesis_submitted" or _value(
             profile, "highest_degree") == "phd_submitted":
         # Part marks, and flagged. The scholarly work is complete and
@@ -846,7 +909,6 @@ def score_doctorate(profile: dict, gate: dict) -> Criterion:
     # award test rather than inside it.
     factors = [{"factor": "qualification", "value": fraction,
                 "reason": note}]
-    review_reasons = []
     institution_name = _value(profile, "phd_institution")
 
     if status == "thesis_submitted" or _value(
@@ -1143,8 +1205,25 @@ def _score_degree(profile: dict, level: str, research_context: str,
     )
 
 
-def score_visibility(verified: list[dict]) -> Criterion:
-    """Citations, counted ONLY on corroborated entries."""
+def score_visibility(verified: list[dict],
+                     profile_works: list[dict] | None = None,
+                     profiles: list[dict] | None = None,
+                     links: dict | None = None) -> Criterion:
+    """
+    Citations and h-index, counted ONLY from verifiable sources.
+
+    Two verified measures, and the stronger one counts:
+      citations  on corroborated CV entries and credited profile works, or
+                 the verified ORCID record's total when that is higher;
+      h-index    from the verified ORCID record in OpenAlex.
+    The h-index is read because a citation total alone rewards one heavily
+    cited paper over a consistently cited record.
+
+    Figures the CV reports itself (typically from Google Scholar, which
+    cannot be retrieved) are never scored; when they exceed the verified
+    ones the gap is flagged, so a reviewer can check the profile rather
+    than see an unexplained low number.
+    """
     weight = WEIGHTS["research_visibility"]
     citations, rows = 0, []
 
@@ -1159,22 +1238,80 @@ def score_visibility(verified: list[dict]) -> Criterion:
         if count:
             rows.append({"title": entry.get("title"), "cited_by": count,
                          "openalex": verification.get("openalex_id")})
+    for work in profile_works or []:
+        if work.get("credit"):
+            count = work.get("cited_by_count") or 0
+            citations += count
+            if count:
+                rows.append({"title": work.get("title"), "cited_by": count,
+                             "openalex": work.get("openalex_id"),
+                             "source": "orcid_openalex"})
 
-    fraction = _capped(citations, FULL_MARKS_CITATIONS)
-    return Criterion(
+    profile = next((p for p in profiles or []
+                    if p.get("status") == "verified"), None)
+    h_index = profile.get("h_index") if profile else None
+    used, basis = citations, "corroborated publications"
+    if profile and (profile.get("cited_by_count") or 0) > citations:
+        used = profile["cited_by_count"]
+        basis = f"the verified ORCID record ({profile.get('id')})"
+
+    by_citations = _capped(used, FULL_MARKS_CITATIONS)
+    by_h = _capped(h_index or 0, FULL_MARKS_H_INDEX)
+    fraction = max(by_citations, by_h)
+
+    note = (f"{used} citations from {basis}"
+            + (f"; h-index {h_index} (OpenAlex, via ORCID)" if h_index else "")
+            + f"; full marks at {FULL_MARKS_CITATIONS} citations or an "
+              f"h-index of {FULL_MARKS_H_INDEX}, whichever is reached first")
+
+    review = []
+    reported = (links or {}).get("self_reported") or {}
+    claimed_h, claimed_c = reported.get("h_index"), reported.get("citations")
+    if (claimed_h and claimed_h > (h_index or 0)) or             (claimed_c and claimed_c > used):
+        stated = ", ".join(filter(None, [
+            f"an h-index of {claimed_h}" if claimed_h else "",
+            f"{claimed_c} citations" if claimed_c else ""]))
+        review.append(
+            f"The CV reports {stated}, higher than the {used} citations"
+            + (f" and h-index {h_index}" if h_index else "")
+            + " that could be verified. Self-reported figures (usually Google "
+              "Scholar, which cannot be retrieved automatically) are not "
+              "scored; please check the candidate's profile.")
+    for kind in ("scholar", "scopus"):
+        for link in (links or {}).get(kind) or []:
+            review.append(f"The CV links a {kind.title()} profile ({link['url']}), "
+                          f"which was {link['retrieval'].split(' - ')[0]}: "
+                          f"{link['retrieval'].split(' - ')[-1]}.")
+    for p in profiles or []:
+        if p.get("status") in ("name_mismatch", "lookup_failed", "not_found"):
+            review.append(f"ORCID {p.get('id')}: {p.get('note')}.")
+
+    if used == 0 and not h_index:
+        note = "no citations on corroborated work - insufficient evidence"
+
+    if profile:
+        rows.append({"source": "orcid_openalex", "orcid": profile.get("id"),
+                     "openalex": profile.get("openalex_id"),
+                     "cited_by": profile.get("cited_by_count"),
+                     "h_index": h_index,
+                     "query_urls": profile.get("query_urls")})
+
+    criterion = Criterion(
         name="research_visibility",
         weight=weight,
-        raw=citations,
-        unit="citations of corroborated publications",
+        raw=used,
+        unit="verified citations (h-index alongside)",
         fraction=fraction,
         points=weight * fraction,
-        sources=["verification.cited_by_count"],
+        sources=["verification.cited_by_count", "research_profiles.orcid"],
         evidence=rows,
-        insufficient_evidence=(citations == 0),
-        note=("no citations on corroborated work - insufficient evidence"
-              if citations == 0 else
-              f"full marks at {FULL_MARKS_CITATIONS} citations"),
+        insufficient_evidence=(used == 0 and not h_index),
+        note=note,
+        needs_review=bool(review),
+        review_reasons=review,
     )
+    criterion.full_marks_at = FULL_MARKS_CITATIONS
+    return criterion
 
 
 # ---------------------------------------------------------------------------
@@ -1214,7 +1351,7 @@ def evaluate_gate(profile: dict, summary: dict) -> dict:
     doctorate_evidenced = bool(
         _value(profile, "highest_degree") in ("phd", "phd_submitted",
                                                "phd_pursuing")
-        or phd_status == "thesis_submitted"
+        or phd_status in ("awarded", "thesis_submitted", "pursuing")
         or _value(profile, "phd_institution")
         or cross_check_failed
         or _rejected(profile, "phd_status")
@@ -1224,6 +1361,12 @@ def evaluate_gate(profile: dict, summary: dict) -> dict:
         outcome = "met"
         reason = f"doctorate awarded {phd_year}"
         evidence = _evidence(profile, "phd_year")
+        status_entry = profile.get("phd_status") or {}
+        if status_entry.get("source") == "cv_rule_parser":
+            reason = (f"doctorate completed {phd_year} - "
+                      f"{status_entry.get('completion_basis', '')}"
+                      + ("; please confirm the award"
+                         if status_entry.get("needs_confirmation") else ""))
     elif net is True:
         outcome = "met"
         reason = "NET/SET qualified (recognised teaching-eligibility route)"
@@ -1355,8 +1498,10 @@ def score_candidate(validated: dict, verified: dict,
 
     criteria = [
         # --- Research and related contributions: 40 -----------------------
-        score_publications(pubs, patents),
-        score_visibility(pubs),
+        score_publications(pubs, patents, verified.get("profile_works")),
+        score_visibility(pubs, verified.get("profile_works"),
+                         verified.get("research_profiles"),
+                         verified.get("research_links")),
         # --- Experience: 25 -----------------------------------------------
         score_experience(positions, {"teaching"}, "teaching_experience",
                          FULL_MARKS_TEACHING_YEARS, as_of),

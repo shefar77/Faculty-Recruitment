@@ -1,0 +1,237 @@
+{
+  "candidate_id": "Candidate_04",
+  "extracted_at": "2026-11-14T11:21:48+00:00",
+  "profile": {
+    "full_name": {
+      "value": "Neha Rai",
+      "evidence": "NAME IN FULL :        Neha Rai"
+    },
+    "email": {
+      "value": "neha.rai0184@gmail.com",
+      "evidence": "EMAIL ID :              neha.rai0184@gmail.com"
+    },
+    "orcid": {
+      "value": null,
+      "evidence": null
+    },
+    "scholar_url": {
+      "value": null,
+      "evidence": null
+    },
+    "highest_degree": {
+      "value": "phd",
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  1   Ph.D.            Number         Mathematics     Indian             IIT Roorkee      2022      0.00    8.70                       I"
+    },
+    "phd_status": {
+      "value": "awarded",
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  1   Ph.D.            Number         Mathematics     Indian             IIT Roorkee      2022      0.00    8.70                       I"
+    },
+    "phd_institution": {
+      "value": "Indian Institute of Technology Roorkee",
+      "evidence": "Name of the Institute: Indian Institute of Technology Roorkee"
+    },
+    "phd_start_year": {
+      "value": 2012,
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  1   Ph.D.            Number         Mathematics     Indian             IIT Roorkee      2022      0.00    8.70                       I"
+    },
+    "phd_year": {
+      "value": 2022,
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  1   Ph.D.            Number         Mathematics     Indian             IIT Roorkee      2022      0.00    8.70                       I"
+    },
+    "phd_subject": {
+      "value": "Mathematics",
+      "evidence": "Branch/ Specialization: Mathematics"
+    },
+    "masters_degree": {
+      "value": "masters",
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  2   M.Sc               Mathematics                  Deen Dayal    Deen Dayal      2013     84.38   0.00                       I"
+    },
+    "masters_institution": {
+      "value": "Deen Dayal Upadhyaya Gorakhpur University",
+      "evidence": "Name of the Institute: Deen Dayal Upadhyaya Gorakhpur University"
+    },
+    "masters_year": {
+      "value": 2013,
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  2   M.Sc               Mathematics                  Deen Dayal    Deen Dayal      2013     84.38   0.00                       I"
+    },
+    "masters_subject": {
+      "value": "Mathematics",
+      "evidence": "Branch/ Specialization: Mathematics"
+    },
+    "bachelors_degree": {
+      "value": "bachelors",
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  3   B.Sc.               Mathematics                           St. Andrews    Deen Dayal      2011     67.66   0.00                       I"
+    },
+    "bachelors_institution": {
+      "value": "Deen Dayal Upadhyaya Gorakhpur University",
+      "evidence": "Name of the Institute: Deen Dayal Upadhyaya Gorakhpur University"
+    },
+    "bachelors_year": {
+      "value": 2011,
+      "evidence": "Sl.No. Degree   Other    Branch/        Research      Name of the     Name of the     Year of  % of   CGPA  Class/     No. Of\n  3   B.Sc.               Mathematics                           St. Andrews    Deen Dayal      2011     67.66   0.00                       I"
+    },
+    "bachelors_subject": {
+      "value": "Mathematics",
+      "evidence": "Branch/ Specialization: Mathematics"
+    },
+    "research_area": {
+      "value": "Blockchain",
+      "evidence": "SPECIALISATION :Blockchain"
+    },
+    "positions": [
+      {
+        "title": "Research Scientist",
+        "organisation": "Folium Labs Private Limited",
+        "category": "research",
+        "start_date": "2022-07",
+        "end_date": "2023-11",
+        "is_current": false,
+        "evidence": "1     Folium Labs Private Limited                                     Research        01/07/2022 0    10/11/2023 0\n                                               Scientist",
+        "source_section": "Details of Experience"
+      }
+    ],
+    "net_qualified": {
+      "value": null,
+      "evidence": ""
+    }
+  },
+  "publications": [
+    {
+      "title": "Density of sets with missing differences and its applications",
+      "authors": [
+        "Ram Slovaca Krishna Pandey",
+        "Neha Rai"
+      ],
+      "year": 2021,
+      "venue": "Mathematica Slovaca",
+      "doi": null,
+      "status": "published",
+      "evidence": "Density of sets with missing differences and its applications. (2021). Mathematica Slovaca, 0139-9918."
+    },
+    {
+      "title": "Maximal Density of Sets with Missing Differences and Various Coloring Parameters of Distance Graphs",
+      "authors": [
+        "Ram Slovaca Krishna Pandey",
+        "Neha Rai"
+      ],
+      "year": 2020,
+      "venue": "Taiwanese Journal of Mathematics",
+      "doi": "2224-6851",
+      "status": "published",
+      "evidence": "Maximal Density of Sets with Missing Differences and Various Coloring Parameters of Distance Graphs. (2020). Taiwanese Journal of Mathematics, 2224-6851."
+    },
+    {
+      "title": "Maximal density and the kappa values for the families {a, a +1, 2a +1,n} and {a, a +1, 2a +1, 3a +1,n}",
+      "authors": [
+        "Ram Slovaca Krishna Pandey",
+        "Neha Rai"
+      ],
+      "year": 2023,
+      "venue": "Mathematica Slovaca",
+      "doi": "0139-9918",
+      "status": "published",
+      "evidence": "Maximal density and the kappa values for the families {a, a +1, 2a +1,n} and {a, a +1, 2a +1, 3a +1,n}. (2023). Mathematica Slovaca, 0139-9918."
+    }
+  ],
+  "patents": [
+    {
+      "title": null,
+      "inventors": [
+        null
+      ],
+      "number": null,
+      "status": "unknown",
+      "year": null,
+      "jurisdiction": null,
+      "evidence": " Sl No.  Name of patent                                  Year               Organisation\n   1    NA                                 NA           NA"
+    }
+  ],
+  "provenance": {
+    "profile_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 2994,
+      "output_tokens": 1114,
+      "seconds": 241.6,
+      "load_seconds": 0.02,
+      "prefill_seconds": 6.28,
+      "decode_seconds": 231.87,
+      "truncated": false,
+      "called_at": "2026-11-14T11:14:01+00:00",
+      "prompt_sha": "9dc6b3351040ca40"
+    },
+    "eligibility_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 2103,
+      "output_tokens": 19,
+      "seconds": 14.1,
+      "load_seconds": 0.02,
+      "prefill_seconds": 6.53,
+      "decode_seconds": 5.27,
+      "truncated": false,
+      "called_at": "2026-11-14T11:18:03+00:00",
+      "prompt_sha": "6951038f63325fb0"
+    },
+    "positions_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 1076,
+      "output_tokens": 123,
+      "seconds": 39.6,
+      "load_seconds": 0.0,
+      "prefill_seconds": 0.0,
+      "decode_seconds": 0.0,
+      "truncated": false,
+      "called_at": "2026-11-14T11:18:17+00:00",
+      "prompt_sha": ""
+    },
+    "publications_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 2268,
+      "output_tokens": 448,
+      "seconds": 147.3,
+      "load_seconds": 0.02,
+      "prefill_seconds": 5.07,
+      "decode_seconds": 139.96,
+      "truncated": false,
+      "called_at": "2026-11-14T11:18:57+00:00",
+      "prompt_sha": "82b69c047eb07576"
+    },
+    "patents_call": {
+      "ok": true,
+      "error": "",
+      "model": "qwen2.5:7b",
+      "num_ctx": 16384,
+      "seed": 42,
+      "temperature": 0,
+      "prompt_tokens": 2252,
+      "output_tokens": 84,
+      "seconds": 24.3,
+      "load_seconds": 0.02,
+      "prefill_seconds": 5.0,
+      "decode_seconds": 16.98,
+      "truncated": false,
+      "called_at": "2026-11-14T11:21:24+00:00",
+      "prompt_sha": "6355dcdb9b42eed6"
+    }
+  },
+  "source_sha256": "bdb606aeab89f4bbe6a125533ea71fb332b6853e16a67fa37b83d5df6c2bd6f4"
+}

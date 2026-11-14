@@ -1,0 +1,262 @@
+Dr. Apala Banerjee                                                apala.banerjee26@gmail.com
+
+                                                                                       PH: +91 7044689822
+Indian Institute of Science, Bangalore,                                                LinkedIn, Google Scholar
+King Abdullah University of Science and Technology (KAUST), Saudi Arabia.
+Indian Institute of Technology Kanpur
+
+ Academic Qualifications
+
+     Year              Degree/Certificate                               Institute                CPI/%
+    2018 - 2024                 PhD,                  Indian Institute of Technology Kanpur, India     7.5
+                   RF and Microwaves
+    2016-2018            Master Of Technology,             The University Of Burdwan, India           9.37
+                              Microwaves
+    2012-2016            Bachelor Of Technology,        West Bengal University Of Technology, India     9.14
+                        Electronics and Communications
+                                Engineering
+    2011-2012                 HSC(XII)                                ISC, India                  83%
+    2009-2010                 SSC(X)                              ICSE, India                 89%
+
+POST PHD/THESIS SUBMISSION EXPERIENCE
+
+  • RF Quantum Engineer at IISC, Bangalore
+                                                                                       (May 2026- Present)
+  • Post Doctoral Researcher at CEMSE, KAUST Saudi Arabia
+                                                                                          (March 2025-March 2026)
+  • Research Consultant Electromagnetics at CEMSE, KAUST Saudi Arabia: EM Simulation, Design, Development, Analysis
+     and Validation of RF biosensors.
+                                                                                      (May 2024-Sept 2024)
+  • Project Scientist at Department of Electrical Engineering, Indian Institute of Technology Kanpur: Dielectric and Material
+     Characterization of planetary analogous rocks sponsored by ISRO.
+                                                                                              (Nov 2024-Feb 2025)
+
+ Scholastic Achievements
+
+  • Awarded IEEE MTT-S Graduate Fellowship at IMS 2023 San Diego, California.
+  • Awarded Best Female Student Paper Award 1st Runner Up at IEEE MTT-S and IEEE APS MAPCON 2022.
+  • Awarded Best Female Student Paper Award at IEEE MTT-S IMARC 2021.
+  • Awarded Best Student Volunteer Award at IEEE Uttar Pradesh Section Region 10.
+  • Awarded University Gold Medal for Excellent Academic Performance during Master Of Technology Thesis.
+  • Awarded West Bengal Merit Scholarship for Higher Education from Government of West Bengal.
+  • Distinction Award for Academic Performance during Undergrad Degree
+
+ Research Experience
+
+  • Post Doctoral Research Fellow, KAUST, Saudi Arabia: RF and Microwave Planar sensor for Biomedical Applications,
+     Microwave testing of adhesive lap joints in oil pipelines in collaboration with Saudi ARAMCO.                   (2025-2026)
+
+  • Research Consultant, KAUST, Saudi Arabia: Development of RF and Microwave Planar sensor for Biomedical Applica-
+      tions.                                                                                                            (2024)
+
+  • Doctor of Philosophy, Indian Institute of Technology Kanpur  : High Sensitivity Planar RF Sensors for Industrial,
+     Biomedical and Humanitarian Applications. A number of RF sensors with their full modelling, analysis and fabricated prototype
+     with measured results are developed for several real-world applications. To overcome the limitation of resolution, active sensing is
+      also explored using passive meta-material inspired sensors for dielectric characterization of plastic samples. A further prototype
+     development for wireless sensing systems in the near-field ISM band is also proposed.                            (2018-2024)
+
+  • Research Experience, GE Bangalore, India(GE Research):
+     Project 1: Non-Destructive evaluation of Eddy Current sensing system for F-Class Blade Turbine: Modelling and Study of coil
+     geometry, crack-recess-sample analyses, voltage variation, field study and experimental exposure.
+     Project 2: Motion Observation for cracks in moving blade turbines: experimental validation of cracks in lp/mm to determine
+
+the optimum resolution of cracks in turbine blades
+    Project 3: Preliminary/Basics of THz sensing of bio-chemical particles in human breath.                             (2022)
+
+ • Masters Research Experience, Space Applications Center, ISRO, Ahmedabad, India: Design of 102 GHz MMIC
+     Multiplier for Sub-MM Wave Receiver Development. Multiplier and Power Amplifier Design in full layout after LVS DRC check,
+    modeling verification of MIM capacitors and Spiral inductors from foundry specified models.                        (2017-18)
+
+ • Bachelors Research Experience, Variable Energy Cyclotron Centre, Department of Atomic Energy, India: Design
+    Of Cryogenic Temperature Monitor/Controller and Data Acquisition.                                               (2015)
+
+ • Research interest areas: RF sensors, resonators, Electromagnetics, resonant devices, receiver architecture, RFIC, eddy current
+     sensing analysis, Active RF Sensors, Material Characterization.
+
+Academic Projects
+
+ • Doctoral Degree Thesis, IIT Kanp: Design Of an FSS Filter with Cylindrical Conductors in Periodic Structure.
+    (2019) Main Diagnostics Of Thesis:
+      – Design and Simulation Of Cylindrial Conductors (Alumina) in FR4 Substrate in Periodic Structure.
+      – Parametric Variation Of Space, Width, Length and Diameter of Conductors to observe change in Filter Character-
+            istics.
+      – Use Of CST-Microwave Studio for EM Simulation.
+      – Design Of Band Stop Filter.
+      – Future Proposal- To Device LPF, HPF, BPF using the above technique.
+
+ • Master’s Thesis, The University of Burdwan: Design Of 6GHz Microstrip LPF Using Fractal Bending Technique.
+    (2016-18)
+   Main Diagnostics Of Thesis :
+      – An Effective Technique to Design Compact LPF in the C-Band using ADS.
+      – The Size reduction is obtained about One-fifth of the actual conventional filter.
+      – There is close agreement between measured and simulated results.
+
+ • Bachelor’s Thesis: Calculation Of Ionization Rate Of Charge Carriers using Multistage Scattering Phenomena.
+    (2015)
+   Main Diagnostics of Thesis:
+      – Use Of an Analytical Model to calculate the Ionization Rate of Charge Carriers like Wz-GaN and 6H-SiC using multistage
+          scattering phenomena like Optical Phonon Scattering and Carrier-Carrier Scattering
+      – Close Approximation with Kunihiro’s Approximation.
+
+Journals
+
+  1. G. Abuhaimed, H.Lu, A. Banerjee, J. R. Dominguez, E. Hasan, A. Shamim and D. Alsulaiman, ”Beyond the 2D Plane:
+     Interfacing Microwave Resonators with Bioreceptor-Functionalized Hydrogel Micropillars for Label-free Enhanced Sensitivity
+     Biosensing,” ACS Applied Materials and Interfaces (Revision Submitted)
+
+  2. A. Banerjee, N. K. Tiwari, and M. J. Akhtar, ”Microwave Measurement Techniques Using High Sensitivity Planar RF Sensors
+     for Biomedical Applications,” IEEE Instrumentation and Measurement Magazine,vol. 28, no. 8, pp. 20-30, November 2025
+
+  3. A. O. Gonzalez, S. Rauf, A. Banerjee and A. Shamim, ”Highly Selective IL-6 Detection Through a Microwave Sensor for Sepsis
+     Severity Evaluation,” IEEE Sensors Journal, vol. 25, no. 22, pp. 41096-41104, 15 Nov.15, 2025
+
+  4. Firas Fatani, Sakandar Rauf, Apala Banerjee, and Atif Shamim, ”Breaking the Specificity Barrier in Microwave Sensing: Highly
+     Specific Lactate Microwave Biosensor for Fitness and Exercise Optimization,” ACS Sensors Article ASAP DOI: 10.1021/acssen-
+     sors.5c00470
+
+  5. A. Banerjee, N. K. Tiwari, F. Fatima and M. J. Akhtar, ”An Improved Microwave Sensor for Qualitative Assessment of Recycled
+    Cooking Oils,” IEEE Transactions on Instrumentation and Measurement, vol. 72, pp. 1-14, 2023, Art no. 8005714
+
+  6. A. Banerjee, F. Fatima, N. K. Tiwari and M. J. Akhtar (2023) Flexible printed electrically small microwave resonator for
+    automated displacement tracking, Journal of Electromagnetic Waves and Applications, 37:17, 1409-1424
+
+  7. A. Banerjee, M. J. Akhtar. Design of slot radiating RF planar sensor for homogeneity check of dielectric discontinuity. Microw
+    Opt Technol Lett. 2023; 65: 2238-2245
+
+8. A. Banerjee, P. Azad and M. J. Akhtar, ”Detection of Sodium Ion Imbalance in Human Body Fluids Using an Improved RF
+     Sensor,” in IEEE Journal of Electromagnetics, RF and Microwaves in Medicine and Biology, vol. 7, no. 1, pp. 73-81, March 2023
+
+  9. S. Seth, A. Banerjee, N. K. Tiwari and M. Jaleel Akhtar (2021) Frequency controlled intelligent standalone RF sensor system
+     for dispersive material testing, Journal of Electromagnetic Waves and Applications, 35:12, 1619-1636
+
+ 10. A. Banerjee, A. Kumar, N. K. Tiwari and M. J. Akhtar, ”Design of Bridge Type C-Band Planar RF Sensor for Detection of
+     Solute Concentration Level in Water,” in IEEE Sensors Journal, vol. 21, no. 20, pp. 22670-22678, 15 Oct.15, 2021
+
+ 11. S.Seth, A. Banerjee, N. K. Tiwari and M. J. Akhtar; Artificial neural network-based standalone tunable RF sensor system.
+    Rev. Sci. Instrum. 1 July 2021; 92 (7): 075003
+
+ 12. A. Banerjee Bhowmick, A. Banerjee, A. R. Pandey, A. Yadav, P. Pallye and A. Acharyya (2016) Impact Ionization Rate of
+     Electrons in Monolayer Graphene Nanoribbons, IETE Journal of Research, 62:5, 645-653
+
+ 13. Acharyya, A., Chatterjee, S., Das, A.Banerjee et al.  Additional confirmation of a generalized analytical model based on
+     multistage scattering phenomena to evaluate the ionization rates of charge carriers in semiconductors. J Comput Electron 15,
+    34–39 (2016)
+
+Book Chapter
+
+  1. A. Banerjee, A. Das, S. Chatterjee, S. Chakraborty, and A. Acharyya, ”Evaluation of ionization rates of charge carriers in a
+    semiconductor via a generalized analytical model based on multistage scattering phenomena—part II: Type-IIb diamond and
+    6H-SiC,” in Foundations and Frontiers in Computer, Communication and Electrical Engineering, 1st ed. CRC Press, 2016, p. 4.
+    eBook ISBN: 9780429225802
+
+  2. A. Banerjee, S. Chatterjee, A. Das, S. Chakraborty, and A. Acharyya, ”Evaluation of ionization rates of charge carriers
+     in a semiconductor via a generalized analytical model based on multistage scattering phenomena—part I: Wurtzite-GaN,” in
+    Foundations and Frontiers in Computer, Communication and Electrical Engineering, 1st ed. CRC Press, 2016, p.  4. eBook
+    ISBN: 9780429225802
+
+  3. Banerjee, A. (2021). Development of an Active MMIC Frequency Tripler System in a Sub-millimeter to Terahertz RegionRe-
+     ceiver for Planetary Observation. In: Acharyya, A., Das, P. (eds) Advanced Materials for Future Terahertz Devices, Circuits and
+    Systems. Lecture Notes in Electrical Engineering, vol 727. Springer, Singapore.
+
+Conferences
+
+  1. A. Banerjee, P. Tzourmpakis, F. Fatani and A. Shamim, ”Design and Implementation of a Microwave CSRR Sensor for CO2
+    Gas Detection in Ambient Air,” IEEE IMAS 2025, Nairobi, Kenya
+
+  2. S. Balasubramanian, A. Banerjee, M. Vaseem and A. Shamim, ”An ISM Band Flexible Printed Rectenna for Wearable Appli-
+     cations,” 2025 IEEE Microwaves, Antennas, and Propagation Conference (MAPCON), Kochi, India, 2025, pp. 1-4
+
+  3. F. Fatani, S. Rauf, A. Banerjee and A. Shamim, ”Microwaves Meets Enzymes: A Flexible, Screen-Printed Biosensor for Specific
+    Lactate Detection,” 2025 IEEE SENSORS, Vancouver, BC, Canada, 2025, pp. 1-4
+
+  4. R. Mohamed, A. Banerjee,F.Fatani, S. Rauf and A. Shamim, ”Multi-Radial Slotted RF Resonator for Hydrogen Peroxide
+    Concentration Sensing,”IEEE IMAS 2025, Nairobi, Kenya
+
+  5. A. Banerjee, M. J. Akhtar and A. Shamim, ”High Q Microwave Bent-microstrip Sensor for Interface Detection in Immiscible
+     Solutions,” IEEE AP-S/URSI 2025, Ottawa, Canada
+
+  6. A. Banerjee, and M. J. Akhtar, ”Electromagnetic Analysis of a Flexible Spilt Ring Microwave Sensor for Rotation and Dis-
+    placement Measurement,” 2025 PhotonIcs and Electromagnetics Research Symposium (PIERS), Abu Dhabi, UAE (Accepted)
+
+  7. A. Banerjee, A. Kumari and M. J. Akhtar, ”Chipless RFID Tag using a Quad Bridge Complimentary Split Ring Resonator,”
+    2024 IEEE Applied Sensing Conference (APSCON), Goa, India, 2024, pp. 1-4.
+
+  8. D. Banerjee, A. Banerjee and M. J. Akhtar, ”A Novel Interference-Based Approach for Harmonic Suppression in Microwave
+    Frequency Doublers,” 2023 IEEE Microwaves, Antennas, and Propagation Conference (MAPCON), Ahmedabad, India, 2023, pp.
+     1-5.
+
+  9. A. Banerjee, N. K. Tiwari and M. J. Akhtar, ”Complementary Radially Shaped Split Resonator Structure for Quality Assessment
+     of Cooking Oils,” 2023 IEEE Microwaves, Antennas, and Propagation Conference (MAPCON), Ahmedabad, India, 2023, pp. 1-5
+
+10. A. Banerjee, D. Banerjee, A. Kumar and M. J. Akhtar, ”Microwave Active Resonator for High Resolution Sensing Applications,”
+    2023 IEEE Microwaves, Antennas, and Propagation Conference (MAPCON), Ahmedabad, India, 2023, pp. 1-5.
+
+ 11. A. Banerjee, P. Azad and M. J. Akhtar, ”Design of Spoke Type CSRR based RF Sensor for Non-Destructive Quality Evaluation
+     of Wood,” 2023 IEEE/MTT-S International Microwave Symposium - IMS 2023, San Diego, CA, USA, 2023, pp. 955-958
+
+ 12. A. Banerjee, A. Kumar, N. K. Tiwari and M. J. Akhtar, ”Design of Slotted Microwave Sensor for Evaluation of Water Quality,”
+    2022 IEEE Microwaves, Antennas, and Propagation Conference (MAPCON), Bangalore, India, 2022, pp. 331-335
+
+ 13. A. Banerjee, S. Paul, N. K. Tiwari and M. J. Akhtar, ”An Improved RF Sensor to Determine Solute Concentration Level in
+    Simulated Body Fluids,” 2022 IEEE MTT-S International Microwave Biomedical Conference (IMBioC), Suzhou, China, 2022,
+    pp. 283-285
+
+ 14. A. Banerjee, S. Paul and M. J. Akhtar, ”Wireless CSRR based sensing system for Sensitivity Evaluation of Dielectric Materials
+     in Nearfield ISM-Band,” 2021 IEEE MTT-S International Microwave and RF Conference (IMARC), KANPUR, India, 2021, pp.
+     1-4
+
+ 15. S. Paul, A. Banerjee, V. S. Bhadouria and M. J. Akhtar, ”Investigation of Corrosion in Steel Reinforced Concrete Structure
+     using Directive ZIM based Yagi Antenna and SAR Technique,” 2021 IEEE MTT-S International Microwave and RF Conference
+    (IMARC), KANPUR, India, 2021, pp. 1-4
+
+Certification Courses
+
+ •  Microfluidics (Grade A), Saveetha Engineering College, Centre for Micro Nano Design and Fabrication.
+ • Metamaterial and its Applications, International workshop by IEEE Delhi Section, APS Chapter, Jaipur and IEEE Ra-
+    jasthan subsection.
+
+Technical Skills
+
+ • Programming Languages: MATLAB.
+ • Software: ADS, Altium Designer, CST-Microwave Studio, COMSOL Multiphysics, HFSS, Origin Pro.
+
+Courses Taught
+
+ • Introduction to Electronics ESC 201 IIT Kanpur .
+ • Monolithic Microwave Integrated Circuits, IIT Kanpur .
+ • Electromagnetic Interference and Compliance, IIT Kanpur .
+MS/PHD Mentored
+
+ • M.Tech Mentored: Neha Viltoria, IIT Kanpur, 2021 thesis titled ”Design of Single band Split Ring Resonator loaded
+    with IDC and Meandered Line for characterization of Magneto-dielectric materials” .
+ • M.Tech Mentored: Debabrata Banerjee, IIT Kanpur, 2023 thesis titled ” Design of Active Frequency Multiplier for
+    Receiver Technology”
+ • M.Tech Mentored: Andres Ortega Gonzalez, KAUST, Saudi Arabia, 2024 thesis titled ” Label-free Microwave Res-
+    onator based Biosensor for Sepsis Severity Level Detection ”
+ • PhD mentored: Firas Fatani, KAUST, Saudi Arabia, (ongoing).
+
+Positions of Responsibility
+
+ • IEEE APS YP Ambassador 2026
+ • Subcommittee member of IEEE MTT-S Education Committee
+ • Secretary Subcommittee member of IEEE APS Wireless Communications
+ • Reviewer of IEEE T-MTT, Scientific Reports, IEEE TIM, IEEE Sensor’s Journal, IEEE JERM, MOTL and Sadhana
+ • Women in Microwaves (WiM), IEEE Region 10-Asia Pacific
+ • Chair, IEEE MTT-S UP Section-IIT Kanpur
+ • Member, Women in Sensors-IEEE Sensor’s Council
+ • Member-IEEE Young Professional
+ • Women in Microwaves WiE at IEEE MTT-S (IMaRC)-2021-jointly organized by IIT Kanpur and IIT Roorkee
+ • Lead Volunteer and coordinator in the International RF and Microwave Conference (IMaRC)-2021-
+ • Representative Of Department PostGraduate Committee (DPGC)- IIT Kanpur
+
+• Course Tutor-IIT Kanpur
+ • Teaching Assistant-IIT Kanpur
+ • Secretary, IEEE MTT-S UP Section-IIT Kanpur
+ • PG Manger-Research, Academic an Career Council(AnC)-IIT Kanpur
+
+Relevant Courses and Research Areas
+
+RF and Microwaves                            MMIC
+EM Theory                                               Microwave Circuits
+ EMI/EMC                                        Sub-mm Receiver System
+RF Sensors                                                Semi-Conductor Physics

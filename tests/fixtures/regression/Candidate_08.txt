@@ -1,0 +1,345 @@
+Prabhat Dansena
+# p.dansena23@gmail.com
+\ Prabhat Dansena
+
+Research Profile
+
+   ]  Researcher in Artificial Intelligence and Computer Vision with expertise in Document Intelligence
+       and Image Forensics. Recipient of externally funded research projects from TIH IIT Bhilai and ICSSR.
+        Published in SCI journals including IEEE Access, Scientific Reports, Multimedia Tools and Applica-
+          tions, Applied Soft Computing, Signal Image and Video Processing, and IET Image Processing.
+
+Research Highlights
+
+              Journal Articles   ]   13 (11 SCI + 1 ESCI + 1 Scopus)
+Journal Articles under Review   ]  9
+     Conference Publications   ]  26
+           Book Chapters   ]   3
+           Research Funding   ]  INR 38.95 Lakhs (Co-PI)
+           Ph.D. Supervision   ]   1 Awarded, 3 Ongoing
+            Research Impact   ]   231 Citations, h-index: 9, i10-index: 8
+
+Academic Appointments
+
+2023 – Till Date   ]  Assistant Professor C. V. Raman Global University, Bhubaneswar.
+
+    2022 – 2023   ]  Assistant Professor ITER, SOA Bhubaneswar.
+
+Education
+
+2015 – 2022   ]  Ph.D. Computer Science and Engineering
+                   Indian Institute of Technology (Indian School of Mines) Dhanbad, Jharkhand, India.
+                   Thesis title: Developing Ink Discrimination based Methods for Handwritten Document Foren-
+                           sics.
+
+ 2013 – 2015   ]  M.Tech. Information Technology
+                   University of Hyderabad, Telangana, India.
+               CGPA: 7.68 on scale of 10.
+                   Thesis title: Automatic Extraction of Important Regions and Verification of Security Features
+                     in Cheque Images.
+
+2008 – 2012   ]  B.Tech. Computer Science and Engineering
+               CGPA: 7.89 on scale of 10.
+                   Chhattisgarh Swami Vivekanand Technical University, Chhattisgarh, India.
+
+Research Interests
+
+   ]   Artificial Intelligence, Computer Vision, Deep Learning, Document Intelligence, Document Image
+         Analysis and Forensics, Image Enhancement and Restoration, Pattern Recognition, Machine Learn-
+          ing, Digital Image Processing, FinTech Applications of AI etc.
+
+Research Funding
+
+2025 – 2027   ]   Title: Design and Development of a Deep Learning Assisted Smart Phone based
+                 Application Towards the Automated Cheque Clearing Process in Banking System
+                Funded by: TIH IIT Bhilai (NMICPS)
+                  Sanctioned Amount: 27,95,680
+                    Role: Co-PI
+
+2026 – 2027   ]   Title: Bridging the Digital Divide: How Adaptability to Online Learning Platforms
+                Transforms Higher Education in Underserved Regions
+                Funded by: ICSSR
+                  Sanctioned Amount: 11,00,000
+                    Role: Co-PI
+
+Research Student Supervision (Ph.D.)
+
+Awarded: 2025   ]   Title: Enhancing Camouflaged Object Detection Algorithms from Preprocess-
+                    ing to Optimized Object Segmentation and Detection
+                  Name: Dr. Isha Padhy (19080014), C. V. Raman Global University, Bhubaneswar
+                       Role: Guide (Jointly with Dr. Sampa Sahu, Associate Professor C. V. Raman Global
+                       University)
+    Ongoing   ]   Title: Suspicious Behavior Detection in Video Surveillance Systems
+                  Name:  Mr.  Manas Ranjan Mishra (18080007), C. V. Raman Global University,
+                   Bhubaneswar
+                       Role: Guide
+    Ongoing   ]   Title: Handwritten Document Image Processing
+                  Name: Mr. Shailesh Kumar (24DP0288), IIT ISM Dhanbad
+                       Role: Co-Guide (Jointly with Dr. Soumen Bag, Associate Professor IIT ISM Dhanbad).
+    Ongoing   ]   Title: Devising Strategist for Handwritten Document Image Processing and Al-
+                     teration Detection
+                  Name: Mr. Om Prakash (26DR0214), IIT ISM Dhanbad
+                       Role: Co-Guide (Jointly with Dr. Soumen Bag, Associate Professor IIT ISM Dhanbad).
+
+Workshop Organized
+
+December 2025   ]  Handwritten Document Forensics: Challenges, Advances, and Applications
+                    (HDF-2025) in conjunction with Indian Conference on Computer Vision,
+                   Graphics and Image Processing (ICVGIP 2025)
+                     AT: IIT Mandi
+                        https://sites.google.com/cgu-odisha.ac.in/whdf/
+
+Research Publications
+
+Journal Articles
+
+  1    Gupta, R., Wagh, M. P., Dansena, P., & Saikia, M. J. (2026). Multilingual Signature Verification System
+     Using Handcrafted Features Infused VGG-16 Model. Signal, Image and Video Processing. Accepted.
+
+ 2    Mishra, M. R., Dansena, P., & Meher, P. K. (2026). An Efficient Low-Complexity Deep Learning Model
+      for Low-Light Human Action Recognition using IoT Devices. Internet Technology Letters. Accepted.
+
+ 3    Yadav, D., Dwivedi, A., Lu, X., Vishwakarma, C. B., Jing, D., Dansena, P., & Kumar, R. R. (2026). A Sys-
+      tematic Multi-Criteria Framework for Selecting Hydrogen Production Methods. International Journal
+      of Green Energy, 23(8), 1691–1708. Retrieved from   https://doi.org/10.1080/15435075.2026.2626404
+
+ 4   Mahala, A., Ranjan, A., Priyadarshini, R.,Vikram, R.,&Dansena, P. (2025).Afast(CNN+MCWS-transformer)
+     based Architecture for Protein Function Prediction. Statistical Applications in Genetics and Molecular
+      Biology, 24(1), 20240027. Retrieved from   https://doi.org/10.1515/sagmb-2024-0027
+
+ 5    Padhy, I., Dansena, P., Sahoo, S., & Priyadarshi, R. (2025). An Efficient Camouflaged Image Segmentation
+     with Modified U-Net and Attention Techniques. Scientific Reports, 15(1), 21086. Retrieved from   https:
+     //doi.org/10.1038/s41598-025-07571-9
+
+ 6    Yadav, D., Lu, X., Dansena, P., & Jing, D. (2025). Numerical Analysis of a Helical Spiral Microevaporator-
+     Microreformer System for Enhanced Methanol Conversion and Hydrogen Production. Chemical En-
+      gineering and Processing-Process Intensification, 209, 110149. Retrieved from   https://doi.org/10.
+     1016/j.cep.2024.110149
+
+ 7    Yadav, S., Saha, S. K., Kar, R., & Dansena, P. (2025). Evolutionary Optimization-Based Descendent Adap-
+       tive Filter for Noise Confiscation in Electrocardiogram Signals. Physical and Engineering Sciences in
+      Medicine, 1–23. Retrieved from   https://doi.org/10.1007/s13246-025-01631-0
+
+ 8   Dansena, P., Bag, S., & Pal, R. (2022). Pen Ink Discrimination in Handwritten Documents using Statistical
+     and Motif Texture Analysis: A Classification based Approach. Multimedia Tools and Applications, 81(21),
+      30881–30909. Retrieved from   https://doi.org/10.1007/s11042-022-12843-x
+
+ 9    Kiran, R., Dansena, P., Salehi, S., & Rajak, V. K. (2022). Application of Machine Learning and Well Log
+      Attributes in Geothermal Drilling. Geothermics, 101, 102355. Retrieved from   https://doi.org/10.
+     1016/j.geothermics.2022.102355
+
+ 10   Dansena, P., Bag, S., & Pal, R. (2021). Generation of Synthetic Data for Handwritten Word Alteration
+      Detection. IEEE Access, 9, 38979–38990. Retrieved from   https://doi.org/10.1109/ACCESS.2021.
+     3059342
+
+ 11   Pradhan,  J., Pal, A. K., Banka, H., & Dansena, P. (2021). Fusion of Region based Extracted Features
+      for Instance-and Class-based CBIR Applications. Applied Soft Computing, 102, 107063. Retrieved from
+        https://doi.org/10.1016/j.asoc.2020.107063
+
+ 12   Dansena, P., Pal, R., & Bag, S. (2020). Quantitative Assessment of Capabilities of Colour Models for Pen
+     Ink Discrimination in Handwritten Documents. IET Image Processing, 14(8), 1594–1604. Retrieved from
+        https://doi.org/10.1049/iet-ipr.2018.6616
+
+ 13   Yadav, D., Dansena, P., Ghosh, S. K., & Singh, P. K. (2020). A Unique Multilayer Perceptron Model (ANN)
+      for Different Oxide/EG Nanofluid’s Viscosity from the Experimental Study. Physica A: Statistical Me-
+      chanics and Its Applications, 549, 124030. Retrieved from   https://doi.org/10.1016/j.physa.2019.
+     124030
+
+Conference Proceedings
+
+  1     Jha, B., Dansena, P., Ranjan, A., & Bag, S. (2026). Folded Artifact Removal in Document Images via Light-
+      ness Channel Simulation and Conditional GAN Restoration. In Proceedings of the nternational Con-
+      ference on Intelligent Computing, Cognitive Networks, and Smart Systems (IC2NS2). Accepted.
+
+2   Khonde, S. P., Mishra, G., Dansena, P., Ranjan, A., & Kumari, R. (2026). GL-3DViT: A Global-Local
+     Feature Fusion based Hybrid Network for Hyperspectral Land Cover Classification. In Proceedings of
+     the International Joint Conference on Knowledge Discovery, Knowledge Engineering and Knowledge
+    Management. Accepted.
+
+3   Kumar, N., Mishra, G., & Dansena, P. (2026). Superpixel-Enhanced SC-U-Net for Skin Lesion Segmen-
+      tation. In Proceedings of the nternational Conference on Intelligent Computing, Cognitive Networks,
+    and Smart Systems (IC2NS2). Accepted.
+
+4    Panigrahi, S., Das Adhikary, D. R., Jena, P. P., Dash, A., & Dansena, P. (2026). Channel Attention-Infused
+    DenseNet for Multi-Class Brain MRI Analysis. In Proceedings of the International Conference on In-
+      telligent Computing, Cognitive Networks, and Smart Systems (IC2NS2). Accepted.
+
+ 5    Paul, R., Bangrawa, S., Dansena, P., & Kiran, R. (2026). Physics-Informed Attention Networks for Flow
+     in Digital Porous Media. In Proceedings of the International Conference on Intelligent Computing,
+     Cognitive Networks, and Smart Systems (IC2NS2). Accepted.
+
+6    Ranjan, A., Dansena, P., Bag, S., & Tripathi, P. C. (2026). γ-Correction + ZeroDCE-PCE: A Text Aware
+     Zero-Reference Approach for Low-Light Cheque Image Enhancement. In Proceedings of the Interna-
+     tional Conference on Pattern Recognition Applications and Methods (ICPRAM). Accepted, Springer.
+
+ 7   Dansena, P., Ranjan, A., Bag, S., & Tripathi, P. C. (2025). A Zero-Reference Approach Employing γ-
+     Correction + Dilated-ZeroDCE++ for Handwritten Cheque Image Enhancement. In Proceedings of the
+     International Conference on Pattern Recognition Applications and Methods (ICPRAM).    doi:10 .
+     5220/0014489900004067
+
+8   Dansena, P., Sinha, A., Bag, S., & Sarkar, K. (2025). Writer Authentication using Different Structural and
+     Geometrical Features: An Application Towards Handwritten Document Forensics. In Proceedings of the
+     Indian Conference on Computer Vision, Graphics and Image Processing ICVGIP 2025 Workshop HDF.
+     Accepted.
+
+9   Mahala, A., Ranjan, A., Dansena, P., & Kumar, G. (2025). A Zero-Reference-Based He + Deep Enhance-
+    ment Approach for Low-Light Images. In Proceedings of the International Conference on Microwave,
+     Optical, and Communication Engineering (ICMOCE-2025). Accepted and Presented.
+
+10   Mahala, A., Ranjan, A., Priyadarshini, R., Dansena, P., & Bharadwaj, K. (2025). LiteSeqCNN + Multi-
+     attention-Based Framework for Protein Function Prediction. In Proceedings of the International Con-
+     ference on Power Engineering and Intelligent Systems (PEIS).   doi:10.1007/978-981-96-9716-8_48
+
+11   Moolchandani, S., Mishra, G., & Dansena, P. (2025). Hybrid Residual 3D CNN with Focal Loss for Hy-
+     perspectral Image Classification. In International Conference on Pattern Recognition and Machine In-
+      telligence (pp. 403–411). Springer. Retrieved from   https://doi.org/10.1007/978-3-032-18477-1_43
+
+12    Panigrahi, S., Adhikary, D. R. D., Mishra, G., Dansena, P., & Vikram, R. (2025). ConvFormer: A Hybrid
+    CNN-Transformer Architecture for Efficient Brain Tumor Recognition in MRI Scans. In Proceedings
+      of the International Conference on Cognitive, Green and Ubiquitous Computing (IC-CGU) (pp. 1–6).
+     IEEE. Retrieved from   https://doi.org/10.1109/IC-CGU67042.2025.11337989
+
+13   Rath, S., Ranjan, A., Panda, G., Dansena, P., & Mahala, A. (2025). An Adaptive (γ-Correction + Deep
+     Learning)-Based Zero-Reference Approach for Low-Light Images. In Proceedings of the IC-CGU Con-
+      ference. Retrieved from   https://doi.org/10.1109/IC-CGU67042.2025.11338095
+
+14   Reddy, V. M., Wali, S., Vurubindi, P., Dansena, P., & Uyyala, R. (2025). Summarizing News Articles Using
+      Artificial Intelligence and Machine Learning. In Proceedings of the International Conference on Cogni-
+      tive, Green and Ubiquitous Computing (IC-CGU) (pp. 1–5). IEEE. Retrieved from   https://doi.org/
+     10.1109/IC-CGU67042.2025.11338128
+
+15   Uyyala, R., Baig, M. I., Reddy, R. R., & Dansena, P. (2025). Kidney Stone Detection Using Deep Learning
+     Techniques. In Proceedings of the International Conference on Cognitive, Green and Ubiquitous Com-
+
+puting (IC-CGU) (pp. 1–6). IEEE. Retrieved from   https://doi.org/10.1109/IC-CGU67042.2025.
+     11338047
+
+16   Uyyala, R., Sajid, M., Madhav, V., & Dansena, P. (2025). AI-Based Terminal Assistant: Code Generator,
+     Summarizer & Smart-Debugger using RAG, FAISS Vector Retrieval, and Large Language Models. In Pro-
+     ceedings of the International Conference on Cognitive, Green and Ubiquitous Computing (IC-CGU)
+      (pp. 1–5). IEEE. Retrieved from   https://doi.org/10.1109/ic-cgu67042.2025.11338012
+
+17   Mahala, A., Ranjan, A., Priyadarshini, R., Dansena, P., & Tripathi, P. C. (2024). A Weighted Deep Learning
+     Approach to Identify Nucleic Acid-Binding Proteins. In Proceedings of the International Conference on
+     Computational Intelligence (pp. 219–230).   doi:10.1007/978-981-96-4539-8_15
+
+18   Uyyala, R., Ramu, S. C., Reddy, R. R., & Dansena, P. (2024). Rhombus Context Based Gradient Estima-
+      tion for Information Retrieval Using Digital Media. In Proceedings of the International Conference on
+     Leveraging Emerging Technologies and Analytics for Development (pp. 83–101).   doi:10.1007/978-
+     981-96-2548-2_4
+
+19   Dansena, P., Pramanik, R., Bag, S., & Pal, R. (2019). Ink Analysis using CNN-based Transfer Learning to
+     Detect Alteration in Handwritten Words. In Proceedings of the International Conference on Computer
+     Vision and Image Processing (CVIP-2019) (pp. 223–232). Springer. Retrieved from   https://doi.org/
+     10.1007/978-981-15-4018-9_21
+
+20   Naruka, D. S., Singh, P. K., Dansena, P., & Patel, H. (2018). Thermal Conductivity of CuO Nano Fluid
+     Using Artificial Neural Network. In Proceedings of the Proceedings of International Conference on
+     Mechanical Engineering (INCOM-2018).
+
+21   Pramanik, R., Dansena, P., & Bag, S. (2018). A Study on the Effect of CNN-based Transfer Learning
+    on Handwritten Indic and Mixed Numeral Recognition. In Proceedings of the Workshop on Document
+     Analysis and Recognition (pp. 41–51). Springer. Retrieved from   https://doi.org/10.1007/978-981-
+     13-9361-7_4
+
+22   Wadhwa, A., Maheshwari, M., Dansena, P., & Bag, S. (2018). Geometrical and Structural Features for
+     Forensics in Handwritten Bank Cheques. In Proceedings of the IEEE India Council International Con-
+     ference (INDICON) (pp. 1–6). IEEE. Retrieved from   https://doi.org/10.1109/INDICON45594.2018.
+     8987116
+
+23   Dansena, P., Bag, S., & Pal, R. (2017). Differentiating Pen Inks in Handwritten Bank Cheques using Multi-
+      layer Perceptron. In Proceedings of the International Conference on Pattern Recognition and Machine
+      Intelligence (PReMI-2017) (pp. 655–663). Springer. Retrieved from   https://doi.org/10.1007/978-3-
+     319-69900-4_83
+
+24   Naruka, D. S., Singh, P. K., Dansena, P., & Patel, H. (2017). Experimental Evaluation and ANN Modeling
+      of Thermal Conductivity of Al2O3 Nanoparticles Dispersed in Different Base Fluids. In Proceedings of
+     the International ISHMT-ASTFE Heat and Mass Transfer Conference (IHMTC-2017). Begel House Inc.
+     Retrieved from   https://doi.org/10.1615/IHMTC-2017.2230
+
+25   Dansena, P., Kumar, K. P., & Pal, R. (2015). Line Based Extraction of Important Regions from a Cheque
+     Image. In Proceedings of the International Conference on Contemporary Computing (IC3-2015) (pp. 183–
+       189). IEEE. Retrieved from   https://doi.org/10.1109/IC3.2015.7346676
+
+26   Pandey, S. K., Yadav, V. K., Kumar, S., Verma, S., & Dansena, P. (2014). Implementation of a New Frame-
+    work for Automated Network Security Checking and Alert System. In Proceedings of the International
+     Conference on Wireless and Optical Communications Networks (WOCN) (pp. 1–7). IEEE. Retrieved
+     from   https://doi.org/10.1109/WOCN.2014.6923089
+
+Books and Chapters
+
+ 1    Adhikary, D. R. D., Dansena, P., Yadav, D., Kumar, A., & Tripathy, L. (2026). Role of Digital Agriculture
+      in Shaping the Future of Farming: A Social Network Analytics Approach. In Social Network Analytics:
+
+Empowering Data Engineering with Deep Learning and Large Language Models. CRC Press. Retrieved
+     from   https://www.routledge.com/Social-Network-Analytics-Empowering-Data-Engineering-
+     with-Deep-Learning-and-Large-Language-Models/Roy-Tripathy-Kumar-Wu/p/book/9781041006909
+
+ 2    Dash, R., Dansena, P., Tripathi, P. C., & Ranjan, A. (2025). Pen Ink Analysis in Handwritten Document
+      Forensics: Classification and Current Trends. In Advanced Techniques for Anomaly Detection (pp. 159–
+        184). CRC Press. Retrieved from   https://doi.org/10.1201/9781003463559-6
+
+ 3     Saif, M., Kiran, R., Dansena, P., & Tripathi, P. C. (2025). Anomaly Detection in Carbon Sequestration: Ad-
+      vancements, Challenges, and Future Directions. In Advanced Techniques for Anomaly Detection (pp. 1–
+        33). CRC Press. Retrieved from   https://doi.org/10.1201/9781003463559-1
+
+Achievements
+
+Professional Recognition
+
+           2013   ]  Qualified GATE 2013 with all India rank 1714.
+
+            2015   ]  Qualified CG-SET in March-2018 for Eligibility of Assistant Professor.
+
+Award
+
+            ]  PReMI’17-Springer Student Award on December, 2017.
+
+Summer School/Workshop Grants
+
+           2013   ]  IDRBT. IDRBT Participation Grant to attend the International Workshop on Quan-
+                            titative Finance, Symbiosis School of Banking and Finance (SSBF), Pune, India, De-
+                    cember 21-24, 2013.
+
+           2021   ]  SSDA Fee waiver. IAPR Summer School on Document Analysis: Document Infor-
+                        matics, Lulea Tekniska Universitet, Lulea, Sweden, August 23-27, 2021.
+
+Scholarship/Fellowship
+
+  During Ph.D.   ]  MHRD, Govt. of India scholarship.
+
+During M.tech.   ]  MHRD, Govt. of India scholarship.
+
+Editorial Work
+
+        1. Editorial Board Member Scientific Reports.
+
+       2. Editorial Board Member Scientific Reviews.
+
+Review Work
+
+    IEEE Access, Computer Methods and Programs in Biomedicine Updates, IET Image Processing, Applied
+     Soft Computing, Multimedia Tools and Applications.
+
+References
+
+Prof. Soumen Bag
+Department of Computer Science and Engineering
+Indian Institute of Technology (Indian School of Mines) Dhanbad, India
+Email: soumen@iitism.ac.in
+
+Prof. Rajarshi Pal
+Head - InfoSec GRC Team, Bandhan Bank
+(previously Assistant Professor (Centre of Excellence in Cyber Security) at Institute of Development and
+Research in Banking Technology (IDRBT), Hyderabad, India)
+Email: iamrajarshi@gmail.com
+
+Prof. Pramod Kumar Meher
+Department of Computer Science and Engineering
+C. V. Raman Global University, Bhubaneswar, India
+(Retired Professor, Utkal University, Bhubaneswar, India)
+E-mail: pkmeher@gmail.com
+Prof. Raj Kiran
+Department of Petroleum Engineering
+Indian Institute of Technology (Indian School of Mines) Dhanbad, India
+E-mail: rajkiran@iitism.ac.in
